@@ -1,0 +1,17 @@
+{
+  "name": "@fuyeor/markdown-parser-benchmark",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@fuyeor/markdown-parser": "workspace:*",
+    "markdown-it": "^14.0.2",
+    "mitata": "^0.1.11"
+  },
+  "scripts": {
+     "bench:speed": "tsx speed.ts",
+    "bench:memory": "node --expose-gc --import tsx memory.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "markdown": "--Fuyeor--",
+    "html": "<del>Fuyeor</del>",
+    "example": 1,
+    "section": "Del"
+  },
+  {
+    "markdown": "__Fuyeor__",
+    "html": "<u>__Fuyeor__</u>",
+    "example": 1,
+    "section": "Underline"
+  }
+]

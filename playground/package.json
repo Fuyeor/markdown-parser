@@ -1,0 +1,23 @@
+{
+  "name": "@fuyeor/markdown-parser-playground",
+  "license": "MIT",
+  "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
+  "type": "module",
+  "main": "./src/index.ts",
+  "sideEffects": false,
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "vite dev"
+  },
+  "dependencies": {
+    "@fuyeor/markdown-parser": "workspace:*",
+    "lit": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.1"
+  }
+}
