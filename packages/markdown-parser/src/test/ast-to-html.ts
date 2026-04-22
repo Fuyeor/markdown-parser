@@ -1,5 +1,5 @@
 // @fuyeor/markdown-parser/test/ast-to-html.ts
-import type { ASTNode } from '../src/types';
+import type { ASTNode } from '#/types';
 
 /**
  * This is a simple escape function used to render an AST into an HTML string

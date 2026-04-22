@@ -23,11 +23,19 @@ const INLINE_MARKERS = new Set([
   // --strike-- (<del>)
   '-',
 ]);
-const LINKIFY_REGEX = /(https?:\/\/[^\s]+|www\.[^\s]+)/gv;
+const LINKIFY_REGEX = /(https?:\/\/[^\s]+|(?<![@\w])(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?)/gv;
 
 export class MarkdownParser {
   #blockRules: BlockRule[] = [];
   #inlineRules: InlineRule[] = [];
+
+  // construct a context for recursive rule calls
+  readonly #context: ParserContext = {
+    parseInline: (content: string) =>
+      this.#parseInline(new InlineState(content)),
+    parseBlocks: (content: string) =>
+      this.#parseBlocks(new BlockState(content)),
+  };
 
   // register block rule
   // By default, it inserts at the end, or before/after a specified rule.
@@ -69,16 +77,6 @@ export class MarkdownParser {
     };
   }
 
-  // construct a context for recursive rule calls
-  get #context(): ParserContext {
-    return {
-      parseInline: (content: string) =>
-        this.#parseInline(new InlineState(content)),
-      parseBlocks: (content: string) =>
-        this.#parseBlocks(new BlockState(content)),
-    };
-  }
-
   #parseBlocks(state: BlockState): ASTNode[] {
     const nodes: ASTNode[] = [];
     while (state.lineIndex < state.lineCount) {
@@ -110,14 +108,27 @@ export class MarkdownParser {
           const line = state.currentLine;
           if (!line || line.trim() === '') break;
 
-          const isInterrupted = this.#blockRules.some((rule) => {
-            if (['heading', 'hr', 'blockquote', 'list'].includes(rule.name)) {
-              return rule.parse(state, this.#context) !== null;
-            }
-            return false;
-          });
+          // fast-path character preflight
+          const firstChar = line.trimStart().charCodeAt(0);
+          // 35:#, 42:*, 43:+, 45:-, 48-57:0-9, 62:>, 95:_
+          const mayInterrupt =
+            firstChar === 35 ||
+            firstChar === 62 ||
+            firstChar === 45 ||
+            firstChar === 42 ||
+            firstChar === 95 ||
+            firstChar === 43 ||
+            (firstChar >= 48 && firstChar <= 57);
 
-          if (isInterrupted && paragraphLines.length > 0) break;
+          if (mayInterrupt) {
+            const isInterrupted = this.#blockRules.some((rule) => {
+              if (['heading', 'hr', 'blockquote', 'list'].includes(rule.name)) {
+                return rule.parse(state, this.#context) !== null;
+              }
+              return false;
+            });
+            if (isInterrupted && paragraphLines.length > 0) break;
+          }
 
           paragraphLines.push(line);
           state.advance(1);
@@ -167,11 +178,16 @@ export class MarkdownParser {
             }
           }
 
-          const fullUrl = urlStr.startsWith('www.')
-            ? `http://${urlStr}`
-            : urlStr;
+      const fullUrl = urlStr.startsWith('http')
+            ? urlStr
+            : `https://${urlStr}`;
 
-          if (URL.canParse(fullUrl)) {
+          const isValid =
+            fullUrl.startsWith('http://') ||
+            fullUrl.startsWith('https://') ||
+            globalThis.URL.canParse(fullUrl);
+
+          if (isValid) {
             if (matchIdx > lastIdx) {
               nodes.push({
                 type: 'text',
@@ -197,9 +213,19 @@ export class MarkdownParser {
     while (state.pos < state.length) {
       const char = state.currentChar;
 
+      
+      // ``\n` -> hardbreak
+      if (char === '\n') {
+        flushText();
+        nodes.push({ type: 'hardbreak' });
+        state.advance(1);
+        continue;
+      }
+
+
       // escape symbols
       if (char === '\\') {
-        const nextChar = state.peek(2)[1];
+        const nextChar = state.content[state.pos + 1];
         if (nextChar === '\n') {
           flushText();
           nodes.push({ type: 'hardbreak' });
@@ -216,7 +242,7 @@ export class MarkdownParser {
       }
 
       // line break (a line ending with two or more spaces followed by a newline character)
-      if (char === ' ' && state.peek(2) === ' \n') {
+      if (char === ' ' && state.content.startsWith(' \n', state.pos)) {
         flushText();
         nodes.push({ type: 'hardbreak' });
         state.advance(2);

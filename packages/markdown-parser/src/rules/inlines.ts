@@ -8,7 +8,7 @@ import { InlineState } from '#/core/state';
 export const hardBreakRule: InlineRule = {
   name: 'hardbreak',
   parse(state: InlineState) {
-    if (state.currentChar === '\\' && state.peek(2)[1] === '\n') {
+    if (state.currentChar === '\\' && state.content[state.pos + 1] === '\n') {
       return {
         node: { type: 'hardbreak' },
         consumedChars: 2,
@@ -24,7 +24,7 @@ export const hardBreakRule: InlineRule = {
 export const boldRule: InlineRule = {
   name: 'bold',
   parse(state: InlineState, ctx) {
-    if (state.peek(2) !== '**') return null;
+    if (!state.content.startsWith('**', state.pos)) return null;
 
     // find directly for the next **;
     // if not found, treat it as plain text.
@@ -84,7 +84,13 @@ export const linkRule: InlineRule = {
     const innerText = state.content.slice(state.pos + 1, textEnd);
     let url = state.content.slice(textEnd + 2, urlEnd).trim();
 
-    if (!globalThis.URL.canParse(url) && !url.startsWith('/')) {
+    const isValid =
+      url.startsWith('http://') ||
+      url.startsWith('https://') ||
+      url.startsWith('/') ||
+      globalThis.URL.canParse(url);
+
+    if (!isValid) {
       // try verifying as a relative or completed HTTP response
       const testUrl = url.startsWith('www.') ? `http://${url}` : url;
       if (globalThis.URL.canParse(testUrl)) url = testUrl;
@@ -108,7 +114,7 @@ export const linkRule: InlineRule = {
 export const underlineRule: InlineRule = {
   name: 'underline',
   parse(state: InlineState, ctx) {
-    if (state.peek(2) !== '__') return null;
+    if (!state.content.startsWith('__', state.pos)) return null;
 
     const endIdx = state.content.indexOf('__', state.pos + 2);
     if (endIdx === -1) return null;
@@ -129,7 +135,7 @@ export const underlineRule: InlineRule = {
 export const strikeRule: InlineRule = {
   name: 'strike',
   parse(state: InlineState, ctx) {
-    if (state.peek(2) !== '--') return null;
+    if (!state.content.startsWith('--', state.pos)) return null;
 
     const endIdx = state.content.indexOf('--', state.pos + 2);
     if (endIdx === -1) return null;

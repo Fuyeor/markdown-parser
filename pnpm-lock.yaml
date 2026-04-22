@@ -24,11 +24,11 @@ importers:
         specifier: ^4.1.0
         version: 4.1.4(@types/node@25.6.0)(@vitest/coverage-v8@4.1.4)(jsdom@29.0.2)(vite@8.0.9(@types/node@25.6.0)(esbuild@0.27.7)(tsx@4.21.0))
 
-  benchmarks:
+  packages/benchmarks:
     dependencies:
       '@fuyeor/markdown-parser':
         specifier: workspace:*
-        version: link:..
+        version: link:../markdown-parser
       markdown-it:
         specifier: ^14.0.2
         version: 14.1.1
@@ -40,11 +40,26 @@ importers:
         specifier: ^4.21.0
         version: 4.21.0
 
-  playground:
+  packages/markdown-parser:
+    devDependencies:
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.0
+        version: 4.1.4(@types/node@25.6.0)(@vitest/coverage-v8@4.1.4)(jsdom@29.0.2)(vite@8.0.9(@types/node@25.6.0)(esbuild@0.27.7)(tsx@4.21.0))
+
+  packages/playground:
     dependencies:
+      '@fuyeor/locale':
+        specifier: https://github.com/Fuyeor/webroamer.git#path:packages/locale
+        version: https://codeload.github.com/Fuyeor/webroamer/tar.gz/c502f739f4b633ab24386fe9f90fb77ed9f6ca9d#path:packages/locale(@lit-labs/signals@0.2.0)(lit@3.3.2)(signal-polyfill@0.2.2)
       '@fuyeor/markdown-parser':
         specifier: workspace:*
-        version: link:..
+        version: link:../markdown-parser
       lit:
         specifier: ^3.3.2
         version: 3.3.2
@@ -311,6 +326,14 @@ packages:
       '@noble/hashes':
         optional: true
 
+  '@fuyeor/locale@https://codeload.github.com/Fuyeor/webroamer/tar.gz/c502f739f4b633ab24386fe9f90fb77ed9f6ca9d#path:packages/locale':
+    resolution: {path: packages/locale, tarball: https://codeload.github.com/Fuyeor/webroamer/tar.gz/c502f739f4b633ab24386fe9f90fb77ed9f6ca9d}
+    version: 1.0.0
+    peerDependencies:
+      '@lit-labs/signals': '*'
+      lit: '*'
+      signal-polyfill: '*'
+
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
     engines: {node: '>=6.0.0'}
@@ -320,6 +343,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lit-labs/signals@0.2.0':
+    resolution: {integrity: sha512-68plyIbciumbwKaiilhLNyhz4Vg6/+nJwDufG2xxWA9r/fUw58jxLHCAlKs+q1CE5Lmh3cZ3ShyYKnOCebEpVA==}
 
   '@lit-labs/ssr-dom-shim@1.5.1':
     resolution: {integrity: sha512-Aou5UdlSpr5whQe8AA/bZG0jMj96CoJIWbGfZ91qieWu5AWUMKw8VR/pAkQkJYvBNhmCcWnZlyyk5oze8JIqYA==}
@@ -781,6 +807,9 @@ packages:
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
+  signal-polyfill@0.2.2:
+    resolution: {integrity: sha512-p63Y4Er5/eMQ9RHg0M0Y64NlsQKpiu6MDdhBXpyywRuWiPywhJTpKJ1iB5K2hJEbFZ0BnDS7ZkJ+0AfTuL37Rg==}
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -1129,6 +1158,12 @@ snapshots:
 
   '@exodus/bytes@1.15.0': {}
 
+  '@fuyeor/locale@https://codeload.github.com/Fuyeor/webroamer/tar.gz/c502f739f4b633ab24386fe9f90fb77ed9f6ca9d#path:packages/locale(@lit-labs/signals@0.2.0)(lit@3.3.2)(signal-polyfill@0.2.2)':
+    dependencies:
+      '@lit-labs/signals': 0.2.0
+      lit: 3.3.2
+      signal-polyfill: 0.2.2
+
   '@jridgewell/resolve-uri@3.1.2':
     optional: true
 
@@ -1139,6 +1174,11 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
     optional: true
+
+  '@lit-labs/signals@0.2.0':
+    dependencies:
+      lit: 3.3.2
+      signal-polyfill: 0.2.2
 
   '@lit-labs/ssr-dom-shim@1.5.1': {}
 
@@ -1591,6 +1631,8 @@ snapshots:
     optional: true
 
   siginfo@2.0.0: {}
+
+  signal-polyfill@0.2.2: {}
 
   source-map-js@1.2.1: {}
 

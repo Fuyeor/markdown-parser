@@ -1,4 +1,4 @@
-@fuyeor/markdown-parser: A lightweight Markdown parser optimized for loading speed and extensibility. It supports CommonMark standards alongside **Fuyeor Flavored Markdown (FFM)** across various frameworks.
+**@fuyeor/markdown-parser**: A lightweight Markdown parser optimized for loading speed and extensibility. It supports CommonMark standards alongside **Fuyeor Flavored Markdown (FFM)** across various frameworks.
 
 > [!IMPORTANT]
 > By default, `@fuyeor/markdown-parser` does **not** support bolding with `__`, strikethrough with `~~`, or italics with `_italic_`. Image syntax `![]()` is also disabled by default.

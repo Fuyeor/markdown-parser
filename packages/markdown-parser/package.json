@@ -1,5 +1,5 @@
 {
-  "name": "fuyeor-markdown-parser",
+  "name": "@fuyeor/markdown-parser",
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",
@@ -9,14 +9,11 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "format": "prettier --write \"**/*.ts\"",
-    "test": "pnpm -F @fuyeor/markdown-parser test",
-    "playground": "pnpm -F @fuyeor/markdown-parser-playground dev"
+    "test": "vitest run",
+    "build": "vite build"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "jsdom": "^29.0.1",
-    "prettier": "^3.8.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.0"
   }

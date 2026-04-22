@@ -96,14 +96,16 @@ export const tableRule: BlockRule = {
 
     let consumedLines = 2;
     // split header
-    const extractCells = (row: string) =>
-      row
-        .split('|')
-        .filter((s) => s.trim().length > 0)
-        .map((s) => s.trim());
-    const headers = extractCells(line);
-    const rows = [];
+ const extractCells = (row: string) => {
+      const parts = row.split('|');
+      if (parts[0] !== undefined && parts[0].trim() === '') parts.shift();
+      if (parts.length > 0 && parts[parts.length - 1].trim() === '') parts.pop();
+      return parts.map((s) => s.trim());
+    };
 
+        const headers = extractCells(line);
+    const rows = [];
+    
     // scan subsequent lines
     while (state.lineIndex + consumedLines < state.lineCount) {
       const rowLine = state.lines[state.lineIndex + consumedLines];

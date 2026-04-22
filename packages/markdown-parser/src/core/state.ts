@@ -8,8 +8,8 @@ export class BlockState {
     // convert tab at the line beginning to 4 spaces
     this.lines = content
       .replace(/\r\n|\r/g, '\n')
-      .split('\n')
-      .map((l) => l.replace(/^\t/, '    '));
+      .replace(/^[ \t]*\t/gm, '    ')
+      .split('\n');
     this.lineCount = this.lines.length;
   }
 
@@ -40,10 +40,6 @@ export class InlineState {
   get currentChar(): string | null {
     if (this.pos >= this.length) return null;
     return this.content[this.pos];
-  }
-
-  peek(length: number): string {
-    return this.content.slice(this.pos, this.pos + length);
   }
 
   advance(count: number = 1): void {

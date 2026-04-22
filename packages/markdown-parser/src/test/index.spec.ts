@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it, expect, afterAll } from 'vitest';
-import { createFuyeorMarkdownParser } from '../src/default';
+import { createFuyeorMarkdownParser } from '#/default';
 import { astToHtml } from './ast-to-html';
 
 const parse = createFuyeorMarkdownParser();
