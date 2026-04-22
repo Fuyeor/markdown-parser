@@ -11,11 +11,13 @@ import {
 import {
   hardBreakRule,
   inlineCodeRule,
-  boldRule,
   linkRule,
+  boldRule,
   underlineRule,
+  italicRule,
   strikeRule,
 } from './rules/inlines';
+import { ffmBlockRule } from './rules/ffm';
 
 export function createMarkdownParser() {
   return (
@@ -34,6 +36,7 @@ export function createMarkdownParser() {
       .addInlineRule(linkRule)
       .addInlineRule(boldRule)
       .addInlineRule(underlineRule)
+      .addInlineRule(italicRule)
       .addInlineRule(strikeRule)
 
       .build()
@@ -44,6 +47,7 @@ export function createFuyeorMarkdownParser() {
   return (
     new MarkdownParser()
       // block order: Code block -> List -> Title -> Table -> Delete line -> Quote
+      .addBlockRule(ffmBlockRule)
       .addBlockRule(codeBlockRule)
       .addBlockRule(listRule)
       .addBlockRule(headingRule)
@@ -57,6 +61,7 @@ export function createFuyeorMarkdownParser() {
       .addInlineRule(linkRule)
       .addInlineRule(boldRule)
       .addInlineRule(underlineRule)
+      .addInlineRule(italicRule)
       .addInlineRule(strikeRule)
 
       .build()

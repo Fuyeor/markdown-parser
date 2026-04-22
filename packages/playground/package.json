@@ -13,7 +13,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@fuyeor/markdown-parser": "workspace:*",
+    "@fuyeor/markdown-parser-lit": "workspace:*",
     "@fuyeor/locale": "https://github.com/Fuyeor/webroamer.git#path:packages/locale",
     "lit": "^3.3.2"
   },

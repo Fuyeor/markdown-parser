@@ -1,0 +1,19 @@
+{
+  "name": "@fuyeor/markdown-parser-vue",
+  "license": "MIT",
+  "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
+  "type": "module",
+  "main": "./src/index.ts",
+  "sideEffects": false,
+  "dependencies": {
+    "@fuyeor/markdown-parser": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3",
+    "vue": "^3.5.30"
+  }
+}

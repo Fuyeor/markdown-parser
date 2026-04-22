@@ -67,6 +67,8 @@ The playground allows you to view the generated Markdown and AST in real-time.
 ### Run Benchmark:
 
 ```bash
-# pnpm -F @fuyeor/markdown-parser-benchmark bench:speed
-# pnpm -F @fuyeor/markdown-parser-benchmark bench:memory
+# test parsing speed
+pnpm -F @fuyeor/markdown-parser-benchmark bench:speed
+# test memory usage
+pnpm -F @fuyeor/markdown-parser-benchmark bench:memory
 ```

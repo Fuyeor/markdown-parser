@@ -1,13 +1,13 @@
 [
   {
     "markdown": "--Fuyeor--",
-    "html": "<del>Fuyeor</del>",
+    "html": "<p><del>Fuyeor</del></p>",
     "example": 1,
     "section": "Del"
   },
   {
     "markdown": "__Fuyeor__",
-    "html": "<u>__Fuyeor__</u>",
+    "html": "<p><u>Fuyeor</u></p>",
     "example": 1,
     "section": "Underline"
   }

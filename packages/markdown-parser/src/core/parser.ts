@@ -23,7 +23,8 @@ const INLINE_MARKERS = new Set([
   // --strike-- (<del>)
   '-',
 ]);
-const LINKIFY_REGEX = /(https?:\/\/[^\s]+|(?<![@\w])(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?)/gv;
+const LINKIFY_REGEX =
+  /(https?:\/\/[^\s]+|(?<![@\w])(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?)/gv;
 
 export class MarkdownParser {
   #blockRules: BlockRule[] = [];
@@ -110,19 +111,37 @@ export class MarkdownParser {
 
           // fast-path character preflight
           const firstChar = line.trimStart().charCodeAt(0);
-          // 35:#, 42:*, 43:+, 45:-, 48-57:0-9, 62:>, 95:_
           const mayInterrupt =
+            // # for title
             firstChar === 35 ||
-            firstChar === 62 ||
-            firstChar === 45 ||
+            // * for bold and italic
             firstChar === 42 ||
+            // _ for underline
             firstChar === 95 ||
+            // +
             firstChar === 43 ||
-            (firstChar >= 48 && firstChar <= 57);
-
+            // - for bulletin list and strike
+            firstChar === 45 ||
+            // 0-9 for ordered list
+            (firstChar >= 48 && firstChar <= 57) ||
+            // > for inline quote
+            firstChar === 62 ||
+            // ` for code block and inline code
+            firstChar === 96 ||
+            // ~ equals `
+            firstChar === 126;
           if (mayInterrupt) {
             const isInterrupted = this.#blockRules.some((rule) => {
-              if (['heading', 'hr', 'blockquote', 'list'].includes(rule.name)) {
+              if (
+                [
+                  'heading',
+                  'hr',
+                  'blockquote',
+                  'list',
+                  'code_block',
+                  'ffm_blocks',
+                ].includes(rule.name)
+              ) {
                 return rule.parse(state, this.#context) !== null;
               }
               return false;
@@ -178,9 +197,9 @@ export class MarkdownParser {
             }
           }
 
-      const fullUrl = urlStr.startsWith('http')
+          const fullUrl = urlStr.startsWith('http')
             ? urlStr
-            : `https://${urlStr}`;
+            : `http://${urlStr}`;
 
           const isValid =
             fullUrl.startsWith('http://') ||
@@ -213,7 +232,6 @@ export class MarkdownParser {
     while (state.pos < state.length) {
       const char = state.currentChar;
 
-      
       // ``\n` -> hardbreak
       if (char === '\n') {
         flushText();
@@ -221,7 +239,6 @@ export class MarkdownParser {
         state.advance(1);
         continue;
       }
-
 
       // escape symbols
       if (char === '\\') {

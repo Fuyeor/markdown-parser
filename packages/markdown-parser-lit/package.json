@@ -1,0 +1,19 @@
+{
+  "name": "@fuyeor/markdown-parser-lit",
+  "license": "MIT",
+  "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
+  "type": "module",
+  "main": "./src/index.ts",
+  "sideEffects": false,
+  "dependencies": {
+    "@fuyeor/markdown-parser": "workspace:*"
+  },
+  "peerDependencies": {
+    "lit": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3",
+    "lit": "^3.3.2"
+  }
+}

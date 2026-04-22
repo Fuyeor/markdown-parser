@@ -45,6 +45,38 @@ export const boldRule: InlineRule = {
 };
 
 /**
+ * parse *italic* or _italic_ syntax
+ */
+export const italicRule: InlineRule = {
+  name: 'italic',
+  parse(state: InlineState, ctx) {
+    const char = state.currentChar;
+    //  only triggers when it starts with * and
+    // is not immediately followed by the same symbol
+    // (to prevent it from overriding the bold/underline).
+    if (char === '*' && state.content[state.pos + 1] !== char) {
+      // find the next matching closing symbol
+      const endIdx = state.content.indexOf(char, state.pos + 1);
+
+      if (endIdx === -1 || endIdx === state.pos + 1) return null;
+
+      return {
+        node: {
+          type: 'italic',
+          children: ctx.parseInline(state.content.slice(state.pos + 1, endIdx)),
+        },
+        consumedChars: endIdx - state.pos + 1,
+      };
+    }
+    return null;
+  },
+};
+
+// GFM color regex: support 3/4/6/8 HEX and rgb/hsl
+const COLOR_REGEX =
+  /^(?:#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|(?:rgb|hsl)a?\([\d\s,%.]+\))$/;
+
+/**
  * parse `inlineCode` syntax
  */
 export const inlineCodeRule: InlineRule = {
@@ -52,15 +84,55 @@ export const inlineCodeRule: InlineRule = {
   parse(state: InlineState) {
     if (state.currentChar !== '`') return null;
 
-    const endIdx = state.content.indexOf('`', state.pos + 1);
-    if (endIdx === -1) return null;
+    let markerLength = 0;
+    while (state.content[state.pos + markerLength] === '`') {
+      markerLength++;
+    }
+
+    const marker = '`'.repeat(markerLength);
+    let currentPos = state.pos + markerLength;
+    let endIdx = -1;
+
+    while (currentPos < state.length) {
+      const foundIdx = state.content.indexOf(marker, currentPos);
+      if (foundIdx === -1) break;
+
+      if (state.content[foundIdx + markerLength] === '`') {
+        let skipIdx = foundIdx + markerLength;
+        while (state.content[skipIdx] === '`') skipIdx++;
+        currentPos = skipIdx;
+      } else {
+        endIdx = foundIdx;
+        break;
+      }
+    }
+
+    if (endIdx === -1) {
+      return {
+        node: { type: 'text', content: marker },
+        consumedChars: markerLength,
+      };
+    }
+
+    let rawContent = state.content.slice(state.pos + markerLength, endIdx);
+
+    if (
+      rawContent.startsWith(' ') &&
+      rawContent.endsWith(' ') &&
+      rawContent.trim().length > 0
+    ) {
+      rawContent = rawContent.slice(1, -1);
+    }
+
+    // if it is a color, directly change it to a `color_code` node
+    const isColor = COLOR_REGEX.test(rawContent);
 
     return {
       node: {
-        type: 'inline_code',
-        content: state.content.slice(state.pos + 1, endIdx),
+        type: isColor ? 'color_code' : 'inline_code',
+        content: rawContent,
       },
-      consumedChars: endIdx - state.pos + 1,
+      consumedChars: endIdx + markerLength - state.pos,
     };
   },
 };

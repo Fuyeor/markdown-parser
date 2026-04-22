@@ -31,53 +31,59 @@ export const headingRule: BlockRule = {
 export const codeBlockRule: BlockRule = {
   name: 'code_block',
   parse(state: BlockState) {
-    const line = state.currentLine;
-    if (!line) return null;
-
-    // matches 0-3 spaces starting with ``` or ~~~, followed by the info string
-    const match = line.match(/^(\s{0,3})(`{3,}|~{3,})([^`]*)$/);
-    if (!match) return null;
-
-    const indent = match[1].length;
-    const fenceMarker = match[2];
-    const lang = match[3].trim();
-
-    let consumedLines = 1;
-    const contentLines: string[] = [];
-
-    // find downwards for closed ```
-    while (state.lineIndex + consumedLines < state.lineCount) {
-      const nextLine = state.lines[state.lineIndex + consumedLines];
-      consumedLines++;
-
-      const closeMatch = nextLine.match(/^(\s{0,3})(`{3,}|~{3,})\s*$/);
-      // closure conditions: Same symbol, length greater than or equal to the opening flag
-      if (
-        closeMatch &&
-        closeMatch[2][0] === fenceMarker[0] &&
-        closeMatch[2].length >= fenceMarker.length
-      ) {
-        break;
-      }
-
-      // remove indentation
-      if (nextLine.startsWith(' '.repeat(indent))) {
-        contentLines.push(nextLine.slice(indent));
-      } else {
-        contentLines.push(nextLine);
-      }
-    }
+    const block = extractFencedBlock(state);
+    if (!block) return null;
 
     return {
-      node: {
-        type: 'code_block',
-        lang,
-        content: contentLines.join('\n'),
-      },
-      consumedLines,
+      node: { type: 'code_block', lang: block.lang, content: block.content },
+      consumedLines: block.consumedLines,
     };
   },
 };
+
+/**
+ * helper function: extract code block
+ */
+export function extractFencedBlock(state: BlockState) {
+  const line = state.currentLine;
+  if (!line) return null;
+
+  // matches 0-3 spaces starting with ``` or ~~~, followed by the info string
+  const match = line.match(/^(\s{0,3})(`{3,}|~{3,})([^`]*)$/);
+  if (!match) return null;
+
+  const indent = match[1].length;
+  const fenceMarker = match[2];
+  const lang = match[3].trim();
+
+  let consumedLines = 1;
+  const contentLines: string[] = [];
+
+  // find downwards for closed ```
+  while (state.lineIndex + consumedLines < state.lineCount) {
+    const nextLine = state.lines[state.lineIndex + consumedLines];
+    consumedLines++;
+
+    const closeMatch = nextLine.match(/^(\s{0,3})(`{3,}|~{3,})\s*$/);
+    // closure conditions: Same symbol, length greater than or equal to the opening flag
+    if (
+      closeMatch &&
+      closeMatch[2][0] === fenceMarker[0] &&
+      closeMatch[2].length >= fenceMarker.length
+    ) {
+      break;
+    }
+
+    // remove indentation
+    if (nextLine.startsWith(' '.repeat(indent))) {
+      contentLines.push(nextLine.slice(indent));
+    } else {
+      contentLines.push(nextLine);
+    }
+  }
+
+  return { lang, content: contentLines.join('\n'), consumedLines };
+}
 
 /**
  * parse table |...| syntax
@@ -96,16 +102,17 @@ export const tableRule: BlockRule = {
 
     let consumedLines = 2;
     // split header
- const extractCells = (row: string) => {
+    const extractCells = (row: string) => {
       const parts = row.split('|');
       if (parts[0] !== undefined && parts[0].trim() === '') parts.shift();
-      if (parts.length > 0 && parts[parts.length - 1].trim() === '') parts.pop();
+      if (parts.length > 0 && parts[parts.length - 1].trim() === '')
+        parts.pop();
       return parts.map((s) => s.trim());
     };
 
-        const headers = extractCells(line);
+    const headers = extractCells(line);
     const rows = [];
-    
+
     // scan subsequent lines
     while (state.lineIndex + consumedLines < state.lineCount) {
       const rowLine = state.lines[state.lineIndex + consumedLines];

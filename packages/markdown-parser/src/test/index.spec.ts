@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it, expect, afterAll } from 'vitest';
 import { createFuyeorMarkdownParser } from '#/default';
-import { astToHtml } from './ast-to-html';
+import { render } from '#/core/render';
 
 const parse = createFuyeorMarkdownParser();
 const failures: any[] = [];
@@ -48,6 +48,8 @@ const shouldSkip = (item: any) => {
     // skip if the use case contains bold or italic text
     // as we do not implement a Latin-centric grammar.
     item.markdown.includes('_') ||
+    // 4-space indentation to code block
+    (item.markdown.startsWith('    ') && item.html.startsWith('<pre><code>')) ||
     // most users don't use the system's default email address
     // and don't want to trigger side effects after clicking
     item.html.includes('mailto:') ||
@@ -56,8 +58,6 @@ const shouldSkip = (item: any) => {
     item.html.includes('ftp:') ||
     // don't implement xmpp
     item.html.includes('xmpp:') ||
-    // 4-space indentation to code block
-    (item.section === 'Tabs' && item.html.includes('<pre><code>')) ||
     // default skipped sections
     skipSections.includes(item.section)
   )
@@ -72,7 +72,7 @@ function assertMarkdown(
   expectedHtml: string,
 ) {
   const ast = parse(markdown);
-  const resultHtml = astToHtml(ast).trim();
+  const resultHtml = render(ast).trim();
   const targetHtml = expectedHtml.trim();
 
   if (resultHtml !== targetHtml) {
