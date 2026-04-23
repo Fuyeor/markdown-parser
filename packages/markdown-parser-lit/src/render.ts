@@ -33,7 +33,7 @@ export function render(nodes?: ASTNode[]): (TemplateResult | string | null)[] {
         return html`<em>${render(node.children)}</em>`;
 
       case 'underline':
-        return html`<u>${render(node.children)}</u>`;
+        return html`<ins>${render(node.children)}</ins>`;
 
       case 'strike':
         return html`<del>${render(node.children)}</del>`;

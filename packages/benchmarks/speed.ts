@@ -8,7 +8,7 @@ import { marked } from 'marked';
 import { socialSample, blogSample } from './samples';
 
 const ffm = createFuyeorMarkdownParser();
-const mdIt = new MarkdownIt();
+const mdIt = new MarkdownIt({ linkify: true });
 
 const ffmIt = (content: string) => {
   const ast = ffm(content);
@@ -17,16 +17,18 @@ const ffmIt = (content: string) => {
 
 // Benchmarking Social scenario
 group('50 Social Posts (Small/Frequent)', () => {
-  bench('@fuyeor/markdown-parser', () => ffmIt(socialSample));
-  bench('markdown-it', () => mdIt.render(socialSample));
-  bench('marked', () => marked.parse(socialSample));
+  bench('@fuyeor/markdown-parser (AST)', () => ffm(socialSample));
+  bench('@fuyeor/markdown-parser (HTML)', () => ffmIt(socialSample));
+  bench('markdown-it (HTML)', () => mdIt.render(socialSample));
+  bench('marked (HTML)', () => marked.parse(socialSample));
 });
 
 // Benchmarking Blog scenario
 group('20 Blog Posts (Structured/Nested)', () => {
-  bench('@fuyeor/markdown-parser', () => ffmIt(blogSample));
-  bench('markdown-it', () => mdIt.render(blogSample));
-  bench('marked', () => marked.parse(blogSample));
+  bench('@fuyeor/markdown-parser (AST)', () => ffm(blogSample));
+  bench('@fuyeor/markdown-parser (HTML)', () => ffmIt(blogSample));
+  bench('markdown-it (HTML)', () => mdIt.render(blogSample));
+  bench('marked (HTML)', () => marked.parse(blogSample));
 });
 
 await run();

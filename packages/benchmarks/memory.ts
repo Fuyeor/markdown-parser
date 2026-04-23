@@ -10,7 +10,7 @@ import { socialSample, blogSample } from './samples';
 if (typeof window === 'undefined') global.window = globalThis;
 
 const ffm = createFuyeorMarkdownParser();
-const mdIt = new MarkdownIt();
+const mdIt = new MarkdownIt({ linkify: true });
 
 const ffmIt = (content: string) => {
   const ast = ffm(content);

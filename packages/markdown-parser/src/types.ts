@@ -37,6 +37,8 @@ export interface ParserContext {
 // block parsing rule (such as header, code block, table)
 export interface BlockRule {
   name: string;
+  // optional markers to quickly identify potential matches (e.g., '#' for headings)
+  markers: string[];
   // Returns the generated Node and the number of rows consumed if the match is successful;
   // returns null if the match fails.
   parse: (
@@ -48,6 +50,7 @@ export interface BlockRule {
 // inline parsing rule (such as bold, italics, links)
 export interface InlineRule {
   name: string;
+  markers: string[];
   // Returns the generated Node and the number of chars consumed if the match is successful;
   // returns null if the match fails.
   parse: (

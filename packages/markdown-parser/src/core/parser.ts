@@ -8,27 +8,12 @@ import type {
   ParserContext,
 } from '#/types';
 
-// prettier-ignore
-const INLINE_MARKERS = new Set([
-  // **bold** and *italic**
-  '*',
-  // [link](https://fuyeor.com)
-  '[', ']', '(', ')',
-  // > inline quote
-  '>',
-  // `inlineCode` and ```code block
-  '`',
-  // __underline__
-  '_',
-  // --strike-- (<del>)
-  '-',
-]);
 const LINKIFY_REGEX =
   /(https?:\/\/[^\s]+|(?<![@\w])(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?)/gv;
 
 export class MarkdownParser {
-  #blockRules: BlockRule[] = [];
-  #inlineRules: InlineRule[] = [];
+  #blockRuleMap = new Map<string, BlockRule[]>();
+  #inlineRuleMap = new Map<string, InlineRule[]>();
 
   // construct a context for recursive rule calls
   readonly #context: ParserContext = {
@@ -40,29 +25,25 @@ export class MarkdownParser {
 
   // register block rule
   // By default, it inserts at the end, or before/after a specified rule.
-  addBlockRule(
-    rule: BlockRule,
-    anchor?: { before?: string; after?: string },
-  ): this {
-    if (anchor?.before) {
-      const idx = this.#blockRules.findIndex((r) => r.name === anchor.before);
-      this.#blockRules.splice(idx === -1 ? 0 : idx, 0, rule);
-    } else if (anchor?.after) {
-      const idx = this.#blockRules.findIndex((r) => r.name === anchor.after);
-      this.#blockRules.splice(
-        idx === -1 ? this.#blockRules.length : idx + 1,
-        0,
-        rule,
-      );
-    } else {
-      this.#blockRules.push(rule);
+  addBlockRule(rule: BlockRule): this {
+    for (const marker of rule.markers) {
+      const list = this.#blockRuleMap.get(marker) || [];
+      list.push(rule);
+      this.#blockRuleMap.set(marker, list);
     }
     return this;
   }
 
   // register inline rule
   addInlineRule(rule: InlineRule): this {
-    this.#inlineRules.unshift(rule);
+    // register the rule under its markers for quick lookup during parsing
+    for (const marker of rule.markers) {
+      const rulesForMarker = this.#inlineRuleMap.get(marker) || [];
+      // ensure the rule is in the list for this marker
+      rulesForMarker.unshift(rule);
+      this.#inlineRuleMap.set(marker, rulesForMarker);
+    }
+
     return this;
   }
 
@@ -81,23 +62,32 @@ export class MarkdownParser {
   #parseBlocks(state: BlockState): ASTNode[] {
     const nodes: ASTNode[] = [];
     while (state.lineIndex < state.lineCount) {
-      const currentLine = state.currentLine;
+      const line = state.currentLine;
 
       // skip purely empty line
-      if (!currentLine || currentLine.trim() === '') {
+      if (!line || line.trim() === '') {
         state.advance(1);
         continue;
       }
 
-      // attempt to match block-level rules (Heading, CodeBlock, Table, etc.)
+      // find the first non-whitespace character
+      const trimmed = line.trimStart();
+      const firstChar = trimmed[0];
+
+      // get candidate rules based on the first character
+      const rules = this.#blockRuleMap.get(firstChar);
+
       let matched = false;
-      for (const rule of this.#blockRules) {
-        const result = rule.parse(state, this.#context);
-        if (result) {
-          nodes.push(result.node);
-          state.advance(result.consumedLines);
-          matched = true;
-          break;
+
+      if (rules) {
+        for (const rule of rules) {
+          const result = rule.parse(state, this.#context);
+          if (result) {
+            nodes.push(result.node);
+            state.advance(result.consumedLines);
+            matched = true;
+            break;
+          }
         }
       }
 
@@ -130,22 +120,33 @@ export class MarkdownParser {
             firstChar === 96 ||
             // ~ equals `
             firstChar === 126;
+
           if (mayInterrupt) {
-            const isInterrupted = this.#blockRules.some((rule) => {
-              if (
-                [
-                  'heading',
-                  'hr',
-                  'blockquote',
-                  'list',
-                  'code_block',
-                  'ffm_blocks',
-                ].includes(rule.name)
-              ) {
-                return rule.parse(state, this.#context) !== null;
+            const rules = this.#blockRuleMap.get(
+              String.fromCharCode(firstChar),
+            );
+            let isInterrupted = false;
+
+            if (rules) {
+              for (const rule of rules) {
+                if (
+                  [
+                    'heading',
+                    'hr',
+                    'blockquote',
+                    'list',
+                    'code_block',
+                    'ffm_blocks',
+                  ].includes(rule.name)
+                ) {
+                  if (rule.parse(state, this.#context) !== null) {
+                    isInterrupted = true;
+                    break;
+                  }
+                }
               }
-              return false;
-            });
+            }
+
             if (isInterrupted && paragraphLines.length > 0) break;
           }
 
@@ -168,12 +169,16 @@ export class MarkdownParser {
 
   #parseInline(state: InlineState): ASTNode[] {
     const nodes: ASTNode[] = [];
-    let textBuffer = '';
+
+    // record the start position of plain text
+    let textStart = state.pos;
 
     // linkify
-    const flushText = () => {
-      if (textBuffer.length > 0) {
+    const flushText = (endPos: number) => {
+      if (endPos > textStart) {
+        const textBuffer = state.content.slice(textStart, endPos);
         let lastIdx = 0;
+
         for (const match of textBuffer.matchAll(LINKIFY_REGEX)) {
           let urlStr = match[0];
           let matchIdx = match.index!;
@@ -192,14 +197,12 @@ export class MarkdownParser {
           if (urlStr.endsWith(')')) {
             const openCount = (urlStr.match(/\(/g) || []).length;
             const closeCount = (urlStr.match(/\)/g) || []).length;
-            if (closeCount > openCount) {
-              urlStr = urlStr.slice(0, -1);
-            }
+            if (closeCount > openCount) urlStr = urlStr.slice(0, -1);
           }
 
           const fullUrl = urlStr.startsWith('http')
             ? urlStr
-            : `http://${urlStr}`;
+            : `https://${urlStr}`;
 
           const isValid =
             fullUrl.startsWith('http://') ||
@@ -225,68 +228,49 @@ export class MarkdownParser {
         if (lastIdx < textBuffer.length) {
           nodes.push({ type: 'text', content: textBuffer.slice(lastIdx) });
         }
-        textBuffer = '';
       }
     };
 
     while (state.pos < state.length) {
       const char = state.currentChar;
 
-      // ``\n` -> hardbreak
-      if (char === '\n') {
-        flushText();
-        nodes.push({ type: 'hardbreak' });
-        state.advance(1);
-        continue;
-      }
+      // find candidate rules based on the current character
+      const rules = char ? this.#inlineRuleMap.get(char) : undefined;
 
-      // escape symbols
-      if (char === '\\') {
-        const nextChar = state.content[state.pos + 1];
-        if (nextChar === '\n') {
-          flushText();
-          nodes.push({ type: 'hardbreak' });
-          state.advance(2);
-          continue;
-        }
-
-        const escapable = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
-        if (nextChar && escapable.includes(nextChar)) {
-          textBuffer += nextChar;
-          state.advance(2);
-          continue;
-        }
-      }
-
-      // line break (a line ending with two or more spaces followed by a newline character)
-      if (char === ' ' && state.content.startsWith(' \n', state.pos)) {
-        flushText();
-        nodes.push({ type: 'hardbreak' });
-        state.advance(2);
-        continue;
-      }
-
-      // plugin distribution
-      if (char && INLINE_MARKERS.has(char)) {
+      if (rules) {
         let matched = false;
-        for (const rule of this.#inlineRules) {
+
+        // only check rules that are registered for this marker character
+        for (const rule of rules) {
           const result = rule.parse(state, this.#context);
           if (result) {
-            flushText();
+            flushText(state.pos);
             nodes.push(result.node);
             state.advance(result.consumedChars);
+            textStart = state.pos;
             matched = true;
             break;
           }
         }
+
+        // skip the normal character advancement if any rule matched
         if (matched) continue;
       }
 
-      textBuffer += char;
+      // normal characters without matching rules, just advance
+      if (char === '\n') {
+        flushText(state.pos);
+        nodes.push({ type: 'hardbreak' });
+        state.advance(1);
+        textStart = state.pos;
+        continue;
+      }
+
+      // just advance the pointer for normal characters
       state.advance(1);
     }
 
-    flushText();
+    flushText(state.pos);
     return nodes;
   }
 }

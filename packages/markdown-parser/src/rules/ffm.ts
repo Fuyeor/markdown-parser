@@ -17,6 +17,8 @@ const TITLE_REGEX = /^\s*\*\*(?:\[([ xX])\]\s*)?(.+?)\*\*\s*$/;
  */
 export const ffmBlockRule: BlockRule = {
   name: 'ffm_blocks',
+  // same as code block to leverage fenced block parsing
+  markers: ['`', '~'],
   parse(state: BlockState, ctx) {
     const block = extractFencedBlock(state);
     if (!block) return null;

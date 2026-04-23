@@ -7,6 +7,7 @@ import { BlockState } from '#/core/state';
  */
 export const headingRule: BlockRule = {
   name: 'heading',
+  markers: ['#'],
   parse(state: BlockState, ctx) {
     const line = state.currentLine;
     if (!line) return null;
@@ -30,6 +31,7 @@ export const headingRule: BlockRule = {
  */
 export const codeBlockRule: BlockRule = {
   name: 'code_block',
+  markers: ['`', '~'],
   parse(state: BlockState) {
     const block = extractFencedBlock(state);
     if (!block) return null;
@@ -90,6 +92,7 @@ export function extractFencedBlock(state: BlockState) {
  */
 export const tableRule: BlockRule = {
   name: 'table',
+  markers: ['|'],
   parse(state: BlockState, ctx) {
     const line = state.currentLine;
     if (!line || !line.includes('|')) return null;
@@ -147,6 +150,7 @@ export const tableRule: BlockRule = {
  */
 export const hrRule: BlockRule = {
   name: 'hr',
+  markers: ['-', '*', '_'],
   parse(state: BlockState) {
     const line = state.currentLine;
     if (!line) return null;
@@ -167,6 +171,7 @@ export const hrRule: BlockRule = {
  */
 export const blockquoteRule: BlockRule = {
   name: 'blockquote',
+  markers: ['>'],
   parse(state: BlockState, ctx) {
     const line = state.currentLine;
     if (!line || !line.trimStart().startsWith('>')) return null;
@@ -206,6 +211,7 @@ export const blockquoteRule: BlockRule = {
  */
 export const listRule: BlockRule = {
   name: 'list',
+  markers: ['-', '*', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
   parse(state: BlockState, ctx) {
     const line = state.currentLine;
     if (!line) return null;

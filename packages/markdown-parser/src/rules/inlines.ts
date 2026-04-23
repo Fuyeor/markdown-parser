@@ -7,6 +7,7 @@ import { InlineState } from '#/core/state';
  */
 export const hardBreakRule: InlineRule = {
   name: 'hardbreak',
+  markers: ['\\', ' '],
   parse(state: InlineState) {
     if (state.currentChar === '\\' && state.content[state.pos + 1] === '\n') {
       return {
@@ -23,6 +24,7 @@ export const hardBreakRule: InlineRule = {
  */
 export const boldRule: InlineRule = {
   name: 'bold',
+  markers: ['*'],
   parse(state: InlineState, ctx) {
     if (!state.content.startsWith('**', state.pos)) return null;
 
@@ -49,6 +51,7 @@ export const boldRule: InlineRule = {
  */
 export const italicRule: InlineRule = {
   name: 'italic',
+  markers: ['*'],
   parse(state: InlineState, ctx) {
     const char = state.currentChar;
     //  only triggers when it starts with * and
@@ -81,6 +84,7 @@ const COLOR_REGEX =
  */
 export const inlineCodeRule: InlineRule = {
   name: 'inline_code',
+  markers: ['`'],
   parse(state: InlineState) {
     if (state.currentChar !== '`') return null;
 
@@ -142,6 +146,7 @@ export const inlineCodeRule: InlineRule = {
  */
 export const linkRule: InlineRule = {
   name: 'link',
+  markers: ['['],
   parse(state: InlineState, ctx) {
     if (state.currentChar !== '[') return null;
 
@@ -185,6 +190,7 @@ export const linkRule: InlineRule = {
  */
 export const underlineRule: InlineRule = {
   name: 'underline',
+  markers: ['_'],
   parse(state: InlineState, ctx) {
     if (!state.content.startsWith('__', state.pos)) return null;
 
@@ -206,6 +212,7 @@ export const underlineRule: InlineRule = {
  */
 export const strikeRule: InlineRule = {
   name: 'strike',
+  markers: ['-'],
   parse(state: InlineState, ctx) {
     if (!state.content.startsWith('--', state.pos)) return null;
 

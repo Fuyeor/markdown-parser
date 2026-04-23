@@ -19,9 +19,9 @@ Further, I'm working to __create content scenarios__ like [social](https://fuyeo
  * Focus: Structured headers, nested lists, code blocks, and tables.
  */
 export const blogSample = `
-### The \`translate\` attribute
+### The \`translate\` attribute [link](https://html.spec.whatwg.org/multipage/dom.html#the-translate-attribute)
 
-> The **\`translate\` attribute** is used to specify whether an element's attribute values and the text content of its \`Text\` node children should be translated when the page is localized, or left unchanged. It is an **enumerated attribute** with the following keywords and states:
+> The **\`translate\` attribute** is used to specify whether an element's attribute values and the text content of its \`Text\` node children should be translated when the page is localized, or left unchanged. It is an **[enumerated attribute](https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#enumerated-attribute)** with the following keywords and states:
 
 | Keyword | State | Brief description |
 |---------|-------|-------------------|

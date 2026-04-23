@@ -1,4 +1,4 @@
-**@fuyeor/markdown-parser**: A lightweight Markdown parser optimized for loading speed and extensibility. It supports CommonMark standards alongside **Fuyeor Flavored Markdown (FFM)** across various frameworks.
+**@fuyeor/markdown-parser**: A lightweight Markdown parser optimized for loading speed and extensibility. It supports CommonMark standards alongside **Fuyeor Flavored Markdown (FFM)** across various frameworks. [**Try the playground.**](https://flavored.fuyeor.com)
 
 > [!IMPORTANT]
 > By default, `@fuyeor/markdown-parser` does **not** support bolding with `__`, strikethrough with `~~`, or italics with `_italic_`. Image syntax `![]()` is also disabled by default.
@@ -26,13 +26,13 @@
 | :--- | :--- | :--- |
 | `**Bold**` | **Bold** | Heavy / Emphasis |
 | `*Italic*` | *Italic* | Elegant / Slight Emphasis |
-| `__Underline__` | <u>Underline</u> | Bottom line |
+| `__Underline__` | <ins>Underline</ins> | Bottom line |
 | `--Strike--` | <del>Strikethrough</del> | Crossing out |
 
 ## ⚙️ Usage
 
 ```javascript
-import { createMarkdownParser } from '@fuyeor/markdown-parser';
+import { createMarkdownParser, render } from '@fuyeor/markdown-parser';
 
 // Initialize and configure your rules
 const parse = createMarkdownParser();
@@ -43,7 +43,7 @@ const markdown = `## Hello World`;
 const ast = parse(markdown);
 
 // Render the AST (Example)
-const resultHtml = astToHtml(ast); 
+const resultHtml = render(ast); 
 ```
 
 ## 🚧 Development
@@ -58,17 +58,20 @@ A `tests.failed.json` file will be generated in the `test` directory. This file 
 
 ### Run Playground:
 
+The playground provides a real-time view of both rendered Markdown and the AST. Run it locally:
+
 ```bash
 pnpm playground
 ```
 
-The playground allows you to view the generated Markdown and AST in real-time.
+You can also explore it online at [flavored.fuyeor.com](https://flavored.fuyeor.com) or [fuyeormark.vercel.app](https://fuyeormark.vercel.app).
 
 ### Run Benchmark:
 
 ```bash
 # test parsing speed
 pnpm -F @fuyeor/markdown-parser-benchmark bench:speed
+
 # test memory usage
 pnpm -F @fuyeor/markdown-parser-benchmark bench:memory
 ```
