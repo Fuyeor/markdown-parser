@@ -1,5 +1,6 @@
 // @fuyeor/markdown-parser/src/index.ts
 export { MarkdownParser } from './core/parser';
+export { render } from './core/render';
 export {
   headingRule,
   tableRule,
