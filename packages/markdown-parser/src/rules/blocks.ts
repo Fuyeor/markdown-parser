@@ -1,6 +1,17 @@
 // @fuyeor/markdown-parser/src/rules/blocks.ts
-import type { BlockRule } from '#/types';
+import type { ASTNode, BlockRule } from '#/types';
 import { BlockState } from '#/core/state';
+
+type FencedBlock = {
+  lang: string;
+  content: string;
+  consumedLines: number;
+};
+
+const fencedBlockCache = new WeakMap<
+  BlockState,
+  Map<number, FencedBlock | null>
+>();
 
 /**
  * parse ATX # title syntax
@@ -46,15 +57,30 @@ export const codeBlockRule: BlockRule = {
 /**
  * helper function: extract code block
  */
-export function extractFencedBlock(state: BlockState) {
+export function extractFencedBlock(state: BlockState): FencedBlock | null {
+  let cache = fencedBlockCache.get(state);
+  if (!cache) {
+    cache = new Map();
+    fencedBlockCache.set(state, cache);
+  }
+
+  if (cache.has(state.lineIndex)) return cache.get(state.lineIndex) ?? null;
+
   const line = state.currentLine;
-  if (!line) return null;
+  if (!line) {
+    cache.set(state.lineIndex, null);
+    return null;
+  }
 
   // matches 0-3 spaces starting with ``` or ~~~, followed by the info string
   const match = line.match(/^(\s{0,3})(`{3,}|~{3,})([^`]*)$/);
-  if (!match) return null;
+  if (!match) {
+    cache.set(state.lineIndex, null);
+    return null;
+  }
 
   const indent = match[1].length;
+  const indentPrefix = ' '.repeat(indent);
   const fenceMarker = match[2];
   const lang = match[3].trim();
 
@@ -77,14 +103,16 @@ export function extractFencedBlock(state: BlockState) {
     }
 
     // remove indentation
-    if (nextLine.startsWith(' '.repeat(indent))) {
+    if (nextLine.startsWith(indentPrefix)) {
       contentLines.push(nextLine.slice(indent));
     } else {
       contentLines.push(nextLine);
     }
   }
 
-  return { lang, content: contentLines.join('\n'), consumedLines };
+  const result = { lang, content: contentLines.join('\n'), consumedLines };
+  cache.set(state.lineIndex, result);
+  return result;
 }
 
 /**
@@ -225,7 +253,7 @@ export const listRule: BlockRule = {
     const isOrdered = /\d/.test(marker);
     const startNumber = isOrdered ? parseInt(marker, 10) : undefined;
 
-    const items: any[] = [];
+    const items: ASTNode[] = [];
     let consumedLines = 0;
 
     while (state.lineIndex + consumedLines < state.lineCount) {

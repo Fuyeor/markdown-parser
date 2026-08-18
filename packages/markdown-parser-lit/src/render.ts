@@ -1,7 +1,11 @@
 // @fuyeor/markdown-parser-lit/src/render.ts
 import { html, type TemplateResult } from 'lit';
 import { html as staticHtml, unsafeStatic } from 'lit/static-html.js';
-import type { ASTNode } from '@fuyeor/markdown-parser';
+import {
+  isSafeColorValue,
+  isSafeLinkUrl,
+  type ASTNode,
+} from '@fuyeor/markdown-parser';
 
 /**
  * recursively render AST nodes into Lit TemplateResult
@@ -12,7 +16,16 @@ export function render(nodes?: ASTNode[]): (TemplateResult | string | null)[] {
   return nodes.map((node) => {
     switch (node.type) {
       case 'heading': {
-        const tagName = `h${node.level}`;
+        const level =
+          typeof node.level === 'number' &&
+          Number.isInteger(node.level) &&
+          node.level >= 1 &&
+          node.level <= 6
+            ? node.level
+            : null;
+        if (level === null) return html`<span>${render(node.children)}</span>`;
+
+        const tagName = `h${level}`;
         return staticHtml`
           <${unsafeStatic(tagName)}>
             ${render(node.children)}
@@ -33,36 +46,43 @@ export function render(nodes?: ASTNode[]): (TemplateResult | string | null)[] {
         return html`<em>${render(node.children)}</em>`;
 
       case 'underline':
-        return html`<ins>${render(node.children)}</ins>`;
+        return html`<u>${render(node.children)}</u>`;
 
       case 'strike':
         return html`<del>${render(node.children)}</del>`;
 
-      case 'link':
-        return html`<a href="${node.url}">${render(node.children)}</a>`;
+      case 'link': {
+        const url = String(node.url ?? '').trim();
+        return isSafeLinkUrl(url)
+          ? html`<a href="${url}">${render(node.children)}</a>`
+          : html`${render(node.children)}`;
+      }
 
       case 'inline_code':
         return html`<code>${node.content}</code>`;
 
-      case 'color_code':
+      case 'color_code': {
+        const color = String(node.content ?? '');
+        if (!isSafeColorValue(color)) return html`${color}`;
         return html`
           <code class="ffm-color-code">
             <span
               class="ffm-color-swatch"
               style="
-                display: inline-block; 
-                width: 0.8em; 
-                height: 0.8em; 
-                border-radius: 50%; 
-                background-color: ${node.content}; 
-                vertical-align: middle; 
-                margin-right: 0.3em; 
+                display: inline-block;
+                width: 0.8em;
+                height: 0.8em;
+                border-radius: 50%;
+                background-color: ${color};
+                vertical-align: middle;
+                margin-right: 0.3em;
                 border: 1px solid #00000030;
               "
             ></span
-            >${node.content}
+            >${color}
           </code>
         `;
+      }
 
       case 'code_block':
         return html`
@@ -105,17 +125,17 @@ export function render(nodes?: ASTNode[]): (TemplateResult | string | null)[] {
             <table>
               <thead>
                 <tr>
-                  ${node.headers.map(
-                    (cell: any) => html`<th>${render(cell.children)}</th>`,
+                  ${(node.headers ?? []).map(
+                    (cell) => html`<th>${render(cell.children)}</th>`,
                   )}
                 </tr>
               </thead>
               <tbody>
                 ${node.children?.map(
-                  (row: any) => html`
+                  (row) => html`
                     <tr>
-                      ${row.children.map(
-                        (cell: any) => html`<td>${render(cell.children)}</td>`,
+                      ${(row.children ?? []).map(
+                        (cell) => html`<td>${render(cell.children)}</td>`,
                       )}
                     </tr>
                   `,

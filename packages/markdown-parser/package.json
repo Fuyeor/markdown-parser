@@ -1,16 +1,22 @@
 {
   "name": "@fuyeor/markdown-parser",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",
-  "main": "./src/index.ts",
   "sideEffects": false,
+  "scripts": {
+    "test": "vitest run",
+    "test:unit": "vitest run src/index.spec.ts",
+    "test:ffm": "vitest run src/test/index.spec.ts -t \"Fuyeor Mark\"",
+    "test:compat": "vitest run src/test/index.spec.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
+  },
   "imports": {
     "#/*": "./src/*"
   },
-  "scripts": {
-    "test": "vitest run",
-    "build": "vite build"
+  "exports": {
+    ".": "./src/index.ts"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

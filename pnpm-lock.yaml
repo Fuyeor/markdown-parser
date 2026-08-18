@@ -362,7 +362,7 @@ packages:
         optional: true
 
   '@fuyeor/locale@https://codeload.github.com/Fuyeor/webroamer/tar.gz/c502f739f4b633ab24386fe9f90fb77ed9f6ca9d#path:packages/locale':
-    resolution: {path: packages/locale, tarball: https://codeload.github.com/Fuyeor/webroamer/tar.gz/c502f739f4b633ab24386fe9f90fb77ed9f6ca9d}
+    resolution: {gitHosted: true, path: packages/locale, tarball: https://codeload.github.com/Fuyeor/webroamer/tar.gz/c502f739f4b633ab24386fe9f90fb77ed9f6ca9d}
     version: 1.0.0
     peerDependencies:
       '@lit-labs/signals': '*'

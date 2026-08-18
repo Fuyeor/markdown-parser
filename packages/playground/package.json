@@ -1,16 +1,18 @@
 {
-  "name": "@fuyeor/markdown-parser-playground",
+  "name": "@fuyeor/markdown-playground",
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",
-  "main": "./src/index.ts",
   "sideEffects": false,
-  "imports": {
-    "#/*": "./src/*"
-  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build"
+  },
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "exports": {
+    ".": "./src/main.ts"
   },
   "dependencies": {
     "@fuyeor/markdown-parser-lit": "workspace:*",

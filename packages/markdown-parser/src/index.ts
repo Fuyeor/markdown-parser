@@ -1,6 +1,8 @@
 // @fuyeor/markdown-parser/src/index.ts
 export { MarkdownParser } from './core/parser';
 export { render } from './core/render';
+export { isSafeColorValue } from './core/color';
+export { isSafeLinkUrl } from './core/url';
 export {
   headingRule,
   tableRule,
@@ -25,5 +27,6 @@ export type {
   ParserContext,
   BlockRule,
   InlineRule,
+  MarkdownParserOptions,
   MarkdownPlugin,
 } from './types';

@@ -1,0 +1,9 @@
+// packages/markdown-parser/tsconfig.test.json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["src/**/*.spec.ts", "src/test/**/*.ts"],
+  "exclude": []
+}

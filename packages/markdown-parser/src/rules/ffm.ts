@@ -55,22 +55,21 @@ export const ffmBlockRule: BlockRule = {
     // ffm chain and accordion
     if (type === 'accordion' || type === 'chain') {
       const items: ASTNode[] = [];
-      let currentItem: any = null;
+      let currentItem: ASTNode | null = null;
       let currentLines: string[] = [];
       // collect the text before the first title
       let preambleLines: string[] = [];
 
       // generate a unique name for mutually exclusive folding
       const accordionName =
-        type === 'accordion'
-          ? `acc-${Math.random().toString(36).slice(2, 8)}`
-          : undefined;
+        type === 'accordion' ? ctx.createId('acc') : undefined;
 
-      rawContent.split('\n').forEach((l) => {
+      for (const l of rawContent.split('\n')) {
         const titleMatch = l.match(TITLE_REGEX);
         if (titleMatch) {
           // archive the previous item, or archive free content
-          if (!currentItem) {
+          const previousItem = currentItem;
+          if (!previousItem) {
             if (
               currentLines.length > 0 &&
               currentLines.join('').trim() !== ''
@@ -79,7 +78,7 @@ export const ffmBlockRule: BlockRule = {
               preambleLines = currentLines;
             }
           } else {
-            currentItem.children = ctx.parseBlocks(
+            previousItem.children = ctx.parseBlocks(
               currentLines.join('\n').trim(),
             );
           }
@@ -104,11 +103,12 @@ export const ffmBlockRule: BlockRule = {
         } else {
           currentLines.push(l);
         }
-      });
+      }
 
       // archive the last item or go back
-      if (currentItem) {
-        currentItem.children = ctx.parseBlocks(currentLines.join('\n').trim());
+      const lastItem = currentItem;
+      if (lastItem) {
+        lastItem.children = ctx.parseBlocks(currentLines.join('\n').trim());
       } else {
         // if no valid title is found from beginning to end
         // revert to displaying regular content
