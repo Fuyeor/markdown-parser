@@ -6,6 +6,7 @@ on:
     branches: ['main']
     # Only trigger when relevant code changes to save resources
     paths:
+      - '.github/workflows/ci.yml'
       - 'packages/markdown-parser/**'
       - 'packages/markdown-parser-lit/**'
       - 'packages/markdown-parser-vue/**'
@@ -13,9 +14,10 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'Dockerfile'
-      - '.github/workflows/ci.yml'
+
   pull_request:
     paths:
+      - '.github/workflows/ci.yml'
       - 'packages/markdown-parser/**'
       - 'packages/markdown-parser-lit/**'
       - 'packages/markdown-parser-vue/**'
@@ -23,7 +25,6 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'Dockerfile'
-      - '.github/workflows/ci.yml'
   workflow_dispatch:
     # Allow manual trigger
 
@@ -58,8 +59,6 @@ jobs:
         run: pnpm --filter @fuyeor/markdown-parser test:unit
       - name: Run FFM regression tests
         run: pnpm --filter @fuyeor/markdown-parser test:ffm
-      - name: Build parser package
-        run: pnpm --filter @fuyeor/markdown-parser build
 
   build-markdown-playground:
     needs: test-markdown-parser
