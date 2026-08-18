@@ -3,6 +3,7 @@
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",
+  "packageManager": "pnpm@11.20.0",
   "main": "./src/index.ts",
   "sideEffects": false,
   "imports": {
