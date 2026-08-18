@@ -28,9 +28,10 @@ export class BlockState {
 }
 
 export class InlineState {
-  content: string;
+  readonly content: string;
   pos: number = 0;
   readonly length: number;
+  readonly #tokenPositions = new Map<string, number[]>();
 
   constructor(content: string) {
     this.content = content;
@@ -40,6 +41,31 @@ export class InlineState {
   get currentChar(): string | null {
     if (this.pos >= this.length) return null;
     return this.content[this.pos];
+  }
+
+  findNextToken(token: string, from: number): number {
+    if (!token) throw new RangeError('token must not be empty');
+
+    let positions = this.#tokenPositions.get(token);
+    if (!positions) {
+      positions = [];
+      let position = this.content.indexOf(token);
+      while (position !== -1) {
+        positions.push(position);
+        position = this.content.indexOf(token, position + 1);
+      }
+      this.#tokenPositions.set(token, positions);
+    }
+
+    let low = 0;
+    let high = positions.length;
+    while (low < high) {
+      const middle = low + ((high - low) >> 1);
+      if (positions[middle] < from) low = middle + 1;
+      else high = middle;
+    }
+
+    return positions[low] ?? -1;
   }
 
   advance(count: number = 1): void {

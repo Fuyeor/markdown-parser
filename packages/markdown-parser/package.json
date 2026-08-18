@@ -3,18 +3,34 @@
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "imports": {
     "#/*": "./src/*"
   },
   "scripts": {
     "test": "vitest run",
-    "build": "vite build"
+    "test:unit": "vitest run src/index.spec.ts",
+    "test:ffm": "vitest run src/test/index.spec.ts -t \"Fuyeor Mark\"",
+    "test:compat": "vitest run src/test/index.spec.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "build": "vite build && tsc -p tsconfig.build.json"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3",
+    "vite": "^8.0.1",
     "vitest": "^4.1.0"
   }
 }

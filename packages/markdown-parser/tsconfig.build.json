@@ -1,0 +1,12 @@
+// packages/markdown-parser/tsconfig.build.json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist/types"
+  },
+  "exclude": ["src/**/*.spec.ts", "src/test/**/*.ts"]
+}

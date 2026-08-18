@@ -10,5 +10,53 @@
     "html": "<p><u>Fuyeor</u></p>",
     "example": 1,
     "section": "Underline"
+  },
+  {
+    "markdown": "`#ff0000`",
+    "html": "<p><code class=\"ffm-color-code\"><span class=\"ffm-color-swatch\" style=\"display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:#ff0000;vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;\"></span>#ff0000</code></p>",
+    "example": 1,
+    "section": "Color code"
+  },
+  {
+    "markdown": "```quote\n## Title\n```",
+    "html": "<blockquote>\n<h2>Title</h2>\n</blockquote>",
+    "example": 1,
+    "section": "Quote block"
+  },
+  {
+    "markdown": "```accordion\n**One**\nContent\n```",
+    "html": "<div class=\"ffm-accordion\"><details name=\"acc-0\"><summary>One</summary><div class=\"accordion-content\"><p>Content</p>\n</div></details></div>",
+    "example": 1,
+    "section": "Accordion"
+  },
+  {
+    "markdown": "```chain\n**[x] Done**\nBody\n```",
+    "html": "<div class=\"chain-container\"><div class=\"chain-item is-completed\"><div class=\"chain-marker\"></div><div class=\"chain-content-wrapper\"><div class=\"chain-title\">Done</div><div class=\"chain-body\"><p>Body</p>\n</div></div></div></div>",
+    "example": 1,
+    "section": "Chain"
+  },
+  {
+    "markdown": "```slide\nFirst\n\n---\n\nSecond\n```",
+    "html": "<div class=\"slide-container-wrapper\"><div class=\"slide-container\"><div class=\"slide-item\"><p>First</p>\n</div><div class=\"slide-item\"><p>Second</p>\n</div></div></div>",
+    "example": 1,
+    "section": "Slide"
+  },
+  {
+    "markdown": "[x](javascript:alert(1))",
+    "html": "<p>[x](javascript:alert(1))</p>",
+    "example": 1,
+    "section": "Unsafe link schemes"
+  },
+  {
+    "markdown": "[x](data:text/html,<script>alert(1)</script>)",
+    "html": "<p>[x](data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;)</p>",
+    "example": 1,
+    "section": "Unsafe link schemes"
+  },
+  {
+    "markdown": "[x](file:///etc/passwd)",
+    "html": "<p>[x](file:///etc/passwd)</p>",
+    "example": 1,
+    "section": "Unsafe link schemes"
   }
 ]

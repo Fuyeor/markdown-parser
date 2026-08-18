@@ -1,6 +1,7 @@
 // @fuyeor/markdown-parser/src/index.spec.ts
 import { describe, it, expect } from 'vitest';
 import { MarkdownParser } from './core/parser';
+import { createFuyeorMarkdownParser } from './default';
 import { headingRule, codeBlockRule, tableRule } from './rules/blocks';
 import { boldRule, linkRule } from './rules/inlines';
 
@@ -67,5 +68,23 @@ describe('test @fuyeor/markdown-parser', () => {
     expect(tableNode).toBeDefined();
     expect(tableNode.headers).toHaveLength(2);
     expect(tableNode.children![0].type).toBe('table_row');
+  });
+
+  it('rejects unsafe link schemes', () => {
+    const ast = parse('[click](javascript:alert(1))');
+
+    expect(ast[0].children?.some((node) => node.type === 'link')).toBe(false);
+  });
+
+  it('bounds recursive block parsing', () => {
+    const boundedParse = createFuyeorMarkdownParser({ maxNestingDepth: 8 });
+
+    expect(() => boundedParse(`${'>'.repeat(100)} value`)).not.toThrow();
+  });
+
+  it('fails fast for an invalid nesting depth', () => {
+    expect(() => new MarkdownParser({ maxNestingDepth: 0 })).toThrow(
+      RangeError,
+    );
   });
 });

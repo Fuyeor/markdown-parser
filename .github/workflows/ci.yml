@@ -3,13 +3,27 @@ name: Build and Push Playground
 
 on:
   push:
-    branches: [ "main" ]
-    # Only trigger when relevant code changes to save resources 
+    branches: ['main']
+    # Only trigger when relevant code changes to save resources
     paths:
-      - "packages/markdown-parser/src"
-      - "packages/markdown-parser-lit/src"
-      - "packages/playground/**"
-      - "Dockerfile"
+      - 'packages/markdown-parser/**'
+      - 'packages/markdown-parser-lit/**'
+      - 'packages/markdown-parser-vue/**'
+      - 'packages/playground/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'Dockerfile'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'packages/markdown-parser/**'
+      - 'packages/markdown-parser-lit/**'
+      - 'packages/markdown-parser-vue/**'
+      - 'packages/playground/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'Dockerfile'
+      - '.github/workflows/ci.yml'
   workflow_dispatch:
     # Allow manual trigger
 
@@ -18,7 +32,36 @@ env:
   IMAGE_NAME: fuyeor/flavored-front-end
 
 jobs:
+  test-markdown-parser:
+    name: Test markdown parser
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Enable pnpm
+        run: corepack enable
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Typecheck parser package
+        run: pnpm --filter @fuyeor/markdown-parser typecheck
+      - name: Run parser unit tests
+        run: pnpm --filter @fuyeor/markdown-parser test:unit
+      - name: Run FFM regression tests
+        run: pnpm --filter @fuyeor/markdown-parser test:ffm
+      - name: Build parser package
+        run: pnpm --filter @fuyeor/markdown-parser build
+
   build-markdown-playground:
+    needs: test-markdown-parser
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read

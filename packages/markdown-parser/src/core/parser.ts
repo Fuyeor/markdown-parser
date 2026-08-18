@@ -5,8 +5,10 @@ import type {
   BlockRule,
   InlineRule,
   MarkdownPlugin,
+  MarkdownParserOptions,
   ParserContext,
 } from '#/types';
+import { isSafeLinkUrl } from '#/core/url';
 
 const LINKIFY_REGEX =
   /(https?:\/\/[^\s]+|(?<![@\w])(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?)/gv;
@@ -14,14 +16,33 @@ const LINKIFY_REGEX =
 export class MarkdownParser {
   #blockRuleMap = new Map<string, BlockRule[]>();
   #inlineRuleMap = new Map<string, InlineRule[]>();
+  #idSequence = 0;
+  #isPreflight = false;
+  readonly #maxNestingDepth: number;
+
+  constructor(options: MarkdownParserOptions = {}) {
+    const maxNestingDepth = options.maxNestingDepth ?? 64;
+    if (!Number.isInteger(maxNestingDepth) || maxNestingDepth < 1)
+      throw new RangeError('maxNestingDepth must be a positive integer');
+
+    this.#maxNestingDepth = maxNestingDepth;
+  }
 
   // construct a context for recursive rule calls
-  readonly #context: ParserContext = {
-    parseInline: (content: string) =>
-      this.#parseInline(new InlineState(content)),
-    parseBlocks: (content: string) =>
-      this.#parseBlocks(new BlockState(content)),
-  };
+  readonly #context: ParserContext = this.#createContext(0);
+
+  #createContext(depth: number): ParserContext {
+    return {
+      parseInline: (content: string) =>
+        this.#parseInline(new InlineState(content), depth + 1),
+      parseBlocks: (content: string) =>
+        this.#parseBlocks(new BlockState(content), depth + 1),
+      createId: (prefix: string) =>
+        this.#isPreflight
+          ? `${prefix}-probe`
+          : `${prefix}-${this.#idSequence++}`,
+    };
+  }
 
   // register block rule
   // By default, it inserts at the end, or before/after a specified rule.
@@ -54,12 +75,28 @@ export class MarkdownParser {
 
   build(): (content: string) => ASTNode[] {
     return (content: string) => {
+      this.#idSequence = 0;
       const state = new BlockState(content);
       return this.#parseBlocks(state);
     };
   }
 
-  #parseBlocks(state: BlockState): ASTNode[] {
+  #parseBlocks(state: BlockState, depth = 0): ASTNode[] {
+    if (depth > this.#maxNestingDepth) {
+      return [
+        {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'text',
+              content: state.remainingLines.join('\n'),
+            },
+          ],
+        },
+      ];
+    }
+
+    const context = depth === 0 ? this.#context : this.#createContext(depth);
     const nodes: ASTNode[] = [];
     while (state.lineIndex < state.lineCount) {
       const line = state.currentLine;
@@ -81,7 +118,7 @@ export class MarkdownParser {
 
       if (rules) {
         for (const rule of rules) {
-          const result = rule.parse(state, this.#context);
+          const result = rule.parse(state, context);
           if (result) {
             nodes.push(result.node);
             state.advance(result.consumedLines);
@@ -139,9 +176,14 @@ export class MarkdownParser {
                     'ffm_blocks',
                   ].includes(rule.name)
                 ) {
-                  if (rule.parse(state, this.#context) !== null) {
-                    isInterrupted = true;
-                    break;
+                  this.#isPreflight = true;
+                  try {
+                    if (rule.parse(state, context) !== null) {
+                      isInterrupted = true;
+                      break;
+                    }
+                  } finally {
+                    this.#isPreflight = false;
                   }
                 }
               }
@@ -159,6 +201,7 @@ export class MarkdownParser {
             type: 'paragraph',
             children: this.#parseInline(
               new InlineState(paragraphLines.join('\n')),
+              depth,
             ),
           });
         }
@@ -167,7 +210,12 @@ export class MarkdownParser {
     return nodes;
   }
 
-  #parseInline(state: InlineState): ASTNode[] {
+  #parseInline(state: InlineState, depth = 0): ASTNode[] {
+    if (depth > this.#maxNestingDepth) {
+      return [{ type: 'text', content: state.content.slice(state.pos) }];
+    }
+
+    const context = depth === 0 ? this.#context : this.#createContext(depth);
     const nodes: ASTNode[] = [];
 
     // record the start position of plain text
@@ -204,12 +252,7 @@ export class MarkdownParser {
             ? urlStr
             : `https://${urlStr}`;
 
-          const isValid =
-            fullUrl.startsWith('http://') ||
-            fullUrl.startsWith('https://') ||
-            globalThis.URL.canParse(fullUrl);
-
-          if (isValid) {
+          if (isSafeLinkUrl(fullUrl)) {
             if (matchIdx > lastIdx) {
               nodes.push({
                 type: 'text',
@@ -242,7 +285,7 @@ export class MarkdownParser {
 
         // only check rules that are registered for this marker character
         for (const rule of rules) {
-          const result = rule.parse(state, this.#context);
+          const result = rule.parse(state, context);
           if (result) {
             flushText(state.pos);
             nodes.push(result.node);

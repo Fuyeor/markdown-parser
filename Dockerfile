@@ -23,6 +23,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # copy source code
 COPY . .
 
+# build parser package before workspace consumers resolve its package exports
+RUN pnpm --filter @fuyeor/markdown-parser build
+
 # build playground
 RUN pnpm --filter @fuyeor/markdown-parser-playground build
 

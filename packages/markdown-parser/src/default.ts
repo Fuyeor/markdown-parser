@@ -1,5 +1,6 @@
 // @fuyeor/markdown-parser/src/default.ts
 import { MarkdownParser } from './core/parser';
+import type { MarkdownParserOptions } from './types';
 import {
   headingRule,
   tableRule,
@@ -19,9 +20,9 @@ import {
 } from './rules/inlines';
 import { ffmBlockRule } from './rules/ffm';
 
-export function createMarkdownParser() {
+export function createMarkdownParser(options: MarkdownParserOptions = {}) {
   return (
-    new MarkdownParser()
+    new MarkdownParser(options)
       // block order: Code block -> List -> Title -> Table -> Delete line -> Quote
       .addBlockRule(codeBlockRule)
       .addBlockRule(listRule)
@@ -43,9 +44,11 @@ export function createMarkdownParser() {
   );
 }
 
-export function createFuyeorMarkdownParser() {
+export function createFuyeorMarkdownParser(
+  options: MarkdownParserOptions = {},
+) {
   return (
-    new MarkdownParser()
+    new MarkdownParser(options)
       // block order: Code block -> List -> Title -> Table -> Delete line -> Quote
       .addBlockRule(ffmBlockRule)
       .addBlockRule(codeBlockRule)
