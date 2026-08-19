@@ -19,6 +19,7 @@ export {
   underlineRule,
   strikeRule,
 } from './rules/inlines';
+export { twemojiPlugin, twemojiRule } from './rules/twemoji';
 export { createMarkdownParser, createFuyeorMarkdownParser } from './default';
 
 export type {

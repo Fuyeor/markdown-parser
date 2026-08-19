@@ -35,6 +35,18 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
         return h('del', renderToVue(node.children || []));
       case 'inline_code':
         return h('code', node.content || '');
+      case 'twemoji': {
+        const emoji = String(node.emoji ?? '');
+        const url = String(node.url ?? '').trim();
+        return emoji && isSafeLinkUrl(url)
+          ? h('img', {
+              class: 'emoji',
+              draggable: false,
+              alt: emoji,
+              src: url,
+            })
+          : emoji;
+      }
       case 'color_code': {
         const color = String(node.content ?? '');
         if (!isSafeColorValue(color)) return color;

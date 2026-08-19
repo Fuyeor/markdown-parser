@@ -16,6 +16,7 @@ const LINKIFY_REGEX =
 export class MarkdownParser {
   #blockRuleMap = new Map<string, BlockRule[]>();
   #inlineRuleMap = new Map<string, InlineRule[]>();
+  #fallbackInlineRules: InlineRule[] = [];
   #idSequence = 0;
   #isPreflight = false;
   readonly #maxNestingDepth: number;
@@ -57,6 +58,8 @@ export class MarkdownParser {
 
   // register inline rule
   addInlineRule(rule: InlineRule): this {
+    if (rule.fallback) this.#fallbackInlineRules.push(rule);
+
     // register the rule under its markers for quick lookup during parsing
     for (const marker of rule.markers) {
       const rulesForMarker = this.#inlineRuleMap.get(marker) || [];
@@ -279,12 +282,13 @@ export class MarkdownParser {
 
       // find candidate rules based on the current character
       const rules = char ? this.#inlineRuleMap.get(char) : undefined;
+      const fallbackRules = this.#fallbackInlineRules;
 
-      if (rules) {
+      if (rules || fallbackRules.length > 0) {
         let matched = false;
 
         // only check rules that are registered for this marker character
-        for (const rule of rules) {
+        for (const rule of rules ?? []) {
           const result = rule.parse(state, context);
           if (result) {
             flushText(state.pos);
@@ -293,6 +297,21 @@ export class MarkdownParser {
             textStart = state.pos;
             matched = true;
             break;
+          }
+        }
+
+        if (!matched) {
+          // Fallback rules are opt-in and run only after marker-specific rules fail.
+          for (const rule of fallbackRules ?? []) {
+            const result = rule.parse(state, context);
+            if (result) {
+              flushText(state.pos);
+              nodes.push(result.node);
+              state.advance(result.consumedChars);
+              textStart = state.pos;
+              matched = true;
+              break;
+            }
           }
         }
 

@@ -21,6 +21,7 @@ export type NodeType =
   | 'link'
   | 'hardbreak'
   | 'hr'
+  | 'twemoji'
   | string;
 
 export interface ASTNode {
@@ -30,6 +31,7 @@ export interface ASTNode {
   level?: number;
   lang?: string;
   url?: string;
+  emoji?: string;
   ordered?: boolean;
   start?: number;
   headers?: ASTNode[];
@@ -65,6 +67,7 @@ export interface BlockRule {
 export interface InlineRule {
   name: string;
   markers: string[];
+  fallback?: boolean;
   // Returns the generated Node and the number of chars consumed if the match is successful;
   // returns null if the match fails.
   parse: (

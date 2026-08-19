@@ -1,9 +1,11 @@
 // @fuyeor/markdown-parser/src/index.spec.ts
 import { describe, it, expect } from 'vitest';
 import { MarkdownParser } from './core/parser';
+import { render } from './core/render';
 import { createFuyeorMarkdownParser } from './default';
 import { headingRule, codeBlockRule, tableRule } from './rules/blocks';
-import { boldRule, linkRule } from './rules/inlines';
+import { boldRule, inlineCodeRule, linkRule } from './rules/inlines';
+import { twemojiPlugin } from './rules/twemoji';
 
 // build parser
 const parse = new MarkdownParser()
@@ -86,5 +88,44 @@ describe('test @fuyeor/markdown-parser', () => {
     expect(() => new MarkdownParser({ maxNestingDepth: 0 })).toThrow(
       RangeError,
     );
+  });
+
+  it('supports Twemoji through an explicit opt-in plugin', () => {
+    const parseWithTwemoji = new MarkdownParser()
+      .addBlockRule(codeBlockRule)
+      .addInlineRule(inlineCodeRule)
+      .use(twemojiPlugin)
+      .build();
+    const ast = parseWithTwemoji('Hello 😀 🇪🇸 👨‍💻');
+    const emojiNodes = ast[0].children?.filter(
+      (node) => node.type === 'twemoji',
+    );
+
+    expect(emojiNodes).toHaveLength(3);
+    expect(emojiNodes?.map((node) => node.emoji)).toEqual(['😀', '🇪🇸', '👨‍💻']);
+    expect(emojiNodes?.map((node) => node.url)).toEqual([
+      'https://deliver.fuyeor.net/@libs/twemoji-new/svg/1f600.svg',
+      'https://deliver.fuyeor.net/@libs/twemoji-new/svg/1f1ea-1f1f8.svg',
+      'https://deliver.fuyeor.net/@libs/twemoji-new/svg/1f468-200d-1f4bb.svg',
+    ]);
+    expect(render(ast)).toBe(
+      '<p>Hello <img class="emoji" draggable="false" alt="😀" src="https://deliver.fuyeor.net/@libs/twemoji-new/svg/1f600.svg"/> <img class="emoji" draggable="false" alt="🇪🇸" src="https://deliver.fuyeor.net/@libs/twemoji-new/svg/1f1ea-1f1f8.svg"/> <img class="emoji" draggable="false" alt="👨‍💻" src="https://deliver.fuyeor.net/@libs/twemoji-new/svg/1f468-200d-1f4bb.svg"/></p>\n',
+    );
+  });
+
+  it('keeps Twemoji disabled in the default parser', () => {
+    const ast = createFuyeorMarkdownParser()('😀');
+
+    expect(ast[0].children?.[0].type).toBe('text');
+  });
+
+  it('does not replace emoji inside inline code', () => {
+    const parseWithTwemoji = new MarkdownParser()
+      .addBlockRule(codeBlockRule)
+      .addInlineRule(inlineCodeRule)
+      .use(twemojiPlugin)
+      .build();
+
+    expect(render(parseWithTwemoji('`😀`'))).toBe('<p><code>😀</code></p>\n');
   });
 });

@@ -61,6 +61,19 @@ export function render(nodes?: ASTNode[]): (TemplateResult | string | null)[] {
       case 'inline_code':
         return html`<code>${node.content}</code>`;
 
+      case 'twemoji': {
+        const emoji = String(node.emoji ?? '');
+        const url = String(node.url ?? '').trim();
+        return emoji && isSafeLinkUrl(url)
+          ? html`<img
+              class="emoji"
+              draggable="false"
+              alt=${emoji}
+              src=${url}
+            />`
+          : html`${emoji}`;
+      }
+
       case 'color_code': {
         const color = String(node.content ?? '');
         if (!isSafeColorValue(color)) return html`${color}`;
