@@ -20,6 +20,7 @@ export {
   strikeRule,
 } from './rules/inlines';
 export { twemojiPlugin, twemojiRule } from './rules/twemoji';
+export { latexPlugin, latexInlineRule, latexBlockRule } from './rules/latex';
 export { createMarkdownParser, createFuyeorMarkdownParser } from './default';
 
 export type {

@@ -22,6 +22,8 @@ export type NodeType =
   | 'hardbreak'
   | 'hr'
   | 'twemoji'
+  | 'math_inline'
+  | 'math_block'
   | string;
 
 export interface ASTNode {

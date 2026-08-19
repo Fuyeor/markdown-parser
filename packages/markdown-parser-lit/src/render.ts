@@ -74,6 +74,11 @@ export function render(nodes?: ASTNode[]): (TemplateResult | string | null)[] {
           : html`${emoji}`;
       }
 
+      case 'math_inline':
+        return html`<span class="math-inline">${node.content ?? ''}</span>`;
+      case 'math_block':
+        return html`<div class="math-block">${node.content ?? ''}</div>`;
+
       case 'color_code': {
         const color = String(node.content ?? '');
         if (!isSafeColorValue(color)) return html`${color}`;

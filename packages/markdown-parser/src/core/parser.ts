@@ -159,7 +159,9 @@ export class MarkdownParser {
             // ` for code block and inline code
             firstChar === 96 ||
             // ~ equals `
-            firstChar === 126;
+            firstChar === 126 ||
+            // $ for LaTeX block formulas
+            firstChar === 36;
 
           if (mayInterrupt) {
             const rules = this.#blockRuleMap.get(
@@ -177,6 +179,7 @@ export class MarkdownParser {
                     'list',
                     'code_block',
                     'ffm_blocks',
+                    'latex_block',
                   ].includes(rule.name)
                 ) {
                   this.#isPreflight = true;

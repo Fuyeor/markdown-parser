@@ -47,6 +47,10 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
             })
           : emoji;
       }
+      case 'math_inline':
+        return h('span', { class: 'math-inline' }, node.content || '');
+      case 'math_block':
+        return h('div', { class: 'math-block' }, node.content || '');
       case 'color_code': {
         const color = String(node.content ?? '');
         if (!isSafeColorValue(color)) return color;

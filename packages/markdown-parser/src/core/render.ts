@@ -70,6 +70,12 @@ export function render(nodes?: ASTNode[]): string {
             : escapeHtml(emoji);
         break;
       }
+      case 'math_inline':
+        html += `<span class="math-inline">${escapeHtml(String(node.content ?? ''))}</span>`;
+        break;
+      case 'math_block':
+        html += `<div class="math-block">${escapeHtml(String(node.content ?? ''))}</div>`;
+        break;
       case 'color_code': {
         const color = String(node.content ?? '');
         if (!isSafeColorValue(color)) {

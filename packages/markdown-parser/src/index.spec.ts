@@ -6,6 +6,7 @@ import { createFuyeorMarkdownParser } from './default';
 import { headingRule, codeBlockRule, tableRule } from './rules/blocks';
 import { boldRule, inlineCodeRule, linkRule } from './rules/inlines';
 import { twemojiPlugin } from './rules/twemoji';
+import { latexPlugin } from './rules/latex';
 
 // build parser
 const parse = new MarkdownParser()
@@ -127,5 +128,35 @@ describe('test @fuyeor/markdown-parser', () => {
       .build();
 
     expect(render(parseWithTwemoji('`😀`'))).toBe('<p><code>😀</code></p>\n');
+  });
+
+  it('supports opt-in LaTeX inline and block formulas', () => {
+    const parseWithLatex = new MarkdownParser()
+      .addBlockRule(codeBlockRule)
+      .addInlineRule(inlineCodeRule)
+      .use(latexPlugin)
+      .build();
+
+    expect(render(parseWithLatex('Euler $e^{i\\pi}+1=0$'))).toBe(
+      '<p>Euler <span class="math-inline">e^{i\\pi}+1=0</span></p>\n',
+    );
+    expect(render(parseWithLatex('$$\nx < y\n$$'))).toBe(
+      '<div class="math-block">x &lt; y</div>',
+    );
+    expect(render(parseWithLatex('Text\n$$\nx < y\n$$'))).toBe(
+      '<p>Text</p>\n<div class="math-block">x &lt; y</div>',
+    );
+  });
+
+  it('keeps LaTeX disabled in the default parser and inside inline code', () => {
+    expect(render(createFuyeorMarkdownParser()('$x$'))).toBe('<p>$x$</p>\n');
+
+    const parseWithLatex = new MarkdownParser()
+      .addBlockRule(codeBlockRule)
+      .addInlineRule(inlineCodeRule)
+      .use(latexPlugin)
+      .build();
+
+    expect(render(parseWithLatex('`$x$`'))).toBe('<p><code>$x$</code></p>\n');
   });
 });
