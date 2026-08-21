@@ -29,10 +29,14 @@ describe('format', () => {
     ).toBe('| 表头一 | 表头二 |\n| :--- | ---: |\n| 内容一 | 内容二 |');
   });
 
-  it('converts a contiguous block with at least three quote markers', () => {
-    expect(format('>>> 第一行\n>>> 第二行\n\n后续内容')).toBe(
-      '```quote\n第一行\n第二行\n```\n\n后续内容',
+  it('converts three quoted segments and preserves quoted blank lines', () => {
+    expect(format('> 引用 1\n>\n> 引用 2\n> \n> 引用 3')).toBe(
+      '```quote\n引用 1\n\n引用 2\n\n引用 3\n```',
     );
+  });
+
+  it('keeps a shorter blockquote as a regular blockquote', () => {
+    expect(format('> 引用 1\n>\n> 引用 2')).toBe('> 引用 1\n>\n> 引用 2');
   });
 
   it('formats semantic FFM fences without changing their delimiters', () => {

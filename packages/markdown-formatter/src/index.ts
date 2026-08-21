@@ -183,35 +183,30 @@ function formatOrdinaryLine(line: string): string {
   return formatted.replace(/[ \t]+$/u, '');
 }
 
-/** Parse a line containing at least three consecutive Markdown quote markers. */
-function getDeepQuoteLine(line: string): QuoteLine | null {
-  const match = line.match(/^\s*((?:>\s*){3,})(.*)$/u);
-  return match ? { content: match[2]! } : null;
-}
-
-/** Parse a continuation line from a deep blockquote. */
-function getQuoteContinuation(line: string): QuoteLine | null {
+/** Parse a single line from a contiguous Markdown blockquote. */
+function getQuoteLine(line: string): QuoteLine | null {
   const match = line.match(/^\s*>+\s?(.*)$/u);
   return match ? { content: match[1]! } : null;
 }
 
-/** Convert a contiguous deep blockquote into FFM's semantic quote fence. */
+/** Convert a blockquote with at least three non-empty quoted lines to FFM quote syntax. */
 function formatDeepQuote(
   lines: readonly string[],
   start: number,
 ): { lines: string[]; next: number } | null {
-  const first = getDeepQuoteLine(lines[start]!);
+  const first = getQuoteLine(lines[start]!);
   if (!first) return null;
 
   const content = [first.content];
   let next = start + 1;
   while (next < lines.length) {
-    const continuation = getQuoteContinuation(lines[next]!);
+    const continuation = getQuoteLine(lines[next]!);
     if (!continuation) break;
     content.push(continuation.content);
     next++;
   }
 
+  if (content.filter((line) => line.trim() !== '').length < 3) return null;
   return {
     lines: ['```quote', ...content.map(formatOrdinaryLine), '```'],
     next,
