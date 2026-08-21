@@ -1,7 +1,7 @@
 // src/index.spec.ts
 import { describe, expect, it } from 'vitest';
-import cases from './linkify-cases.json';
 import { linkify } from './index';
+import cases from './cases.json';
 
 type LinkifyCase = {
   text: string;
