@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Fuyeor Flavored Markdown",
-  "scopeName": "text.html.markdown.ffm",
+  "scopeName": "text.ffm",
   "patterns": [
-    { "include": "#special_fenced_blocks" },
+    { "include": "#layout_blocks" },
     { "include": "#fenced_code_block" },
     { "include": "#math_block" },
     { "include": "#table_row" },
@@ -21,7 +21,7 @@
     { "include": "#italic" }
   ],
   "repository": {
-    "special_fenced_blocks": {
+    "layout_blocks": {
       "begin": "^\\s*(`{3,})(quote|slide|chain|accordion|mermaid|smiles|abc)\\s*$",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.fenced.begin.ffm" },
@@ -33,7 +33,7 @@
       },
       "name": "markup.fenced.block.ffm",
       "patterns": [
-        { "include": "#special_block_title" },
+        { "include": "#layout_block_title" },
         { "include": "#slide_separator" },
         { "include": "#blockquote" },
         { "include": "#image" },
@@ -182,7 +182,7 @@
       },
       "name": "markup.italic.ffm"
     },
-    "special_block_title": {
+    "layout_block_title": {
       "match": "^\\s*\\*\\*(?:\\[[ xX]\\]\\s*)?([^*\\n]+?)\\*\\*\\s*$",
       "captures": {
         "1": { "name": "entity.name.section.block.ffm" }
