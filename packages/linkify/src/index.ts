@@ -1,5 +1,7 @@
 // src/index.ts
 
+import { CC_TLD_BITMAP } from './cc-tld-bitmap.js';
+
 export interface LinkMatch {
   url: string;
   text: string;
@@ -7,23 +9,43 @@ export interface LinkMatch {
   lastIndex: number;
 }
 
-// 剔除了 md，涵盖常用 gTLD 和 ccTLD，通过前缀树压缩。
-const TLD_REGEX =
-  /(?:a(?:pp|[cdefgilmoqrstuwxz])|b(?:iz|[abdefghijmnorstwyz])|c(?:om|[acdfghiklmnoruvwxyz])|d(?:ev|[ejkmoz])|e(?:du|[cegrstu])|f[ijkmor]|g(?:ov|[adefghilmnpqrstuwy])|h[kmnrtu]|i(?:nfo|nt|[delmnoqrst])|j[emop]|k[eghimnprwyz]|l[abcikrstuvy]|m(?:il|[aceghklmnopqrstuvwxyz])|n(?:et|[acefgilopruz])|o(?:nline|rg|m)|p[aefghklmnrstwy]|qa|r[eosuw]|s(?:tore|hop|ite|[abcdeghiklmnorstuvxyz])|t(?:ech|[cdfghjklmnortvwz])|u[agksyz]|v[aceginu]|w[fs]|xyz|y[et]|z[amw]|рф|xn--p1ai)/;
-const LINKIFY_REGEX = new RegExp(
-  `(https?:\\/\\/[^\\s]+|(?<![@\\w])(?:[a-zA-Z0-9\\-]+\\.)+${TLD_REGEX.source}(?:\\/[^\\s]*)?(?![\\p{L}\\p{N}_\\-]))`,
-  'gv',
-);
+// 候选扫描只负责找出域名形状，实际两字母 TLD 合法性由位图校验。
+const LINKIFY_REGEX =
+  /(https?:\/\/[^\s]+|(?<![@\w])(?:[a-zA-Z0-9\-]+\.)+(?:app|biz|com|dev|edu|gov|int|mil|net|org|pro|web|xyz|рф|xn--p1ai|[a-zA-Z]{2})(?:\/[^\s]*)?(?![\p{L}\p{N}_\-]))/giv;
 
-const PUNYCODE_RU_TLD = '.xn--p1ai';
+const PUNYCODE_RU_TLD = 'xn--p1ai';
+const PUNYCODE_RU_SUFFIX = `.${PUNYCODE_RU_TLD}`;
+
+// Check a two-letter ASCII TLD against the generated 26×26 bitmap.
+function isCcTld(text: string, start: number): boolean {
+  const firstCode = text.charCodeAt(start) | 32;
+  const secondCode = text.charCodeAt(start + 1) | 32;
+  const bitIndex = (firstCode - 97) * 26 + secondCode - 97;
+
+  return (CC_TLD_BITMAP[bitIndex >> 5] & (1 << (bitIndex & 31))) !== 0;
+}
+
+// Validate only fuzzy two-letter TLDs; explicit URLs and hand-written TLDs are already gated.
+function isSupportedFuzzyUrl(urlStr: string): boolean {
+  const hostEnd = urlStr.indexOf('/');
+  const hostnameEnd = hostEnd === -1 ? urlStr.length : hostEnd;
+  const tldStart = urlStr.lastIndexOf('.', hostnameEnd - 1) + 1;
+  const tldLength = hostnameEnd - tldStart;
+
+  return (
+    tldLength !== 2 ||
+    urlStr.startsWith('рф', tldStart) ||
+    isCcTld(urlStr, tldStart)
+  );
+}
 
 // Normalize the supported Russian IDN suffix while preserving the original span indexes.
 function normalizeMatchText(urlStr: string): string {
   const hostEnd = urlStr.indexOf('/');
   const hostnameEnd = hostEnd === -1 ? urlStr.length : hostEnd;
-  const suffixStart = hostnameEnd - PUNYCODE_RU_TLD.length;
+  const suffixStart = hostnameEnd - PUNYCODE_RU_SUFFIX.length;
 
-  if (suffixStart <= 0 || !urlStr.startsWith(PUNYCODE_RU_TLD, suffixStart)) {
+  if (suffixStart <= 0 || !urlStr.startsWith(PUNYCODE_RU_SUFFIX, suffixStart)) {
     return urlStr;
   }
 
@@ -42,6 +64,11 @@ export function linkify(text: string): LinkMatch[] {
   for (const match of text.matchAll(LINKIFY_REGEX)) {
     let urlStr = match[0];
     const matchIdx = match.index!;
+    const isExplicitUrl =
+      urlStr.startsWith('http://') || urlStr.startsWith('https://');
+
+    // Skip unsupported fuzzy TLDs while keeping explicit URLs permissive.
+    if (!isExplicitUrl && !isSupportedFuzzyUrl(urlStr)) continue;
 
     // 剔除末尾标点
     while (
@@ -65,7 +92,7 @@ export function linkify(text: string): LinkMatch[] {
     }
 
     const normalizedUrlStr = normalizeMatchText(urlStr);
-    const fullUrl = normalizedUrlStr.startsWith('http')
+    const fullUrl = isExplicitUrl
       ? normalizedUrlStr
       : `https://${normalizedUrlStr}`;
 

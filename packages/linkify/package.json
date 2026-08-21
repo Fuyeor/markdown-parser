@@ -2,14 +2,16 @@
   "name": "@fuyeor/linkify",
   "version": "1.0.0",
   "description": "High performance and minimal size linkifier",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "node --experimental-strip-types build/generate-tlds.ts && tsc",
+    "generate:tlds": "node --experimental-strip-types build/generate-tlds.ts",
     "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "vitest": "^0.34.0"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.0"
   }
 }
