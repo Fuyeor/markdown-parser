@@ -39,8 +39,16 @@
       }
     ]
   },
+  "configurationDefaults": {
+    "[ffm]": {
+      "editor.wordWrap": "on",
+      "editor.wrappingStrategy": "advanced",
+      "editor.unicodeHighlight.ambiguousCharacters": false
+    }
+  },
   "files": [
     "LICENSE",
+    "examples",
     "language-configuration.json",
     "syntaxes"
   ],

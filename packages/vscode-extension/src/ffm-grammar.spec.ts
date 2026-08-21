@@ -57,6 +57,24 @@ describe('FFM VS Code extension source', () => {
       expect(repository[ruleName]).toBeDefined();
   });
 
+  it('configures .ffm documents as wrapped natural text without ambiguous-character highlights', () => {
+    const manifest = readJson('package.json');
+    const configurationDefaults = manifest.configurationDefaults as Record<
+      string,
+      unknown
+    >;
+    const ffmDefaults = configurationDefaults['[ffm]'] as Record<
+      string,
+      unknown
+    >;
+
+    expect(ffmDefaults).toEqual({
+      'editor.wordWrap': 'on',
+      'editor.wrappingStrategy': 'advanced',
+      'editor.unicodeHighlight.ambiguousCharacters': false,
+    });
+  });
+
   it('recognizes FFM-only fenced block keywords and task titles', () => {
     const grammar = readJson('syntaxes/ffm.tmLanguage.json');
     const repository = grammar.repository as Record<string, unknown>;
