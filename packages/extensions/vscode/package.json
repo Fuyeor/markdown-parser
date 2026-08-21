@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "publisher": "Fuyeor",
   "license": "MIT",
-  "icon": "icon.png",
+  "icon": "extension/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/Fuyeor/markdown-parser.git",
@@ -24,8 +24,8 @@
       {
         "id": "ffm",
         "aliases": [
-          "Fuyeor Flavored Markdown",
-          "FFM"
+          "ffm",
+          "fuyeor-flavored-markdown"
         ],
         "extensions": [
           ".ffm"
@@ -52,6 +52,7 @@
     "out",
     "examples",
     "syntaxes",
+    "extension",
     "language-configuration.json",
     "LICENSE"
   ],
