@@ -16,6 +16,7 @@
   "categories": [
     "Programming Languages"
   ],
+  "main": "./out/extension.js",
   "contributes": {
     "languages": [
       {
@@ -48,11 +49,24 @@
   },
   "files": [
     "LICENSE",
+    "out",
     "examples",
     "language-configuration.json",
     "syntaxes"
   ],
   "scripts": {
-    "test": "vitest run --config ../../vitest.config.ts src/ffm-grammar.spec.ts"
+    "compile": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=out/extension.js",
+    "vscode:prepublish": "npm run compile",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config ../../vitest.config.ts src/*.spec.ts"
+  },
+  "dependencies": {
+    "@fuyeor/markdown-formatter": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "esbuild": "^0.27.7",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.0"
   }
 }
