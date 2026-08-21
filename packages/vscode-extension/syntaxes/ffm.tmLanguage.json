@@ -1,0 +1,197 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Fuyeor Flavored Markdown",
+  "scopeName": "text.html.markdown.ffm",
+  "patterns": [
+    { "include": "#special_fenced_blocks" },
+    { "include": "#fenced_code_block" },
+    { "include": "#math_block" },
+    { "include": "#table_row" },
+    { "include": "#heading" },
+    { "include": "#blockquote" },
+    { "include": "#list_marker" },
+    { "include": "#image" },
+    { "include": "#link" },
+    { "include": "#inline_code" },
+    { "include": "#inline_math" },
+    { "include": "#bold_italic" },
+    { "include": "#bold" },
+    { "include": "#underline" },
+    { "include": "#strikethrough" },
+    { "include": "#italic" }
+  ],
+  "repository": {
+    "special_fenced_blocks": {
+      "begin": "^\\s*(`{3,})(quote|slide|chain|accordion|mermaid|smiles|abc)\\s*$",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.fenced.begin.ffm" },
+        "2": { "name": "entity.name.type.block.ffm" }
+      },
+      "end": "^\\s*\\1\\s*$",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.fenced.end.ffm" }
+      },
+      "name": "markup.fenced.block.ffm",
+      "patterns": [
+        { "include": "#special_block_title" },
+        { "include": "#slide_separator" },
+        { "include": "#blockquote" },
+        { "include": "#image" },
+        { "include": "#link" },
+        { "include": "#inline_code" },
+        { "include": "#inline_math" },
+        { "include": "#bold_italic" },
+        { "include": "#bold" },
+        { "include": "#underline" },
+        { "include": "#strikethrough" },
+        { "include": "#italic" }
+      ]
+    },
+    "fenced_code_block": {
+      "begin": "^\\s*(`{3,})([A-Za-z][A-Za-z0-9_+.-]*)?\\s*$",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.fenced.begin.ffm" },
+        "2": { "name": "entity.name.type.language.ffm" }
+      },
+      "end": "^\\s*\\1\\s*$",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.fenced.end.ffm" }
+      },
+      "name": "markup.fenced.code.block.ffm",
+      "contentName": "source.embedded.ffm"
+    },
+    "math_block": {
+      "begin": "^\\s*(\\$\\$)\\s*$",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.math.begin.ffm" }
+      },
+      "end": "^\\s*(\\$\\$)\\s*$",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.math.end.ffm" }
+      },
+      "name": "markup.math.block.ffm"
+    },
+    "table_row": {
+      "begin": "^\\s*(?=\\|)",
+      "end": "$",
+      "name": "meta.table.row.ffm",
+      "patterns": [
+        { "match": "\\|", "name": "punctuation.separator.table.ffm" },
+        {
+          "match": "(?<!\\|)\\s*(:?-{3,}:?)\\s*(?=\\|)",
+          "name": "constant.other.table.delimiter.ffm"
+        }
+      ]
+    },
+    "heading": {
+      "match": "^(#{1,6})(?=\\s)(.*)$",
+      "captures": {
+        "1": { "name": "punctuation.definition.heading.ffm" },
+        "2": { "name": "entity.name.section.ffm" }
+      },
+      "name": "markup.heading.ffm"
+    },
+    "blockquote": {
+      "match": "^(\\s*>)(?:\\s+)(.*)$",
+      "captures": {
+        "1": { "name": "punctuation.definition.quote.begin.ffm" },
+        "2": { "name": "markup.quote.ffm" }
+      }
+    },
+    "list_marker": {
+      "patterns": [
+        {
+          "match": "^(\\s{0,})([-*])(?=\\s+)",
+          "captures": {
+            "1": { "name": "punctuation.whitespace.list.indent.ffm" },
+            "2": { "name": "punctuation.definition.list.unordered.ffm" }
+          }
+        },
+        {
+          "match": "^(\\s{0,})(\\d+\\.)(?=\\s+)",
+          "captures": {
+            "1": { "name": "punctuation.whitespace.list.indent.ffm" },
+            "2": { "name": "punctuation.definition.list.ordered.ffm" }
+          }
+        }
+      ]
+    },
+    "image": {
+      "match": "!\\[([^]\\n]*)\\]\\(([^)\\n]+)\\)",
+      "captures": {
+        "1": { "name": "string.other.image.alt.ffm" },
+        "2": { "name": "markup.underline.link.image.ffm" }
+      },
+      "name": "meta.image.ffm"
+    },
+    "link": {
+      "match": "\\[([^]\\n]*)\\]\\(([^)\\n]+)\\)",
+      "captures": {
+        "1": { "name": "string.other.link.title.ffm" },
+        "2": { "name": "markup.underline.link.ffm" }
+      },
+      "name": "meta.link.ffm"
+    },
+    "inline_code": {
+      "match": "(`{1,3})([^`\\n]+?)\\1",
+      "captures": {
+        "1": { "name": "punctuation.definition.raw.begin.ffm" },
+        "2": { "name": "markup.inline.raw.string.ffm" }
+      },
+      "name": "markup.inline.raw.ffm"
+    },
+    "inline_math": {
+      "match": "\\$(?!\\$)([^$\\n]+?)\\$",
+      "captures": {
+        "1": { "name": "string.other.math.ffm" }
+      },
+      "name": "markup.math.inline.ffm"
+    },
+    "bold_italic": {
+      "match": "\\*\\*\\*([^*\\n]+?)\\*\\*\\*",
+      "captures": {
+        "1": { "name": "markup.bold.italic.content.ffm" }
+      },
+      "name": "markup.bold.italic.ffm"
+    },
+    "bold": {
+      "match": "\\*\\*([^*\\n]+?)\\*\\*",
+      "captures": {
+        "1": { "name": "markup.bold.content.ffm" }
+      },
+      "name": "markup.bold.ffm"
+    },
+    "underline": {
+      "match": "__([^_\\n]+?)__",
+      "captures": {
+        "1": { "name": "markup.underline.content.ffm" }
+      },
+      "name": "markup.underline.ffm"
+    },
+    "strikethrough": {
+      "match": "--([^\\-\\n]+?)--",
+      "captures": {
+        "1": { "name": "markup.strikethrough.content.ffm" }
+      },
+      "name": "markup.strikethrough.ffm"
+    },
+    "italic": {
+      "match": "(?<!\\*)\\*([^*\\n]+?)\\*(?!\\*)",
+      "captures": {
+        "1": { "name": "markup.italic.content.ffm" }
+      },
+      "name": "markup.italic.ffm"
+    },
+    "special_block_title": {
+      "match": "^\\s*\\*\\*(?:\\[[ xX]\\]\\s*)?([^*\\n]+?)\\*\\*\\s*$",
+      "captures": {
+        "1": { "name": "entity.name.section.block.ffm" }
+      },
+      "name": "markup.bold.block-title.ffm"
+    },
+    "slide_separator": {
+      "match": "^\\s*---\\s*$",
+      "name": "meta.separator.slide.ffm"
+    }
+  }
+}
