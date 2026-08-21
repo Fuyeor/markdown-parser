@@ -1,0 +1,228 @@
+# A Small Creative Experiment
+
+This is an article written to demonstrate **Fuyeor Flavored Markdown** syntax. It also includes *italic*, **bold**, ***bold italic***, --strikethrough--, and __underline__.
+
+The goal of the article is simple: keep the content clear and give the structure enough expressive power.
+
+## 1. Starting from an Idea
+
+### 1.1 Capturing Inspiration
+
+Sometimes an idea just needs one sentence: `Write it down first, then refine it gradually.`
+
+If the code itself contains backticks, you can wrap it with two backticks, for example: `` const mark = `FFM` ``.
+
+We can also visit the [Fuyeor FFM Syntax Overview](https://reference.fuyeor.com/ffm/overview), or simply type an autolink: https://reference.fuyeor.com/ffm/overview.
+
+### 1.2 A Glance at All Six Heading Levels
+
+# Heading Level 1
+## Heading Level 2
+### Heading Level 3
+#### Heading Level 4
+##### Heading Level 5
+###### Heading Level 6
+
+All six heading levels above use `#` at the start of the line, with a space after the hash.
+
+## 2. Organising Materials into Lists
+
+For unordered lists, the recommended hyphen style works well:
+
+- Observe the problem
+  - Find the core need
+    - Record constraints
+    - Distinguish facts from assumptions
+  - Identify who the reader is
+- Design the solution
+- Verify the final result
+
+Unordered lists can also use the asterisk style:
+
+* First material
+  * Second material
+* Third material
+
+Ordered lists use digits, a half‑width period, and a space:
+
+1. Write down the topic
+2. Organise paragraphs
+    - Add a nested unordered item
+        - And one more deeper item
+3. Check the tone
+
+## 3. Quotations and Explanations
+
+> Good documentation is not about piling up all the information, but about helping readers find the next step.
+
+For longer quotations, you can use a `quote` code block:
+
+```quote
+What really matters is not memorising every piece of syntax,
+but letting the syntax serve clear expression.
+```
+
+## 4. Code and Implementation
+
+Here is a TypeScript example:
+
+```typescript
+function greet(name: string): string {
+  return `Hello, ${name}!`;
+}
+
+console.log(greet('FFM reader'));
+```
+
+If you need to show a nested FFM code block inside the article, you can increase the number of backticks on the outer fence:
+
+````ffm
+```accordion
+**Expand to see details**
+
+This is a piece of collapsed content.
+```
+````
+
+## 5. Comparing Options with a Table
+
+The table below shows how inline syntax works inside table cells. The first column is left‑aligned, the second is centered, and the third is right‑aligned.
+
+| Approach | Characteristics | Use Case |
+| :--- | :---: | ---: |
+| **Lit** | `lightweight`, embeddable | Web Components |
+| *Vue* | component‑based, extensible | Application websites |
+| **Vue + parser** | __clear separation__ | Documentation playground |
+
+## 6. Displaying Views Side by Side
+
+The `slide` block below is suitable for presenting comparative content:
+
+```slide
+**First card: understand the problem**
+
+- Identify the reader
+- Clarify the goal
+- List constraints
+
+---
+
+**Second card: choose the tool**
+
+- Compare complexity
+- Evaluate maintainability
+- Reserve room for future extensions
+
+---
+
+**Third card: verify the result**
+
+- Check rendering
+- Check mobile layout
+- Check accessibility
+```
+
+## 7. Expressing a Process with chain
+
+A project typically goes through several stages:
+
+```chain
+**Start from the problem**
+First gather background information and confirm what actually needs to be solved, rather than rushing to choose a technology.
+
+**[x] Complete material organisation**
+I have read the syntax documentation and recorded basic syntax, layout blocks, and advanced extensions.
+
+**[x] Create a minimal example**
+I have prepared an independent FFM document that can be read and verified.
+
+**[ ] Expand to a real page**
+The next step is to connect the example to a playground and observe how different renderers behave.
+
+**[ ] Collect reader feedback**
+Let actual users point out unclear parts, then decide whether to adjust the structure.
+```
+
+In chain, each bold line on its own becomes a node; `[x]` means completed, `[ ]` means pending, and headings without checkboxes use the default state.
+
+## 8. Storing Details with accordion
+
+The following content is collapsed by default; readers can click the headings to reveal the answers:
+
+```accordion
+**Why does FFM use `--strikethrough--`?**
+Because tildes often carry a tonal function in Chinese, Japanese, and Korean contexts; using two hyphens reduces conflicts with everyday writing.
+
+**Why is raw HTML not allowed?**
+This prevents documents from depending on browser tags and reduces security risks from unknown content.
+
+**When is accordion appropriate?**
+It is suitable for FAQs, supplementary explanations, or behind‑the‑scenes details that you do not want to occupy too much space initially.
+```
+
+## 9. Mathematical Formulas
+
+Inline formulas can be placed directly in a sentence: Einstein's mass–energy relation is $E=mc^2$, and the area of a circle is $S=\pi r^2$.
+
+Block‑level formulas stand on their own line:
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+And here is the quadratic formula:
+
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+
+## 10. Flowcharts
+
+Mermaid is great for describing processes and relationships in text:
+
+```mermaid
+graph TD
+    A[Ask a question] --> B{Do we already understand the need?}
+    B -- Yes --> C[Design an example]
+    B -- No --> D[Read more materials]
+    D --> B
+    C --> E[Verify the rendering result]
+```
+
+## 11. Chemical Structure Notation
+
+SMILES can be used inline to show molecular structures. For example, water can be written as #[smiles = `O`], ethanol as #[smiles = `CCO`].
+
+You can also use a block‑level `smiles` block, with one molecule per line:
+
+```smiles
+O
+CCO
+c1ccccc1
+CC(=O)OC1=CC=CC=C1C(=O)O
+```
+
+## 12. Music Notation
+
+ABC notation can describe a simple melody in plain text:
+
+```abc
+X: 1
+T: A short melody
+M: 4/4
+L: 1/4
+K: C
+C D E F | G A B c |
+```
+
+## 13. A Complete Summary
+
+Now, in this single article, we have used headings, paragraphs, inline emphasis, links, images, lists, blockquotes, inline code, code blocks, tables, horizontal rules, slide, chain, accordion, mathematical formulas, Mermaid, SMILES, and ABC notation.
+
+If you are writing your own FFM document, you can start with the simplest structure:
+
+1. Use headings to establish hierarchy.
+2. Use paragraphs to explain the background.
+3. Use lists and tables to organise information.
+4. Use blockquotes, code blocks, and extended blocks to supplement details.
+5. Finally, check whether each block truly helps the reader understand the content.
+
+> The value of FFM lies not in having more symbols, but in using a small set of clear syntax to write content that is structurally stable, easy to read, and convenient to render.
