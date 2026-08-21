@@ -1,0 +1,21 @@
+{
+  "name": "@fuyeor/markdown-formatter",
+  "version": "0.1.0",
+  "description": "Formatter for Fuyeor Flavored Markdown documents.",
+  "license": "MIT",
+  "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "test": "vitest run src/index.spec.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.0"
+  }
+}

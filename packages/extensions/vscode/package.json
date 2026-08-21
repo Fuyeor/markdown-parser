@@ -1,0 +1,74 @@
+{
+  "name": "ffm",
+  "displayName": "Fuyeor Flavored Markdown",
+  "description": "Syntax highlighting for Fuyeor Flavored Markdown in Visual Studio Code.",
+  "version": "0.1.0",
+  "publisher": "Fuyeor",
+  "license": "MIT",
+  "icon": "extension/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fuyeor/markdown-parser.git",
+    "directory": "packages/vscode-extension"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "ffm",
+        "aliases": [
+          "ffm",
+          "fuyeor-flavored-markdown"
+        ],
+        "extensions": [
+          ".ffm"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ffm",
+        "scopeName": "text.ffm",
+        "path": "./syntaxes/ffm.tmLanguage.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[ffm]": {
+        "editor.wordWrap": "on",
+        "editor.wrappingStrategy": "advanced",
+        "editor.unicodeHighlight.ambiguousCharacters": false
+      }
+    }
+  },
+  "files": [
+    "out",
+    "examples",
+    "syntaxes",
+    "extension",
+    "language-configuration.json",
+    "LICENSE"
+  ],
+  "scripts": {
+    "compile": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=out/extension.js",
+    "vscode:prepublish": "npm run compile",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config ../../vitest.config.ts src/*.spec.ts"
+  },
+  "dependencies": {
+    "@fuyeor/markdown-formatter": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "esbuild": "^0.27.7",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.0"
+  }
+}

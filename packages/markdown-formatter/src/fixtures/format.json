@@ -1,0 +1,97 @@
+[
+  {
+    "origin": "这是10个XX",
+    "formatted": "这是 10 个 XX",
+    "section": "cjk-spacing"
+  },
+  {
+    "origin": "展示**Fuyeor Flavored Markdown**的文章",
+    "formatted": "展示 **Fuyeor Flavored Markdown** 的文章",
+    "section": "inline-markup-spacing"
+  },
+  {
+    "origin": "句末。  \n下一句",
+    "formatted": "句末。\n下一句",
+    "section": "trailing-whitespace"
+  },
+  {
+    "origin": " \n\n  第一行\n第二行  \n\n",
+    "formatted": "第一行\n第二行",
+    "section": "document-boundary"
+  },
+  {
+    "origin": "    -   第一项\n      - 第二项",
+    "formatted": "  - 第一项\n    - 第二项",
+    "section": "list-spacing"
+  },
+  {
+    "origin": "1. 写下主题\n2. 组织段落\n   - 添加一个嵌套的无序项目\n     - 再补充一个更深层的项目\n3. 检查语气",
+    "formatted": "1. 写下主题\n2. 组织段落\n  - 添加一个嵌套的无序项目\n    - 再补充一个更深层的项目\n3. 检查语气",
+    "section": "nested-list-spacing"
+  },
+  {
+    "origin": "---",
+    "formatted": "---",
+    "section": "horizontal-rule"
+  },
+  {
+    "origin": "|  表头一  | 表头二 |\n| :------- | -------: |\n|  内容一 | 内容二  |",
+    "formatted": "| 表头一 | 表头二 |\n| :--- | ---: |\n| 内容一 | 内容二 |",
+    "section": "table-spacing"
+  },
+  {
+    "origin": "[Fuyeor FFM 语法总览](  https://reference.fuyeor.com/ffm/overview   )",
+    "formatted": "[Fuyeor FFM 语法总览](https://reference.fuyeor.com/ffm/overview)",
+    "section": "link-destination"
+  },
+  {
+    "origin": "> 引用 1\n>\n> 引用 2\n> \n> 引用 3",
+    "formatted": "```quote\n引用 1\n\n引用 2\n\n引用 3\n```",
+    "section": "blockquote-conversion"
+  },
+  {
+    "origin": "> 引用 1\n>\n> 引用 2",
+    "formatted": "> 引用 1\n>\n> 引用 2",
+    "section": "short-blockquote"
+  },
+  {
+    "origin": ">    Text",
+    "formatted": "> Text",
+    "section": "blockquote-spacing"
+  },
+  {
+    "origin": "文字`code`文字",
+    "formatted": "文字 `code` 文字",
+    "section": "inline-code-spacing"
+  },
+  {
+    "origin": "文本``code``文本",
+    "formatted": "文本 ``code`` 文本",
+    "section": "multi-backtick-spacing"
+  },
+  {
+    "origin": "    text",
+    "formatted": "text",
+    "section": "ordinary-leading-whitespace"
+  },
+  {
+    "origin": "text\n\n\n\ntext",
+    "formatted": "text\n\ntext",
+    "section": "repeated-blank-lines"
+  },
+  {
+    "origin": "```quote\n这是10个XX。  \n```",
+    "formatted": "```quote\n这是 10 个 XX。\n```",
+    "section": "semantic-fence"
+  },
+  {
+    "origin": "```ffm\n这是10个XX。  \n    -   code\n```",
+    "formatted": "```ffm\n这是10个XX。  \n    -   code\n```",
+    "section": "protected-code-fence"
+  },
+  {
+    "origin": "文本 `这是10个XX` 与 $10个XX$",
+    "formatted": "文本 `这是10个XX` 与 $10个XX$",
+    "section": "protected-inline-content"
+  }
+]

@@ -1,8 +1,17 @@
 // vitest.config.ts
+import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [],
+  resolve: {
+    alias: {
+      vscode: resolve(
+        import.meta.dirname,
+        'packages/vscode-extension/src/vscode.mock.ts',
+      ),
+    },
+  },
   test: {
     // Test browser environment
     environment: 'jsdom',
