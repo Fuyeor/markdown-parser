@@ -7,6 +7,12 @@ describe('format', () => {
     expect(format('这是10个XX')).toBe('这是 10 个 XX');
   });
 
+  it('formats CJK boundaries around inline emphasis markers', () => {
+    expect(format('展示**Fuyeor Flavored Markdown**的文章')).toBe(
+      '展示 **Fuyeor Flavored Markdown** 的文章',
+    );
+  });
+
   it('removes trailing spaces before a line break', () => {
     expect(format('句末。  \n下一句')).toBe('句末。\n下一句');
   });
@@ -21,12 +27,24 @@ describe('format', () => {
     );
   });
 
+  it('does not interpret a horizontal rule as a table', () => {
+    expect(format('---')).toBe('---');
+  });
+
   it('normalizes table padding and delimiter hyphens', () => {
     expect(
       format(
         '|  表头一  | 表头二 |\n| :------- | -------: |\n|  内容一 | 内容二  |',
       ),
     ).toBe('| 表头一 | 表头二 |\n| :--- | ---: |\n| 内容一 | 内容二 |');
+  });
+
+  it('trims whitespace around link destinations', () => {
+    expect(
+      format(
+        '[Fuyeor FFM 语法总览](  https://reference.fuyeor.com/ffm/overview   )',
+      ),
+    ).toBe('[Fuyeor FFM 语法总览](https://reference.fuyeor.com/ffm/overview)');
   });
 
   it('converts three quoted segments and preserves quoted blank lines', () => {

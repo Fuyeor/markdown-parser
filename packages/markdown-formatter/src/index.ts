@@ -6,6 +6,8 @@ const CJK_LATIN_BOUNDARY = new RegExp(
   `(?<=[${CJK_CHARACTER}])(?=[${LATIN_OR_DIGIT}])|(?<=[${LATIN_OR_DIGIT}])(?=[${CJK_CHARACTER}])`,
   'gu',
 );
+const INLINE_MARKUP_PATTERN = /(\*{1,3}|_{2}|--)([^\n]+?)\1/gu;
+const LINK_TARGET_PATTERN = /(!?\[[^\]\n]*\])\(\s*([^)]*?\S)\s*\)/gu;
 const SEMANTIC_FENCE_LANGUAGES = new Set([
   'quote',
   'slide',
@@ -108,9 +110,54 @@ function formatTableDelimiter(cells: readonly string[]): string {
   );
 }
 
-/** Apply CJK spacing outside protected inline code and mathematical expressions. */
-function formatTextSegment(segment: string): string {
+/** Apply CJK spacing to plain text without interpreting protected inline code. */
+function formatCjkBoundaries(segment: string): string {
   return segment.replace(CJK_LATIN_BOUNDARY, ' ');
+}
+
+/** Add spaces around inline markup when its content crosses a CJK boundary. */
+function formatInlineMarkupBoundaries(segment: string): string {
+  return segment.replace(
+    INLINE_MARKUP_PATTERN,
+    (
+      full: string,
+      marker: string,
+      inner: string,
+      offset: number,
+      source: string,
+    ) => {
+      const previous = source[offset - 1];
+      const next = source[offset + full.length];
+      const leadingSpace =
+        previous &&
+        /\p{Script=Han}/u.test(previous) &&
+        /[A-Za-z0-9]/u.test(inner[0]!)
+          ? ' '
+          : '';
+      const trailingSpace =
+        next &&
+        /\p{Script=Han}/u.test(next) &&
+        /[A-Za-z0-9]/u.test(inner.at(-1)!)
+          ? ' '
+          : '';
+      return `${leadingSpace}${marker}${formatCjkBoundaries(inner)}${marker}${trailingSpace}`;
+    },
+  );
+}
+
+/** Trim only the outer whitespace of Markdown link destinations. */
+function trimLinkTargets(segment: string): string {
+  return segment.replace(
+    LINK_TARGET_PATTERN,
+    (_full: string, label: string, target: string) => `${label}(${target})`,
+  );
+}
+
+/** Apply inline spacing and link cleanup to an unprotected text segment. */
+function formatTextSegment(segment: string): string {
+  return formatCjkBoundaries(
+    formatInlineMarkupBoundaries(trimLinkTargets(segment)),
+  );
 }
 
 /** Format ordinary text while preserving inline code and math tokens byte-for-byte. */
@@ -218,6 +265,7 @@ function formatTable(
   lines: readonly string[],
   start: number,
 ): { lines: string[]; next: number } | null {
+  if (!lines[start]!.includes('|')) return null;
   const delimiterCells = getTableDelimiterCells(lines[start + 1] ?? '');
   if (!delimiterCells) return null;
 
