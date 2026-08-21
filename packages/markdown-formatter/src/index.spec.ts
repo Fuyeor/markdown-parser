@@ -1,81 +1,22 @@
 // @fuyeor/markdown-formatter/src/index.spec.ts
 import { describe, expect, it } from 'vitest';
+import fixtureData from './fixtures/format.json';
 import { format } from './index';
 
-describe('format', () => {
-  it('adds spaces between CJK text and Latin letters or numbers', () => {
-    expect(format('这是10个XX')).toBe('这是 10 个 XX');
-  });
+type FormatFixture = {
+  origin: string;
+  formatted: string;
+  section: string;
+};
 
-  it('formats CJK boundaries around inline emphasis markers', () => {
-    expect(format('展示**Fuyeor Flavored Markdown**的文章')).toBe(
-      '展示 **Fuyeor Flavored Markdown** 的文章',
-    );
-  });
+const fixtures = fixtureData as FormatFixture[];
 
-  it('removes trailing spaces before a line break', () => {
-    expect(format('句末。  \n下一句')).toBe('句末。\n下一句');
-  });
-
-  it('trims leading and trailing whitespace from the document', () => {
-    expect(format(' \n\n  第一行\n第二行  \n\n')).toBe('第一行\n第二行');
-  });
-
-  it('normalizes list indentation and marker spacing', () => {
-    expect(format('    -   第一项\n      - 第二项')).toBe(
-      '  - 第一项\n  - 第二项',
-    );
-  });
-
-  it('does not interpret a horizontal rule as a table', () => {
-    expect(format('---')).toBe('---');
-  });
-
-  it('normalizes table padding and delimiter hyphens', () => {
-    expect(
-      format(
-        '|  表头一  | 表头二 |\n| :------- | -------: |\n|  内容一 | 内容二  |',
-      ),
-    ).toBe('| 表头一 | 表头二 |\n| :--- | ---: |\n| 内容一 | 内容二 |');
-  });
-
-  it('trims whitespace around link destinations', () => {
-    expect(
-      format(
-        '[Fuyeor FFM 语法总览](  https://reference.fuyeor.com/ffm/overview   )',
-      ),
-    ).toBe('[Fuyeor FFM 语法总览](https://reference.fuyeor.com/ffm/overview)');
-  });
-
-  it('converts three quoted segments and preserves quoted blank lines', () => {
-    expect(format('> 引用 1\n>\n> 引用 2\n> \n> 引用 3')).toBe(
-      '```quote\n引用 1\n\n引用 2\n\n引用 3\n```',
-    );
-  });
-
-  it('keeps a shorter blockquote as a regular blockquote', () => {
-    expect(format('> 引用 1\n>\n> 引用 2')).toBe('> 引用 1\n>\n> 引用 2');
-  });
-
-  it('formats semantic FFM fences without changing their delimiters', () => {
-    expect(format('```quote\n这是10个XX。  \n```')).toBe(
-      '```quote\n这是 10 个 XX。\n```',
-    );
-    expect(format('```chain\n**第一步**\n```')).toBe(
-      '```chain\n**第一步**\n```',
-    );
-  });
-
-  it('does not alter fenced code content', () => {
-    const source = '```ffm\n这是10个XX。  \n    -   code\n```';
-    expect(format(source)).toBe(source);
-  });
-
-  it('does not alter inline code or math expressions', () => {
-    expect(format('文本 `这是10个XX` 与 $10个XX$')).toBe(
-      '文本 `这是10个XX` 与 $10个XX$',
-    );
-  });
+describe('format fixtures', () => {
+  for (const fixture of fixtures) {
+    it(fixture.section, () => {
+      expect(format(fixture.origin)).toBe(fixture.formatted);
+    });
+  }
 
   it('fails fast for non-string input', () => {
     expect(() => format(null as unknown as string)).toThrow(TypeError);

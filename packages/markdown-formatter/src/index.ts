@@ -110,6 +110,16 @@ function formatTableDelimiter(cells: readonly string[]): string {
   );
 }
 
+/** Check whether a single character is a Han-script character. */
+function isCjkCharacter(character: string | undefined): boolean {
+  return character !== undefined && /^\p{Script=Han}$/u.test(character);
+}
+
+/** Check whether a single character is a Latin letter or an ASCII digit. */
+function isLatinOrDigitCharacter(character: string | undefined): boolean {
+  return character !== undefined && /^[A-Za-z0-9]$/u.test(character);
+}
+
 /** Apply CJK spacing to plain text without interpreting protected inline code. */
 function formatCjkBoundaries(segment: string): string {
   return segment.replace(CJK_LATIN_BOUNDARY, ' ');
@@ -129,15 +139,11 @@ function formatInlineMarkupBoundaries(segment: string): string {
       const previous = source[offset - 1];
       const next = source[offset + full.length];
       const leadingSpace =
-        previous &&
-        /\p{Script=Han}/u.test(previous) &&
-        /[A-Za-z0-9]/u.test(inner[0]!)
+        isCjkCharacter(previous) && isLatinOrDigitCharacter(inner[0])
           ? ' '
           : '';
       const trailingSpace =
-        next &&
-        /\p{Script=Han}/u.test(next) &&
-        /[A-Za-z0-9]/u.test(inner.at(-1)!)
+        isCjkCharacter(next) && isLatinOrDigitCharacter(inner.at(-1))
           ? ' '
           : '';
       return `${leadingSpace}${marker}${formatCjkBoundaries(inner)}${marker}${trailingSpace}`;
@@ -158,6 +164,26 @@ function formatTextSegment(segment: string): string {
   return formatCjkBoundaries(
     formatInlineMarkupBoundaries(trimLinkTargets(segment)),
   );
+}
+
+/** Add CJK spacing around a protected inline token without changing its content. */
+function formatProtectedToken(
+  token: string,
+  previous: string | undefined,
+  next: string | undefined,
+): string {
+  const marker =
+    token[0] === '`'
+      ? '`'.repeat(countMarkerCharacters(token, 0, '`'))
+      : token.startsWith('$$')
+        ? '$$'
+        : '$';
+  const inner = token.slice(marker.length, -marker.length);
+  const leadingSpace =
+    isCjkCharacter(previous) && isLatinOrDigitCharacter(inner[0]) ? ' ' : '';
+  const trailingSpace =
+    isCjkCharacter(next) && isLatinOrDigitCharacter(inner.at(-1)) ? ' ' : '';
+  return `${leadingSpace}${token}${trailingSpace}`;
 }
 
 /** Format ordinary text while preserving inline code and math tokens byte-for-byte. */
@@ -187,7 +213,11 @@ function formatText(line: string): string {
       ) {
         appendPlainText(index);
         const contentEnd = closingIndex + marker.length;
-        result += line.slice(index, contentEnd);
+        result += formatProtectedToken(
+          line.slice(index, contentEnd),
+          line[index - 1],
+          line[contentEnd],
+        );
         index = contentEnd;
         segmentStart = index;
         continue;
@@ -223,10 +253,19 @@ function formatListLine(line: string): string | null {
   return `${indentation}${match[2]} ${rest}`;
 }
 
+/** Normalize one Markdown blockquote marker and its content spacing. */
+function formatQuoteLine(line: string): string | null {
+  const match = line.match(/^\s*(>+)[ \t]*(.*)$/u);
+  if (!match) return null;
+  const content = formatText(match[2]!.trimStart());
+  return content ? `${match[1]} ${content}` : match[1]!;
+}
+
 /** Format one non-fenced line without changing its Markdown delimiters. */
 function formatOrdinaryLine(line: string): string {
+  const quoteLine = formatQuoteLine(line);
   const listLine = formatListLine(line);
-  const formatted = listLine ?? formatText(line);
+  const formatted = quoteLine ?? listLine ?? formatText(line).trimStart();
   return formatted.replace(/[ \t]+$/u, '');
 }
 
@@ -336,6 +375,12 @@ export function format(content: string): string {
     if (fence) {
       formatted.push(line);
       if (isFenceClose(line, fence)) fence = null;
+      index++;
+      continue;
+    }
+
+    if (line.trim() === '') {
+      if (formatted.at(-1) !== '') formatted.push('');
       index++;
       continue;
     }
