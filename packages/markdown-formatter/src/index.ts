@@ -25,6 +25,10 @@ type QuoteLine = {
   content: string;
 };
 
+type ListIndentContext = {
+  levels: number[];
+};
+
 /** Normalize line endings before applying deterministic line-based formatting. */
 function normalizeLineEndings(content: string): string {
   return content.replace(/\r\n?/gu, '\n');
@@ -241,15 +245,25 @@ function countMarkerCharacters(
   return count;
 }
 
-/** Normalize list indentation to the requested two-space maximum. */
-function formatListLine(line: string): string | null {
+/** Normalize one list level to two spaces while preserving nested list depth. */
+function formatListLine(
+  line: string,
+  context: ListIndentContext,
+): string | null {
   const match = line.match(/^(\s*)([-*]|\d+[.)])(?=\s+)/u);
   if (!match) return null;
+
+  const rawIndentation = match[1]!.replace(/\t/gu, '  ').length;
+  while (context.levels.length > 1 && rawIndentation < context.levels.at(-1)!) {
+    context.levels.pop();
+  }
+  if (rawIndentation > context.levels.at(-1)!) {
+    context.levels.push(rawIndentation);
+  }
+
   const markerEnd = match[1]!.length + match[2]!.length;
   const rest = formatText(line.slice(markerEnd).trimStart());
-  const indentation = ' '.repeat(
-    Math.min(match[1]!.replace(/\t/gu, '  ').length, 2),
-  );
+  const indentation = ' '.repeat((context.levels.length - 1) * 2);
   return `${indentation}${match[2]} ${rest}`;
 }
 
@@ -262,10 +276,11 @@ function formatQuoteLine(line: string): string | null {
 }
 
 /** Format one non-fenced line without changing its Markdown delimiters. */
-function formatOrdinaryLine(line: string): string {
+function formatOrdinaryLine(line: string, context: ListIndentContext): string {
   const quoteLine = formatQuoteLine(line);
-  const listLine = formatListLine(line);
+  const listLine = formatListLine(line, context);
   const formatted = quoteLine ?? listLine ?? formatText(line).trimStart();
+  if (!listLine) context.levels = [0];
   return formatted.replace(/[ \t]+$/u, '');
 }
 
@@ -293,8 +308,13 @@ function formatDeepQuote(
   }
 
   if (content.filter((line) => line.trim() !== '').length < 3) return null;
+  const listContext: ListIndentContext = { levels: [0] };
   return {
-    lines: ['```quote', ...content.map(formatOrdinaryLine), '```'],
+    lines: [
+      '```quote',
+      ...content.map((line) => formatOrdinaryLine(line, listContext)),
+      '```',
+    ],
     next,
   };
 }
@@ -357,8 +377,8 @@ function trimDocumentBoundary(lines: readonly string[]): string {
   if (start === end) return '';
 
   const body = lines.slice(start, end);
-  const firstLine = body[0]!;
-  body[0] = formatListLine(firstLine) ?? firstLine.trimStart();
+  const listContext: ListIndentContext = { levels: [0] };
+  body[0] = formatOrdinaryLine(body[0]!, listContext);
   return body.join('\n').replace(/[ \t]+$/u, '');
 }
 
@@ -368,6 +388,7 @@ export function format(content: string): string {
     throw new TypeError('content must be a string');
   const lines = normalizeLineEndings(content).split('\n');
   const formatted: string[] = [];
+  const listContext: ListIndentContext = { levels: [0] };
   let fence: Fence | null = null;
 
   for (let index = 0; index < lines.length; ) {
@@ -413,7 +434,7 @@ export function format(content: string): string {
       continue;
     }
 
-    formatted.push(formatOrdinaryLine(line));
+    formatted.push(formatOrdinaryLine(line, listContext));
     index++;
   }
 

@@ -21,8 +21,13 @@
   },
   {
     "origin": "    -   第一项\n      - 第二项",
-    "formatted": "  - 第一项\n  - 第二项",
+    "formatted": "  - 第一项\n    - 第二项",
     "section": "list-spacing"
+  },
+  {
+    "origin": "1. 写下主题\n2. 组织段落\n   - 添加一个嵌套的无序项目\n     - 再补充一个更深层的项目\n3. 检查语气",
+    "formatted": "1. 写下主题\n2. 组织段落\n  - 添加一个嵌套的无序项目\n    - 再补充一个更深层的项目\n3. 检查语气",
+    "section": "nested-list-spacing"
   },
   {
     "origin": "---",
