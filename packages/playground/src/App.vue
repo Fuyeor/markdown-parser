@@ -1,12 +1,23 @@
-<!-- @fuyeor/markdown-parser-playground/src/App.vue -->
+<!-- @/App.vue -->
 <template>
-  <LeftSidebar />
+  <left-sidebar />
+
   <main>
-    <RouterView />
+    <router-view />
   </main>
 </template>
 
 <script setup lang="ts">
-import { RouterView } from '@fuyeor/vue-router';
-import { LeftSidebar } from '@fuyeor/interactify';
+import LeftSidebar from '@/layout/Left.vue';
+
+import { useHeadManager } from '@fuyeor/commons';
+import { useFontLoader } from '@fuyeor/interactify';
+
+// load font
+useFontLoader();
+// load title manager
+useHeadManager({
+  nameKey: 'site.name',
+  titleKey: 'site.title',
+});
 </script>

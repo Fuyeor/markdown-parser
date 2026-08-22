@@ -3,32 +3,31 @@
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",
-  "sideEffects": false,
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
     "typecheck": "vue-tsc --noEmit"
-  },
-  "imports": {
-    "#/*": "./src/*"
   },
   "exports": {
     ".": "./src/main.ts"
   },
   "dependencies": {
     "@fuyeor/commons": "^0.1.2",
+    "@fuyeor/config": "^0.1.1",
     "@fuyeor/interactify": "^0.1.1",
     "@fuyeor/locale": "^0.1.0",
     "@fuyeor/markdown-parser": "workspace:*",
     "@fuyeor/markdown-parser-vue": "workspace:*",
     "@fuyeor/vue-router": "^0.0.9",
-    "vue": "^3.5.34"
+    "vue": "^3.5.41"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
-    "@vitejs/plugin-vue": "^6.0.7",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.1",
-    "vue-tsc": "^3.0.0"
+    "@fuyeor/tsconfig": "0.1.0",
+    "@types/node": "^26.2.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "html-minifier-terser": "^7.2.0",
+    "lightningcss": "^1.33.0",
+    "typescript": "^7.0.2",
+    "vite": "8.0.1"
   }
 }

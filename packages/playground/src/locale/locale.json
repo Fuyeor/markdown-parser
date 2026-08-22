@@ -1,53 +1,17 @@
 {
-  "brand.name": {
-    "ar": "محلل Markdown",
-    "de": "Markdown-Parser",
-    "en": "Markdown Parser",
-    "es": "Analizador Markdown",
-    "fr": "Analyseur Markdown",
-    "ja": "Markdown パーサー",
-    "ko": "Markdown 파서",
-    "pt": "Analisador Markdown",
-    "ru": "Парсер Markdown",
-    "zh-hans": "Markdown 解析器"
-  },
-  "brand.playground": {
-    "ar": "ساحة التجربة",
-    "de": "Spielwiese",
-    "en": "Playground",
-    "es": "Zona de pruebas",
-    "fr": "Espace de test",
-    "ja": "プレイグラウンド",
-    "ko": "플레이그라운드",
-    "pt": "Playground",
-    "ru": "Песочница",
-    "zh-hans": "演练场"
-  },
-  "editor.formatter": {
-    "ar": "Markdown",
-    "de": "Markdown",
-    "en": "Markdown",
-    "es": "Markdown",
-    "fr": "Markdown",
-    "ja": "Markdown",
-    "ko": "Markdown",
-    "pt": "Markdown",
-    "ru": "Markdown",
-    "zh-hans": "Markdown"
-  },
   "editor.sample": {
     "ar": "# مرحبًا بك في ساحة تجربة Markdown\n\nحرّر **Markdown** على اليسار وافحص النتائج مباشرة.\n\n- معاينة باستخدام محوّل Vue\n- JSON يعرض شجرة البنية المجردة\n- HTML يعرض الناتج المتسلسل",
     "de": "# Willkommen in der Markdown-Spielwiese\n\nBearbeite links **Markdown** und prüfe die Ausgaben live.\n\n- Vorschau mit dem Vue-Adapter\n- JSON zeigt den abstrakten Syntaxbaum\n- HTML zeigt die serialisierte Ausgabe",
     "en": "# Welcome to Markdown Playground\n\nEdit the **Markdown** on the left and inspect the live outputs.\n\n- Preview rendered from the Vue adapter\n- JSON exposes the abstract syntax tree\n- HTML shows the serialized output",
     "es": "# Bienvenido a la zona de pruebas de Markdown\n\nEdita el **Markdown** de la izquierda y consulta los resultados en directo.\n\n- Vista previa con el adaptador de Vue\n- JSON muestra el árbol de sintaxis abstracta\n- HTML muestra la salida serializada",
     "fr": "# Bienvenue dans l’espace de test Markdown\n\nModifiez le **Markdown** à gauche et consultez les résultats en direct.\n\n- Aperçu rendu par l’adaptateur Vue\n- JSON expose l’arbre syntaxique abstrait\n- HTML affiche la sortie sérialisée",
-    "ja": "# Markdown プレイグラウンドへようこそ\n\n左側の **Markdown** を編集して、結果をリアルタイムで確認できます。\n\n- Vue アダプターによるプレビュー\n- JSON で抽象構文木を表示\n- HTML でシリアライズ結果を表示",
+    "ja": "# Markdown プレイグラウンドへようこそ\n\n左側の**Markdown** を編集して、結果をリアルタイムで確認できます。\n\n- Vue アダプターによるプレビュー\n- JSON で抽象構文木を表示\n- HTML でシリアライズ結果を表示",
     "ko": "# Markdown 플레이그라운드에 오신 것을 환영합니다\n\n왼쪽에서 **Markdown**을 편집하고 결과를 실시간으로 확인하세요.\n\n- Vue 어댑터로 렌더링한 미리보기\n- JSON으로 추상 구문 트리 확인\n- HTML로 직렬화된 결과 확인",
     "pt": "# Boas-vindas ao Playground de Markdown\n\nEdite o **Markdown** à esquerda e veja os resultados em tempo real.\n\n- Pré-visualização renderizada pelo adaptador Vue\n- JSON expõe a árvore sintática abstrata\n- HTML mostra a saída serializada",
     "ru": "# Добро пожаловать в песочницу Markdown\n\nРедактируйте **Markdown** слева и просматривайте результаты в реальном времени.\n\n- Предпросмотр через адаптер Vue\n- JSON показывает абстрактное синтаксическое дерево\n- HTML показывает сериализованный результат",
-    "zh-hans": "# 欢迎使用 Markdown 演练场\n\n在左侧编辑 **Markdown**，实时查看输出结果。\n\n- 使用 Vue 适配器渲染预览\n- JSON 展示抽象语法树\n- HTML 展示序列化结果"
+    "zh-hans": "# 欢迎使用 Markdown 演练场\n\n在左侧编辑**Markdown**，实时查看输出结果。\n\n- 使用 Vue 适配器渲染预览\n- JSON 展示抽象语法树\n- HTML 展示序列化结果"
   },
-  "editor.sourceLabel": {
+  "editor.source": {
     "ar": "مصدر Markdown",
     "de": "Markdown-Quelle",
     "en": "Markdown source",
@@ -70,30 +34,6 @@
     "pt": "Editor",
     "ru": "Редактор",
     "zh-hans": "编辑器"
-  },
-  "page.eyebrow": {
-    "ar": "محلل تفاعلي",
-    "de": "Interaktiver Parser",
-    "en": "Interactive parser",
-    "es": "Analizador interactivo",
-    "fr": "Analyseur interactif",
-    "ja": "インタラクティブパーサー",
-    "ko": "인터랙티브 파서",
-    "pt": "Analisador interativo",
-    "ru": "Интерактивный парсер",
-    "zh-hans": "交互式解析器"
-  },
-  "page.liveParsing": {
-    "ar": "تحليل مباشر",
-    "de": "Live-Analyse",
-    "en": "Live parsing",
-    "es": "Análisis en vivo",
-    "fr": "Analyse en direct",
-    "ja": "ライブ解析",
-    "ko": "실시간 파싱",
-    "pt": "Análise ao vivo",
-    "ru": "Анализ в реальном времени",
-    "zh-hans": "实时解析"
   },
   "page.title": {
     "ar": "ساحة تجربة Markdown",
@@ -118,5 +58,29 @@
     "pt": "Pré-visualização",
     "ru": "Предпросмотр",
     "zh-hans": "预览"
+  },
+  "site.name": {
+    "ar": "Fuyeor Flavored Markdown",
+    "de": "Fuyeor Flavored Markdown",
+    "en": "Fuyeor Flavored Markdown",
+    "es": "Fuyeor Flavored Markdown",
+    "fr": "Fuyeor Flavored Markdown",
+    "ja": "Fuyeor Flavored Markdown",
+    "ko": "Fuyeor Flavored Markdown",
+    "pt": "Fuyeor Flavored Markdown",
+    "ru": "Fuyeor Flavored Markdown",
+    "zh-hans": "Fuyeor Flavored Markdown"
+  },
+  "site.title": {
+    "ar": "ساحة التجربة",
+    "de": "Spielwiese",
+    "en": "Playground",
+    "es": "Área de pruebas",
+    "fr": "Aire de jeux",
+    "ja": "プレイグラウンド",
+    "ko": "플레이그라운드",
+    "pt": "Área de testes",
+    "ru": "Песочница",
+    "zh-hans": "实验场"
   }
 }

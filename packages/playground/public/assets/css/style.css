@@ -1,0 +1,157 @@
+:root {
+  --width-body: 100%;
+  --width-main: 1000px;
+  --width-left-sidebar: 350px;
+  --width-right-sidebar: 0;
+
+  --playground-border: #e2e8f0;
+  --playground-bg-pane: #ffffff;
+  --playground-bg-header: #f8fafc;
+  --playground-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@media (width >= 1000px) {
+  main {
+    width: 100%;
+  }
+
+  .header {
+    border: none;
+  }
+}
+
+h3::after {
+  display: none;
+}
+
+.markdown-rendered {
+  ol,
+  ul {
+    margin: 0 0 20px 20px;
+    padding: 0;
+  }
+
+  li {
+    margin: 10px 0 10px 0;
+  }
+
+  code,
+  pre,
+  pre * {
+    font-size: 0.9rem;
+  }
+}
+
+html {
+  /* remove scroll bar */
+  scrollbar-gutter: unset;
+}
+
+body {
+  overflow: hidden;
+}
+
+.playground-page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 24px 32px;
+}
+
+.editor-output-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.2fr);
+  gap: 20px;
+  max-width: 1680px;
+  height: calc(100vh - 110px);
+  margin: 0 auto;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--playground-border);
+  border-radius: 12px;
+  background: var(--playground-bg-pane);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--playground-border);
+  background: var(--playground-bg-header);
+  flex-shrink: 0;
+
+  span {
+    color: #94a3b8;
+    font: 700 11px var(--playground-font-mono);
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+  }
+}
+
+.editor-pane textarea {
+  flex: 1;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: #1e293b;
+  font: 400 13px / 1.6 var(--playground-font-mono);
+  tab-size: 2;
+  overflow-y: auto;
+}
+
+.output-pane {
+  .output-tabs {
+    flex-shrink: 0;
+    margin: 0;
+    border-bottom: 1px solid var(--playground-border);
+    background: var(--playground-bg-header);
+  }
+
+  .output-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  pre {
+    margin: 0;
+    color: #0f172a;
+    font: 400 12.5px / 1.6 var(--playground-font-mono);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+}
+
+@media (width <= 900px) {
+  body {
+    overflow: auto;
+  }
+
+  .playground-page {
+    padding: 16px;
+  }
+
+  .editor-output-layout {
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: 400px 520px;
+  }
+}

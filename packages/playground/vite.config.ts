@@ -1,18 +1,15 @@
 // @fuyeor/markdown-parser-playground/vite.config.ts
-import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
+import { createViteConfig } from '@fuyeor/config/vite.config.js';
 
-export default defineConfig({
-  plugins: [vue()],
-  server: { port: 7820 },
-  build: {
-    outDir: 'dist',
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/entry.[hash].js',
-        chunkFileNames: 'assets/chunk.[hash].js',
-        assetFileNames: 'assets/asset.[hash].[ext]',
+export default defineConfig(() => {
+  return createViteConfig(
+    {
+      server: {
+        host: '0.0.0.0',
+        port: 7820,
       },
     },
-  },
+    import.meta.dirname,
+  );
 });
