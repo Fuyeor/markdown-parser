@@ -42,12 +42,22 @@ export function useMarkdownEditor(
 
   const recordInput = () => recordHistory(source.value);
 
-  const setSource = (value: string, selectionStart: number, selectionEnd: number) => {
+  const setSource = (
+    value: string,
+    selectionStart: number,
+    selectionEnd: number,
+    scrollTop?: number,
+  ) => {
     source.value = value;
     recordHistory(value);
     void nextTick(() => {
-      editor.value?.focus();
-      editor.value?.setSelectionRange(selectionStart, selectionEnd);
+      const element = editor.value;
+      if (!element) return;
+      element.focus();
+      element.setSelectionRange(selectionStart, selectionEnd);
+      if (scrollTop !== undefined) {
+        element.scrollTop = scrollTop;
+      }
     });
   };
 
@@ -74,13 +84,24 @@ export function useMarkdownEditor(
 
     const selectionStart = text ? start : start + replacement.length;
     const selectionEnd = text ? start + replacement.length : selectionStart;
-    setSource(`${source.value.slice(0, start)}${replacement}${source.value.slice(end)}`, selectionStart, selectionEnd);
+    setSource(
+      `${source.value.slice(0, start)}${replacement}${source.value.slice(end)}`,
+      selectionStart,
+      selectionEnd,
+      element.scrollTop,
+    );
   };
 
   const formatDocument = () => {
     const formatted = formatMarkdown(source.value);
     if (formatted === source.value) return;
-    setSource(formatted, 0, 0);
+
+    const element = editor.value;
+    if (element) {
+      setSource(formatted, element.selectionStart, element.selectionEnd, element.scrollTop);
+    } else {
+      setSource(formatted, 0, 0);
+    }
   };
 
   const undo = () => {
