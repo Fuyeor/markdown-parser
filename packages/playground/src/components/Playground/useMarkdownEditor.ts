@@ -48,10 +48,27 @@ export function useMarkdownEditor(
     selectionEnd: number,
     scrollTop?: number,
   ) => {
-    source.value = value;
+    const element = editor.value;
+    if (element) {
+      element.focus();
+      // 使用 document.execCommand 来触发原生的输入事件，这样可以被 Ctrl+Z 撤销
+      // 由于 execCommand 已经被弃用但依然是所有浏览器支持插入文本且进入撤销栈的唯一标准方式
+      // 我们全选后替换来更新整个值，或只替换选区
+      element.select();
+      const success = document.execCommand('insertText', false, value);
+
+      // 如果 execCommand 失败（某些环境可能禁用），回退到直接赋值
+      if (!success) {
+        source.value = value;
+        element.value = value;
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    } else {
+      source.value = value;
+    }
+
     recordHistory(value);
     void nextTick(() => {
-      const element = editor.value;
       if (!element) return;
       element.focus();
       element.setSelectionRange(selectionStart, selectionEnd);
@@ -68,28 +85,56 @@ export function useMarkdownEditor(
     const end = element.selectionEnd;
     const text = source.value.slice(start, end);
     const fallback = text || 'text';
+
+    // 检查成对包裹语法是否已经存在
+    const toggleWrap = (prefix: string, suffix: string = prefix) => {
+      const isWrapped = text.startsWith(prefix) && text.endsWith(suffix) && text.length >= prefix.length + suffix.length;
+      if (isWrapped) {
+        // 取消包裹
+        return text.slice(prefix.length, text.length - suffix.length);
+      }
+      // 添加包裹
+      return `${prefix}${fallback}${suffix}`;
+    };
+
     let replacement = fallback;
 
-    if (tool === 'bold') replacement = `**${fallback}**`;
-    if (tool === 'italic') replacement = `*${fallback}*`;
-    if (tool === 'strike') replacement = `~~${fallback}~~`;
-    if (tool === 'code') replacement = `\`${fallback}\``;
-    if (tool === 'link') replacement = `[${fallback}](https://example.com)`;
-    if (tool === 'heading') replacement = `# ${fallback}`;
-    if (tool === 'quote') replacement = fallback.split('\n').map((line) => `> ${line}`).join('\n');
-    if (tool === 'unordered-list') replacement = fallback.split('\n').map((line) => `- ${line}`).join('\n');
-    if (tool === 'ordered-list') replacement = fallback.split('\n').map((line, index) => `${index + 1}. ${line}`).join('\n');
-    if (tool === 'checklist') replacement = fallback.split('\n').map((line) => `- [ ] ${line}`).join('\n');
-    if (tool === 'table') replacement = '| Column 1 | Column 2 |\n| --- | --- |\n| Value | Value |';
+    if (tool === 'bold') replacement = toggleWrap('**');
+    else if (tool === 'italic') replacement = toggleWrap('*');
+    else if (tool === 'strike') replacement = toggleWrap('~~');
+    else if (tool === 'code') replacement = toggleWrap('`');
+    else if (tool === 'link') replacement = `[${fallback}](https://example.com)`;
+    else if (tool === 'heading') replacement = `# ${fallback}`;
+    else if (tool === 'quote') replacement = fallback.split('\n').map((line) => `> ${line}`).join('\n');
+    else if (tool === 'unordered-list') replacement = fallback.split('\n').map((line) => `- ${line}`).join('\n');
+    else if (tool === 'ordered-list') replacement = fallback.split('\n').map((line, index) => `${index + 1}. ${line}`).join('\n');
+    else if (tool === 'checklist') replacement = fallback.split('\n').map((line) => `- [ ] ${line}`).join('\n');
+    else if (tool === 'table') replacement = '| Column 1 | Column 2 |\n| --- | --- |\n| Value | Value |';
 
     const selectionStart = text ? start : start + replacement.length;
     const selectionEnd = text ? start + replacement.length : selectionStart;
-    setSource(
-      `${source.value.slice(0, start)}${replacement}${source.value.slice(end)}`,
-      selectionStart,
-      selectionEnd,
-      element.scrollTop,
-    );
+
+    // 如果工具栏触发时不需要替换全部文档，我们可以只选中文本并执行 insertText 替换选区
+    // 这样能保留更细粒度的 Ctrl+Z 历史
+    element.focus();
+    element.setSelectionRange(start, end);
+    const success = document.execCommand('insertText', false, replacement);
+
+    if (!success) {
+      // 降级策略
+      setSource(
+        `${source.value.slice(0, start)}${replacement}${source.value.slice(end)}`,
+        selectionStart,
+        selectionEnd,
+        element.scrollTop,
+      );
+    } else {
+      recordInput();
+      void nextTick(() => {
+        element.focus();
+        element.setSelectionRange(selectionStart, selectionEnd);
+      });
+    }
   };
 
   const formatDocument = () => {
