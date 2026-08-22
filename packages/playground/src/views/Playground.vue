@@ -10,12 +10,24 @@
         @format="formatDocument"
         @tool="applyTool"
       />
-      <textarea
-        ref="editor"
-        v-model="source"
-        spellcheck="false"
-        @input="recordInput"
-      />
+      <div class="editor-scroll-container" @scroll="syncScroll" ref="scrollContainer">
+        <div class="editor-line-numbers" aria-hidden="true">
+          <div v-for="n in lineNumbers" :key="n" class="line-number">{{ n }}</div>
+        </div>
+        <div class="editor-content-wrapper">
+          <div class="editor-highlight-layer" aria-hidden="true">
+            <div v-for="(html, i) in highlightedLines" :key="i" class="highlight-line" v-html="html"></div>
+          </div>
+          <textarea
+            ref="editor"
+            v-model="source"
+            spellcheck="false"
+            class="editor-textarea"
+            @input="recordInput"
+            @scroll="syncTextareaScroll"
+          />
+        </div>
+      </div>
     </article>
 
     <article class="section preview">
@@ -55,12 +67,30 @@ import { fetchExample } from '@/api/examples';
 import { decodeSnippet } from '@/composables/useCompression';
 import { useMarkdownEditor } from '@/composables/useMarkdownEditor';
 import { usePlaygroundSource } from '@/composables/usePlaygroundSource';
+import { useMarkdownHighlighter } from '@/composables/useMarkdownHighlighter';
 
 const { t, locale } = useLocale();
 const { source } = usePlaygroundSource();
 
 const editor = ref<HTMLTextAreaElement | null>(null);
+const scrollContainer = ref<HTMLElement | null>(null);
 const activeTab = ref('preview');
+
+const { lineNumbers, highlightedLines } = useMarkdownHighlighter(source);
+
+const syncScroll = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (editor.value) {
+    // 同步 textarea 滚动，或者我们通过 CSS 把 textarea 撑开不让它自己滚动
+  }
+};
+
+const syncTextareaScroll = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTop = target.scrollTop;
+  }
+};
 const tabs: TabItem[] = [
   { value: 'preview' },
   { value: 'ast' },
@@ -112,4 +142,82 @@ const previewComponent = computed(() => ({
   height: 3rem;
   border-bottom: var(--border-subtle);
 }
+
+.editor-scroll-container {
+  display: flex;
+  flex: 1;
+  overflow: auto;
+  background: var(--bg-primary, #ffffff);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.editor-line-numbers {
+  padding: 16px 12px;
+  text-align: right;
+  color: #a0aec0;
+  user-select: none;
+  border-right: 1px solid #edf2f7;
+  background: #f8fafc;
+}
+
+.line-number {
+  min-height: 1.6em;
+}
+
+.editor-content-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.editor-highlight-layer,
+.editor-textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.editor-highlight-layer {
+  color: transparent;
+  pointer-events: none;
+}
+
+.highlight-line {
+  min-height: 1.6em;
+  color: #1a202c;
+}
+
+.editor-textarea {
+  color: transparent;
+  background: transparent;
+  caret-color: #2b6cb0;
+  resize: none;
+  outline: none;
+  overflow: hidden;
+}
+
+/* Highlighting tokens */
+.hl-punctuation { color: #a0aec0; }
+.hl-heading { color: #553c9a; font-weight: 600; }
+.hl-quote { color: #718096; font-style: italic; }
+.hl-list { color: #2d3748; }
+.hl-bold { font-weight: 700; color: #1a202c; }
+.hl-italic { font-style: italic; color: #1a202c; }
+.hl-code { color: #d53f8c; background: #faf5ff; border-radius: 3px; padding: 0 2px; }
+.hl-strike { text-decoration: line-through; color: #a0aec0; }
+.hl-code-fence { color: #805ad5; }
 </style>
