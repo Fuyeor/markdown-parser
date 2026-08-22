@@ -1,5 +1,17 @@
 {
-  "editor.source": {
+  "playground": {
+    "ar": "ساحة التجربة",
+    "de": "Spielwiese",
+    "en": "Playground",
+    "es": "Área de pruebas",
+    "fr": "Aire de jeux",
+    "ja": "プレイグラウンド",
+    "ko": "플레이그라운드",
+    "pt": "Área de testes",
+    "ru": "Песочница",
+    "zh-hans": "实验场"
+  },
+  "playground.editor.source": {
     "ar": "مصدر Markdown",
     "de": "Markdown-Quelle",
     "en": "Markdown source",
@@ -11,31 +23,7 @@
     "ru": "Исходный Markdown",
     "zh-hans": "Markdown 源码"
   },
-  "nav.editor": {
-    "ar": "المحرر",
-    "de": "Editor",
-    "en": "Editor",
-    "es": "Editor",
-    "fr": "Éditeur",
-    "ja": "エディター",
-    "ko": "편집기",
-    "pt": "Editor",
-    "ru": "Редактор",
-    "zh-hans": "编辑器"
-  },
-  "page.title": {
-    "ar": "ساحة تجربة Markdown",
-    "de": "Markdown-Spielwiese",
-    "en": "Markdown Playground",
-    "es": "Zona de pruebas de Markdown",
-    "fr": "Espace de test Markdown",
-    "ja": "Markdown プレイグラウンド",
-    "ko": "Markdown 플레이그라운드",
-    "pt": "Playground de Markdown",
-    "ru": "Песочница Markdown",
-    "zh-hans": "Markdown 演练场"
-  },
-  "preview.render": {
+  "playground.preview.render": {
     "ar": "المعاينة",
     "de": "Vorschau",
     "en": "Preview",
@@ -45,7 +33,31 @@
     "ko": "미리보기",
     "pt": "Pré-visualização",
     "ru": "Предпросмотр",
-    "zh-hans": "预览"
+    "zh-hans": "渲染预览"
+  },
+  "playground.share": {
+    "ar": "مشاركة محتوى Markdown",
+    "de": "Markdown-Inhalt teilen",
+    "en": "Share Markdown content",
+    "es": "Compartir contenido Markdown",
+    "fr": "Partager le contenu Markdown",
+    "ja": "Markdownコンテンツを共有",
+    "ko": "Markdown 콘텐츠 공유",
+    "pt": "Compartilhar conteúdo Markdown",
+    "ru": "Поделиться контентом Markdown",
+    "zh-hans": "分享 Markdown 内容"
+  },
+  "playground.share.desc": {
+    "ar": "انسخ الرابط التالي وأرسله:",
+    "de": "Kopieren Sie den folgenden Link zum Senden:",
+    "en": "Copy the following link to send:",
+    "es": "Copia el siguiente enlace para enviar:",
+    "fr": "Copiez le lien suivant à envoyer :",
+    "ja": "次のリンクをコピーして送信：",
+    "ko": "보내려면 다음 링크를 복사하세요:",
+    "pt": "Copie o link abaixo para enviar:",
+    "ru": "Скопируйте следующую ссылку для отправки:",
+    "zh-hans": "复制以下链接发送："
   },
   "site.name": {
     "ar": "Fuyeor Flavored Markdown",

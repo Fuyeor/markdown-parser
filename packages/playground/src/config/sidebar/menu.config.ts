@@ -8,4 +8,9 @@ export const sidebarItemsRaw: SidebarItemConfig[] = [
     icon: getIconUrl('home'),
     textKey: 'home',
   },
+  {
+    target: '/playground',
+    icon: getIconUrl('home'),
+    textKey: 'playground',
+  },
 ];

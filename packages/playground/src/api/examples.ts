@@ -1,4 +1,4 @@
-// @fuyeor/markdown-parser-playground/src/api/examples.ts
+// @/api/examples.ts
 import apiClient from './index';
 
 export async function fetchExample(locale: string): Promise<string> {

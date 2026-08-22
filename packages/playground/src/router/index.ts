@@ -12,6 +12,18 @@ const appRoutes: Array<RouteRecord> = [
     path: '',
     name: 'Home',
     component: () => import('@/views/Home.vue'),
+    meta: {
+      overrideTitle: ['site.name', '/', 'site.title'],
+    },
+  },
+  {
+    // flavored.fuyeor.com/playground
+    path: 'playground',
+    name: 'Playground',
+    component: () => import('@/views/Playground.vue'),
+    meta: {
+      titleKey: 'playground',
+    },
   },
 ];
 
@@ -35,7 +47,6 @@ const routes: Array<RouteRecord> = [
     component: () =>
       import('@fuyeor/interactify/views').then((m) => m.NotFoundView),
     meta: {
-      public: true,
       titleKey: 'notFound.title',
     },
   },

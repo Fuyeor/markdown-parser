@@ -1,27 +1,75 @@
-<!-- @fuyeor/markdown-parser-playground/src/components/Playground/MarkdownToolbar.vue -->
+<!-- @/components/Playground/MarkdownToolbar.vue -->
 <template>
-  <nav class="editor-toolbar" aria-label="Markdown formatting toolbar">
-    <button type="button" :disabled="!canUndo" title="Undo" @click="$emit('undo')">↶</button>
-    <button type="button" :disabled="!canRedo" title="Redo" @click="$emit('redo')">↷</button>
+  <nav class="editor-toolbar">
+    <button
+      type="button"
+      :disabled="!canUndo"
+      title="Undo"
+      @click="$emit('undo')"
+    >
+      ↶
+    </button>
+    <button
+      type="button"
+      :disabled="!canRedo"
+      title="Redo"
+      @click="$emit('redo')"
+    >
+      ↷
+    </button>
     <span class="toolbar-divider" aria-hidden="true" />
-    <button type="button" title="Format Document" @click="$emit('format')">✨</button>
+    <button type="button" title="Format Document" @click="$emit('format')">
+      ✨
+    </button>
     <span class="toolbar-divider" aria-hidden="true" />
-    <button type="button" title="Bold" @click="$emit('tool', 'bold')"><strong>B</strong></button>
-    <button type="button" title="Italic" @click="$emit('tool', 'italic')"><em>I</em></button>
-    <button type="button" title="Heading" @click="$emit('tool', 'heading')">H</button>
-    <button type="button" title="Strikethrough" @click="$emit('tool', 'strike')"><s>S</s></button>
-    <button type="button" title="Unordered list" @click="$emit('tool', 'unordered-list')">☷</button>
-    <button type="button" title="Ordered list" @click="$emit('tool', 'ordered-list')">№</button>
-    <button type="button" title="Checklist" @click="$emit('tool', 'checklist')">☑</button>
-    <button type="button" title="Blockquote" @click="$emit('tool', 'quote')">❯</button>
-    <button type="button" title="Code" @click="$emit('tool', 'code')">&lt;/&gt;</button>
+    <button type="button" title="Bold" @click="$emit('tool', 'bold')">
+      <strong>B</strong>
+    </button>
+    <button type="button" title="Italic" @click="$emit('tool', 'italic')">
+      <em>I</em>
+    </button>
+    <button type="button" title="Heading" @click="$emit('tool', 'heading')">
+      H
+    </button>
+    <button
+      type="button"
+      title="Strikethrough"
+      @click="$emit('tool', 'strike')"
+    >
+      <s>S</s>
+    </button>
+    <button
+      type="button"
+      title="Unordered list"
+      @click="$emit('tool', 'unordered-list')"
+    >
+      ☷
+    </button>
+    <button
+      type="button"
+      title="Ordered list"
+      @click="$emit('tool', 'ordered-list')"
+    >
+      №
+    </button>
+    <button type="button" title="Checklist" @click="$emit('tool', 'checklist')">
+      ☑
+    </button>
+    <button type="button" title="Blockquote" @click="$emit('tool', 'quote')">
+      ❯
+    </button>
+    <button type="button" title="Code" @click="$emit('tool', 'code')">
+      &lt;/&gt;
+    </button>
     <button type="button" title="Link" @click="$emit('tool', 'link')">↗</button>
-    <button type="button" title="Table" @click="$emit('tool', 'table')">▦</button>
+    <button type="button" title="Table" @click="$emit('tool', 'table')">
+      ▦
+    </button>
   </nav>
 </template>
 
 <script setup lang="ts">
-import type { MarkdownTool } from './useMarkdownEditor';
+import type { MarkdownTool } from '../../composables/useMarkdownEditor';
 
 defineProps<{
   canUndo: boolean;
@@ -41,11 +89,9 @@ defineEmits<{
   display: flex;
   align-items: center;
   gap: 2px;
-  min-height: 42px;
   padding: 4px 10px;
-  border-bottom: 1px solid #edf0f2;
-  background: #fbfcfd;
   overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .editor-toolbar button {
@@ -58,11 +104,24 @@ defineEmits<{
   border-radius: 6px;
   color: #53606d;
   background: transparent;
-  font: 600 13px ui-monospace, monospace;
+  font:
+    600 13px ui-monospace,
+    monospace;
   cursor: pointer;
 }
 
-.editor-toolbar button:hover:not(:disabled) { color: #3855ae; background: #edf1ff; }
-.editor-toolbar button:disabled { color: #c7cdd3; cursor: not-allowed; }
-.toolbar-divider { width: 1px; height: 22px; margin: 0 5px; background: #dfe4e8; }
+.editor-toolbar button:hover:not(:disabled) {
+  color: #3855ae;
+  background: #edf1ff;
+}
+.editor-toolbar button:disabled {
+  color: #c7cdd3;
+  cursor: not-allowed;
+}
+.toolbar-divider {
+  width: 1px;
+  height: 22px;
+  margin: 0 5px;
+  background: #dfe4e8;
+}
 </style>

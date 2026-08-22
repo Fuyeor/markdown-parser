@@ -1,4 +1,4 @@
-// @fuyeor/markdown-parser-playground/src/components/Playground/useMarkdownEditor.ts
+// @/composables/useMarkdownEditor.ts
 import { computed, nextTick, ref, type Ref } from 'vue';
 import { format as formatMarkdown } from '@fuyeor/markdown-formatter';
 
@@ -88,7 +88,10 @@ export function useMarkdownEditor(
 
     // 检查成对包裹语法是否已经存在
     const toggleWrap = (prefix: string, suffix: string = prefix) => {
-      const isWrapped = text.startsWith(prefix) && text.endsWith(suffix) && text.length >= prefix.length + suffix.length;
+      const isWrapped =
+        text.startsWith(prefix) &&
+        text.endsWith(suffix) &&
+        text.length >= prefix.length + suffix.length;
       if (isWrapped) {
         // 取消包裹
         return text.slice(prefix.length, text.length - suffix.length);
@@ -103,13 +106,31 @@ export function useMarkdownEditor(
     else if (tool === 'italic') replacement = toggleWrap('*');
     else if (tool === 'strike') replacement = toggleWrap('~~');
     else if (tool === 'code') replacement = toggleWrap('`');
-    else if (tool === 'link') replacement = `[${fallback}](https://example.com)`;
+    else if (tool === 'link')
+      replacement = `[${fallback}](https://example.com)`;
     else if (tool === 'heading') replacement = `# ${fallback}`;
-    else if (tool === 'quote') replacement = fallback.split('\n').map((line) => `> ${line}`).join('\n');
-    else if (tool === 'unordered-list') replacement = fallback.split('\n').map((line) => `- ${line}`).join('\n');
-    else if (tool === 'ordered-list') replacement = fallback.split('\n').map((line, index) => `${index + 1}. ${line}`).join('\n');
-    else if (tool === 'checklist') replacement = fallback.split('\n').map((line) => `- [ ] ${line}`).join('\n');
-    else if (tool === 'table') replacement = '| Column 1 | Column 2 |\n| --- | --- |\n| Value | Value |';
+    else if (tool === 'quote')
+      replacement = fallback
+        .split('\n')
+        .map((line) => `> ${line}`)
+        .join('\n');
+    else if (tool === 'unordered-list')
+      replacement = fallback
+        .split('\n')
+        .map((line) => `- ${line}`)
+        .join('\n');
+    else if (tool === 'ordered-list')
+      replacement = fallback
+        .split('\n')
+        .map((line, index) => `${index + 1}. ${line}`)
+        .join('\n');
+    else if (tool === 'checklist')
+      replacement = fallback
+        .split('\n')
+        .map((line) => `- [ ] ${line}`)
+        .join('\n');
+    else if (tool === 'table')
+      replacement = '| Column 1 | Column 2 |\n| --- | --- |\n| Value | Value |';
 
     const selectionStart = text ? start : start + replacement.length;
     const selectionEnd = text ? start + replacement.length : selectionStart;
@@ -143,7 +164,12 @@ export function useMarkdownEditor(
 
     const element = editor.value;
     if (element) {
-      setSource(formatted, element.selectionStart, element.selectionEnd, element.scrollTop);
+      setSource(
+        formatted,
+        element.selectionStart,
+        element.selectionEnd,
+        element.scrollTop,
+      );
     } else {
       setSource(formatted, 0, 0);
     }

@@ -1,4 +1,4 @@
-// @fuyeor/markdown-parser-playground/src/api/index.ts
+// @/api/index.ts
 import { HttpClient } from '@fuyeor/commons';
 
 const apiClient = new HttpClient({
