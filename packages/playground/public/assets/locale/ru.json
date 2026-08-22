@@ -1,0 +1,14 @@
+{
+  "brand.name": "Парсер Markdown",
+  "brand.playground": "Песочница",
+  "editor.formatter": "Markdown",
+  "editor.sample": "# Добро пожаловать в песочницу Markdown\n\nРедактируйте **Markdown** слева и просматривайте результаты в реальном времени.\n\n- Предпросмотр через адаптер Vue\n- JSON показывает абстрактное синтаксическое дерево\n- HTML показывает сериализованный результат",
+  "editor.sourceLabel": "Исходный Markdown",
+  "nav.editor": "Редактор",
+  "page.eyebrow": "Интерактивный парсер",
+  "page.liveParsing": "Анализ в реальном времени",
+  "page.title": "Песочница Markdown",
+  "preview.ast": "JSON (AST)",
+  "preview.html": "HTML",
+  "preview.render": "Предпросмотр"
+}

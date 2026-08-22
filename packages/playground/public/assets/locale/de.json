@@ -1,0 +1,14 @@
+{
+  "brand.name": "Markdown-Parser",
+  "brand.playground": "Spielwiese",
+  "editor.formatter": "Markdown",
+  "editor.sample": "# Willkommen in der Markdown-Spielwiese\n\nBearbeite links **Markdown** und prüfe die Ausgaben live.\n\n- Vorschau mit dem Vue-Adapter\n- JSON zeigt den abstrakten Syntaxbaum\n- HTML zeigt die serialisierte Ausgabe",
+  "editor.sourceLabel": "Markdown-Quelle",
+  "nav.editor": "Editor",
+  "page.eyebrow": "Interaktiver Parser",
+  "page.liveParsing": "Live-Analyse",
+  "page.title": "Markdown-Spielwiese",
+  "preview.ast": "JSON (AST)",
+  "preview.html": "HTML",
+  "preview.render": "Vorschau"
+}

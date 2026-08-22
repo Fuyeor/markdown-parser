@@ -1,0 +1,14 @@
+{
+  "brand.name": "Markdown 파서",
+  "brand.playground": "플레이그라운드",
+  "editor.formatter": "Markdown",
+  "editor.sample": "# Markdown 플레이그라운드에 오신 것을 환영합니다\n\n왼쪽에서 **Markdown**을 편집하고 결과를 실시간으로 확인하세요.\n\n- Vue 어댑터로 렌더링한 미리보기\n- JSON으로 추상 구문 트리 확인\n- HTML로 직렬화된 결과 확인",
+  "editor.sourceLabel": "Markdown 소스",
+  "nav.editor": "편집기",
+  "page.eyebrow": "인터랙티브 파서",
+  "page.liveParsing": "실시간 파싱",
+  "page.title": "Markdown 플레이그라운드",
+  "preview.ast": "JSON (AST)",
+  "preview.html": "HTML",
+  "preview.render": "미리보기"
+}

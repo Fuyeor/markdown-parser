@@ -1,0 +1,14 @@
+{
+  "brand.name": "محلل Markdown",
+  "brand.playground": "ساحة التجربة",
+  "editor.formatter": "Markdown",
+  "editor.sample": "# مرحبًا بك في ساحة تجربة Markdown\n\nحرّر **Markdown** على اليسار وافحص النتائج مباشرة.\n\n- معاينة باستخدام محوّل Vue\n- JSON يعرض شجرة البنية المجردة\n- HTML يعرض الناتج المتسلسل",
+  "editor.sourceLabel": "مصدر Markdown",
+  "nav.editor": "المحرر",
+  "page.eyebrow": "محلل تفاعلي",
+  "page.liveParsing": "تحليل مباشر",
+  "page.title": "ساحة تجربة Markdown",
+  "preview.ast": "JSON (AST)",
+  "preview.html": "HTML",
+  "preview.render": "المعاينة"
+}

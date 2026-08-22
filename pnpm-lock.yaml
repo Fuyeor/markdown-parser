@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@fuyeor/locale-cli':
+        specifier: ^0.1.1
+        version: 0.1.1
       '@types/node':
         specifier: ^25.6.0
         version: 25.6.0
@@ -116,12 +119,18 @@ importers:
 
   packages/playground:
     dependencies:
+      '@fuyeor/locale':
+        specifier: ^0.1.0
+        version: 0.1.0(vue@3.5.41(typescript@6.0.3))
       '@fuyeor/markdown-parser':
         specifier: workspace:*
         version: link:../markdown-parser
       '@fuyeor/markdown-parser-vue':
         specifier: workspace:*
         version: link:../markdown-parser-vue
+      signal-polyfill:
+        specifier: ^0.2.2
+        version: 0.2.2
       vue:
         specifier: ^3.5.34
         version: 3.5.41(typescript@6.0.3)
@@ -410,6 +419,25 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@fuyeor/locale-cli-linux-x64@0.1.1':
+    resolution: {integrity: sha256-yUuBN7NGq6kvNjAx+gK/FjSAAQIsQXdTrUOIPmDAlPU=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/locale-cli-linux-x64/0.1.1.tgz}
+    cpu: [x64]
+    os: [linux]
+
+  '@fuyeor/locale-cli-win32-x64@0.1.1':
+    resolution: {integrity: sha256-kMoqlLWBKOyK1QSmiu50OCPt+oqfFRX1CF702XSum94=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/locale-cli-win32-x64/0.1.1.tgz}
+    cpu: [x64]
+    os: [win32]
+
+  '@fuyeor/locale-cli@0.1.1':
+    resolution: {integrity: sha256-i4zBm0Akv/BHJaBQmt/kXHqNYcBcCVQYVFcLVqpO6Fw=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/locale-cli/0.1.1.tgz}
+    hasBin: true
+
+  '@fuyeor/locale@0.1.0':
+    resolution: {integrity: sha256-ph3M1g9OPWb8WVAt+W0NeoDJT2uhb9ALn/NnCN0wvZU=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/locale/0.1.0.tgz}
+    peerDependencies:
+      vue: '*'
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -1000,6 +1028,9 @@ packages:
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
+  signal-polyfill@0.2.2:
+    resolution: {integrity: sha512-p63Y4Er5/eMQ9RHg0M0Y64NlsQKpiu6MDdhBXpyywRuWiPywhJTpKJ1iB5K2hJEbFZ0BnDS7ZkJ+0AfTuL37Rg==}
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -1384,6 +1415,21 @@ snapshots:
     optional: true
 
   '@exodus/bytes@1.15.0': {}
+
+  '@fuyeor/locale-cli-linux-x64@0.1.1':
+    optional: true
+
+  '@fuyeor/locale-cli-win32-x64@0.1.1':
+    optional: true
+
+  '@fuyeor/locale-cli@0.1.1':
+    optionalDependencies:
+      '@fuyeor/locale-cli-linux-x64': 0.1.1
+      '@fuyeor/locale-cli-win32-x64': 0.1.1
+
+  '@fuyeor/locale@0.1.0(vue@3.5.41(typescript@6.0.3))':
+    dependencies:
+      vue: 3.5.41(typescript@6.0.3)
 
   '@jridgewell/resolve-uri@3.1.2':
     optional: true
@@ -2013,6 +2059,8 @@ snapshots:
     optional: true
 
   siginfo@2.0.0: {}
+
+  signal-polyfill@0.2.2: {}
 
   source-map-js@1.2.1: {}
 
