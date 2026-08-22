@@ -124,6 +124,11 @@ function isLatinOrDigitCharacter(character: string | undefined): boolean {
   return character !== undefined && /^[A-Za-z0-9]$/u.test(character);
 }
 
+/** Collapse runs of horizontal whitespace in unprotected text to one space. */
+function normalizeHorizontalWhitespace(segment: string): string {
+  return segment.replace(/[ \t]+/gu, ' ');
+}
+
 /** Apply CJK spacing to plain text without interpreting protected inline code. */
 function formatCjkBoundaries(segment: string): string {
   return segment.replace(CJK_LATIN_BOUNDARY, ' ');
@@ -166,7 +171,9 @@ function trimLinkTargets(segment: string): string {
 /** Apply inline spacing and link cleanup to an unprotected text segment. */
 function formatTextSegment(segment: string): string {
   return formatCjkBoundaries(
-    formatInlineMarkupBoundaries(trimLinkTargets(segment)),
+    formatInlineMarkupBoundaries(
+      normalizeHorizontalWhitespace(trimLinkTargets(segment)),
+    ),
   );
 }
 
