@@ -17,8 +17,9 @@ const appRoutes: Array<RouteRecord> = [
     },
   },
   {
-    // flavored.fuyeor.com/playground
-    path: 'playground',
+    // flavored.fuyeor.com/playground or /playground/:id
+    // The optional segment uses URLPattern syntax required by @fuyeor/vue-router.
+    path: 'playground{/:id}?',
     name: 'Playground',
     component: () => import('@/views/Playground.vue'),
     meta: {

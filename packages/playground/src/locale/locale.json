@@ -179,6 +179,18 @@
     "ru": "Поделиться контентом Markdown",
     "zh-hans": "分享 Markdown 内容"
   },
+  "playground.share.button": {
+    "ar": "مشاركة",
+    "de": "Teilen",
+    "en": "Share",
+    "es": "Compartir",
+    "fr": "Partager",
+    "ja": "共有",
+    "ko": "공유",
+    "pt": "Compartilhar",
+    "ru": "Поделиться",
+    "zh-hans": "分享"
+  },
   "playground.share.desc": {
     "ar": "انسخ الرابط التالي وأرسله:",
     "de": "Kopieren Sie den folgenden Link zum Senden:",
