@@ -1,0 +1,94 @@
+{
+  "Domain in text": [
+    {
+      "text": "Visit fuyeor.com.",
+      "expect": "fuyeor.com"
+    },
+    {
+      "text": "Visit fuyeor.com",
+      "expect": "fuyeor.com"
+    },
+    {
+      "text": "Visit fuyeor.com;",
+      "expect": "fuyeor.com"
+    },
+    {
+      "text": "(fuyeor.com)",
+      "expect": "fuyeor.com"
+    }
+  ],
+  "ccTLDs and gTLDs in text": [
+    {
+      "text": "Visit fuyeor.cn.",
+      "expect": "fuyeor.cn"
+    },
+    {
+      "text": "Visit fuyeor.co.uk.",
+      "expect": "fuyeor.co.uk"
+    },
+    {
+      "text": "Visit web.dev.",
+      "expect": "web.dev"
+    },
+    {
+      "text": "Visit vercel.app",
+      "expect": "vercel.app"
+    }
+  ],
+  "IDN ccTLDs in text": [
+    {
+      "text": "Visit fuyeor.рф.",
+      "expect": "fuyeor.рф"
+    },
+    {
+      "text": "Visit fuyeor.xn--p1ai.",
+      "expect": "fuyeor.рф"
+    }
+  ],
+  "Full URLs": [
+    {
+      "text": "Profile: https://fuyeor.com/@Fuyeor",
+      "expect": "https://fuyeor.com/@Fuyeor"
+    },
+    {
+      "text": "A link with parens: https://en.wikipedia.org/wiki/Link_(disambiguation)",
+      "expect": "https://en.wikipedia.org/wiki/Link_(disambiguation)"
+    }
+  ],
+  "Unsupported TLDs": [
+    {
+      "text": "Visit fuyeor.123",
+      "expect": ""
+    },
+    {
+      "text": "Visit fuyeor.enterprise",
+      "expect": ""
+    },
+    {
+      "text": "Visit fuyeor.md",
+      "expect": ""
+    }
+  ],
+  "Wrong Domain/URLs": [
+    {
+      "text": "Visit fuyeor..com",
+      "expect": ""
+    },
+    {
+      "text": "Visit fuyeor,com",
+      "expect": ""
+    },
+    {
+      "text": "Visit fuyeor.com123",
+      "expect": ""
+    },
+    {
+      "text": "Visit fuyeor.comあ",
+      "expect": ""
+    },
+    {
+      "text": "fuyeor.com💜",
+      "expect": "fuyeor.com"
+    }
+  ]
+}
