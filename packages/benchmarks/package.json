@@ -3,14 +3,17 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@fuyeor/linkify": "workspace:*",
     "@fuyeor/markdown-parser": "workspace:*",
+    "linkify-it": "^6.1.0",
     "markdown-it": "^14.0.2",
     "marked": "^18.0.2",
     "mitata": "^0.1.11"
   },
   "scripts": {
     "bench:speed": "tsx speed.ts",
-    "bench:memory": "node --expose-gc --import tsx memory.ts"
+    "bench:memory": "node --expose-gc --import tsx memory.ts",
+    "bench:linkify": "tsx linkify.ts"
   },
   "devDependencies": {
     "tsx": "^4.21.0"
