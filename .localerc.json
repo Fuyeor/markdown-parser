@@ -6,5 +6,9 @@
   "main": {
     "source": "packages/playground/src/locale/locale.json",
     "outDir": "packages/playground/public/assets/locale"
+  },
+  "prod": {
+    "source": "packages/playground/src/locale/locale.json",
+    "outDir": "packages/playground/public/assets/locale"
   }
 }

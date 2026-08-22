@@ -26,8 +26,11 @@ COPY . .
 # build parser package before workspace consumers resolve its package exports
 RUN pnpm --filter @fuyeor/markdown-parser build
 
+# generate production locale assets before the playground build copies public files
+RUN pnpm locale make playground prod
+
 # build playground
-RUN pnpm --filter @fuyeor/markdown-parser-playground build
+RUN pnpm --filter @fuyeor/markdown-playground build
 
 # ==========================================
 # release
