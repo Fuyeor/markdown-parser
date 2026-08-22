@@ -59,6 +59,54 @@
     "ru": "Исходный Markdown",
     "zh-hans": "Markdown 源码"
   },
+  "locale.asia": {
+    "ar": "آسيا",
+    "de": "Asie",
+    "en": "Asia",
+    "es": "Asia",
+    "fr": "Asie",
+    "ja": "アジア",
+    "ko": "아시아",
+    "pt": "Ásia",
+    "ru": "Азия",
+    "zh-hans": "亚洲"
+  },
+  "locale.count": {
+    "ar": "{count} لغات",
+    "de": "{count} Sprachen",
+    "en": "{count} Languages",
+    "es": "{count} idiomas",
+    "fr": "{count} langues",
+    "ja": "{count} 言語",
+    "ko": "{count}개 언어",
+    "pt": "{count} idiomas",
+    "ru": "{count} языков",
+    "zh-hans": "{count} 种语言"
+  },
+  "locale.europe": {
+    "ar": "أوروبا",
+    "de": "Europa",
+    "en": "Europe",
+    "es": "Europa",
+    "fr": "Europe",
+    "ja": "ヨーロッパ",
+    "ko": "유럽",
+    "pt": "Europa",
+    "ru": "Европа",
+    "zh-hans": "欧洲"
+  },
+  "locale.world": {
+    "ar": "حول العالم",
+    "de": "Weltweit",
+    "en": "Worldwide",
+    "es": "En todo el mundo",
+    "fr": "Monde entier",
+    "ja": "世界",
+    "ko": "전 세계",
+    "pt": "Mundial",
+    "ru": "Весь мир",
+    "zh-hans": "全球"
+  },
   "nav.editor": {
     "ar": "المحرر",
     "de": "Editor",
@@ -106,30 +154,6 @@
     "pt": "Playground de Markdown",
     "ru": "Песочница Markdown",
     "zh-hans": "Markdown 演练场"
-  },
-  "preview.ast": {
-    "ar": "JSON (AST)",
-    "de": "JSON (AST)",
-    "en": "JSON (AST)",
-    "es": "JSON (AST)",
-    "fr": "JSON (AST)",
-    "ja": "JSON (AST)",
-    "ko": "JSON (AST)",
-    "pt": "JSON (AST)",
-    "ru": "JSON (AST)",
-    "zh-hans": "JSON（AST）"
-  },
-  "preview.html": {
-    "ar": "HTML",
-    "de": "HTML",
-    "en": "HTML",
-    "es": "HTML",
-    "fr": "HTML",
-    "ja": "HTML",
-    "ko": "HTML",
-    "pt": "HTML",
-    "ru": "HTML",
-    "zh-hans": "HTML"
   },
   "preview.render": {
     "ar": "المعاينة",

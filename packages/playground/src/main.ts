@@ -1,39 +1,22 @@
 // @fuyeor/markdown-parser-playground/src/main.ts
-import { createLocale } from '@fuyeor/locale';
+import { initializeLocale } from '@fuyeor/commons';
 import { createApp, watch } from 'vue';
-import localeSource from './locale/locale.json';
+import { messagesByLocale, SUPPORTED_LOCALES } from './locale';
+import router from './router';
 import App from './App.vue';
 import './styles.css';
 
-const supportedLocales = ['ar', 'de', 'en', 'es', 'fr', 'ja', 'ko', 'pt', 'ru', 'zh-hans'] as const;
-type SupportedLocale = (typeof supportedLocales)[number];
-type LocaleSource = Record<string, Partial<Record<SupportedLocale, string>>>;
+async function bootstrap() {
+  const app = createApp(App);
+  const locale = await initializeLocale({ app });
+  for (const language of SUPPORTED_LOCALES) locale.setLocaleMessage(language, messagesByLocale[language]);
 
-// Detect a supported browser language while keeping English as the deterministic fallback.
-function detectLocale(): SupportedLocale {
-  const browserLocale = window.navigator.language.toLowerCase();
-  if (browserLocale.startsWith('zh')) return browserLocale.includes('hant') ? 'en' : 'zh-hans';
-  const language = browserLocale.slice(0, 2) as SupportedLocale;
-  return supportedLocales.includes(language) ? language : 'en';
+  watch(locale.locale, (language) => {
+    window.document.documentElement.lang = language;
+    window.document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  }, { immediate: true });
+
+  app.use(router).mount('#app');
 }
 
-const locale = createLocale({ locale: detectLocale() });
-const messagesByLocale = Object.fromEntries(
-  supportedLocales.map((language) => [
-    language,
-    Object.fromEntries(
-      Object.entries(localeSource as LocaleSource).map(([key, messages]) => [
-        key,
-        messages[language] ?? messages.en ?? key,
-      ]),
-    ),
-  ]),
-) as Record<SupportedLocale, Record<string, string>>;
-
-for (const language of supportedLocales) locale.setLocaleMessage(language, messagesByLocale[language]);
-
-watch(locale.locale, (language) => {
-  window.document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-}, { immediate: true });
-
-createApp(App).use(locale).mount('#app');
+bootstrap();
