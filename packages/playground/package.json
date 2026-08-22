@@ -6,7 +6,8 @@
   "sideEffects": false,
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build"
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit"
   },
   "imports": {
     "#/*": "./src/*"
@@ -15,13 +16,15 @@
     ".": "./src/main.ts"
   },
   "dependencies": {
-    "@fuyeor/markdown-parser-lit": "workspace:*",
-    "@fuyeor/locale": "https://github.com/Fuyeor/webroamer.git#path:packages/locale",
-    "lit": "^3.3.2"
+    "@fuyeor/markdown-parser-vue": "workspace:*",
+    "vue": "^3.5.34",
+    "@fuyeor/markdown-parser": "workspace:*"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.7",
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.1"
+    "vite": "^8.0.1",
+    "vue-tsc": "^3.0.0"
   }
 }
