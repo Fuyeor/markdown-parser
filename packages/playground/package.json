@@ -16,6 +16,7 @@
     "@fuyeor/config": "^0.1.1",
     "@fuyeor/interactify": "^0.1.1",
     "@fuyeor/locale": "^0.1.0",
+    "@fuyeor/markdown-formatter": "workspace:*",
     "@fuyeor/markdown-parser": "workspace:*",
     "@fuyeor/markdown-parser-vue": "workspace:*",
     "@fuyeor/vue-router": "^0.0.9",

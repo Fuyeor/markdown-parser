@@ -17,6 +17,8 @@
         <button type="button" :disabled="!canUndo" title="Undo" @click="undo">↶</button>
         <button type="button" :disabled="!canRedo" title="Redo" @click="redo">↷</button>
         <span class="toolbar-divider" aria-hidden="true" />
+        <button type="button" title="Format Document" @click="formatDocument">✨</button>
+        <span class="toolbar-divider" aria-hidden="true" />
         <button type="button" title="Bold" @click="applyTool('bold')"><strong>B</strong></button>
         <button type="button" title="Italic" @click="applyTool('italic')"><em>I</em></button>
         <button type="button" title="Heading" @click="applyTool('heading')">H</button>
@@ -69,6 +71,7 @@ import {
   createFuyeorMarkdownParser,
   render as renderMarkdown,
 } from '@fuyeor/markdown-parser';
+import { format as formatMarkdown } from '@fuyeor/markdown-formatter';
 import { renderToVue } from '@fuyeor/markdown-parser-vue';
 import { SUPPORTED_LOCALES } from '../config/locales';
 import { fetchExample } from '../api/examples';
@@ -165,6 +168,12 @@ const redo = () => {
   if (!canRedo.value) return;
   historyIndex.value += 1;
   source.value = history.value[historyIndex.value];
+};
+
+const formatDocument = () => {
+  const formatted = formatMarkdown(source.value);
+  if (formatted === source.value) return;
+  setSource(formatted, 0, 0);
 };
 
 const handleLocaleChange = (newLocale: string) => {
