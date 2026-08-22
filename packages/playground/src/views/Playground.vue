@@ -192,8 +192,8 @@ const previewComponent = computed(() => ({
 }
 
 .editor-highlight-layer {
-  color: transparent;
   pointer-events: none;
+  z-index: 1;
 }
 
 .highlight-line {
@@ -208,6 +208,13 @@ const previewComponent = computed(() => ({
   resize: none;
   outline: none;
   overflow: hidden;
+  z-index: 2;
+}
+
+/* Make selection visible on the transparent textarea */
+.editor-textarea::selection {
+  background: rgba(43, 108, 176, 0.25);
+  color: transparent;
 }
 
 /* Highlighting tokens */
