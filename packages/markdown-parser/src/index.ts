@@ -27,6 +27,7 @@ export type {
   ParserContext,
   BlockRule,
   InlineRule,
+  Linkifier,
   MarkdownParserOptions,
   MarkdownPlugin,
 } from './types';

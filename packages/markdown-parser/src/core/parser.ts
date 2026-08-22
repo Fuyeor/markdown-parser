@@ -1,17 +1,24 @@
 // @fuyeor/markdown-parser/src/core/parser.ts
 import { BlockState, InlineState } from './state';
+import { linkify } from '@fuyeor/linkify';
 import type {
   ASTNode,
   BlockRule,
   InlineRule,
+  Linkifier,
   MarkdownPlugin,
   MarkdownParserOptions,
   ParserContext,
 } from '#/types';
 import { isSafeLinkUrl } from '#/core/url';
 
-const LINKIFY_REGEX =
-  /(https?:\/\/[^\s]+|(?<![@\w])(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?)/gv;
+const LINKIFY_CANDIDATE_REGEX = /(?:https?:\/\/|[A-Za-z0-9-]+\.)/u;
+
+/** Skip linkify scans for text without a possible URL candidate. */
+function linkifyWithCandidateCheck(text: string): ReturnType<typeof linkify> {
+  if (!LINKIFY_CANDIDATE_REGEX.test(text)) return [];
+  return linkify(text);
+}
 
 export class MarkdownParser {
   #blockRuleMap = new Map<string, BlockRule[]>();
@@ -19,6 +26,7 @@ export class MarkdownParser {
   #idSequence = 0;
   #isPreflight = false;
   readonly #maxNestingDepth: number;
+  readonly #linkifier: Linkifier;
 
   constructor(options: MarkdownParserOptions = {}) {
     const maxNestingDepth = options.maxNestingDepth ?? 64;
@@ -26,6 +34,7 @@ export class MarkdownParser {
       throw new RangeError('maxNestingDepth must be a positive integer');
 
     this.#maxNestingDepth = maxNestingDepth;
+    this.#linkifier = options.linkifier ?? linkifyWithCandidateCheck;
   }
 
   // construct a context for recursive rule calls
@@ -227,44 +236,20 @@ export class MarkdownParser {
         const textBuffer = state.content.slice(textStart, endPos);
         let lastIdx = 0;
 
-        for (const match of textBuffer.matchAll(LINKIFY_REGEX)) {
-          let urlStr = match[0];
-          let matchIdx = match.index!;
-
-          // remove the punctuation marks at the end.
-          const punctuation = '.,:;?!';
-          while (
-            urlStr.length > 0 &&
-            punctuation.includes(urlStr[urlStr.length - 1])
-          ) {
-            urlStr = urlStr.slice(0, -1);
-          }
-
-          // handle bracket matching
-          // If a link ends with `)` and the inner brackets are unbalanced, then strip `)`
-          if (urlStr.endsWith(')')) {
-            const openCount = (urlStr.match(/\(/g) || []).length;
-            const closeCount = (urlStr.match(/\)/g) || []).length;
-            if (closeCount > openCount) urlStr = urlStr.slice(0, -1);
-          }
-
-          const fullUrl = urlStr.startsWith('http')
-            ? urlStr
-            : `https://${urlStr}`;
-
-          if (isSafeLinkUrl(fullUrl)) {
-            if (matchIdx > lastIdx) {
+        for (const match of this.#linkifier(textBuffer)) {
+          if (isSafeLinkUrl(match.url)) {
+            if (match.index > lastIdx) {
               nodes.push({
                 type: 'text',
-                content: textBuffer.slice(lastIdx, matchIdx),
+                content: textBuffer.slice(lastIdx, match.index),
               });
             }
             nodes.push({
               type: 'link',
-              url: fullUrl,
-              children: [{ type: 'text', content: urlStr }],
+              url: match.url,
+              children: [{ type: 'text', content: match.text }],
             });
-            lastIdx = matchIdx + urlStr.length;
+            lastIdx = match.lastIndex;
           }
         }
 
