@@ -71,12 +71,13 @@ import {
 } from '@fuyeor/markdown-parser';
 import { renderToVue } from '@fuyeor/markdown-parser-vue';
 import { SUPPORTED_LOCALES } from '../config/locales';
+import { fetchExample } from '../api/examples';
 
-const { t } = useLocale();
+const { t, locale } = useLocale();
 const route = useRoute();
 const router = useRouter();
 const editor = ref<HTMLTextAreaElement | null>(null);
-const source = ref(t('editor.sample'));
+const source = ref('');
 const activeTab = ref('preview');
 const history = ref([source.value]);
 const historyIndex = ref(0);
@@ -85,6 +86,16 @@ const tabs: TabItem[] = [
   { value: 'ast' },
   { value: 'html' },
 ];
+
+// 异步加载对应语言的示例文本
+import { watch } from 'vue';
+watch(locale, (newLocale) => {
+  void fetchExample(newLocale).then((exampleText) => {
+    source.value = exampleText;
+    history.value = [exampleText];
+    historyIndex.value = 0;
+  });
+}, { immediate: true });
 
 const canUndo = computed(() => historyIndex.value > 0);
 const canRedo = computed(() => historyIndex.value < history.value.length - 1);
