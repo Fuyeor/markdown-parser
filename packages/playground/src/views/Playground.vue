@@ -21,7 +21,12 @@ const route = useRoute();
 const router = useRouter();
 const { t, locale } = useLocale();
 const { source } = usePlaygroundSource();
-const { documents, saveDocument, isReady, error: storageError } = useIndexedDb();
+const {
+  documents,
+  saveDocument,
+  isReady,
+  error: storageError,
+} = useIndexedDb();
 const editorComponent = ref<InstanceType<typeof PlaygroundEditor> | null>(null);
 const isRouteLoading = ref(true);
 let skipNextSourceChange = false;
@@ -112,7 +117,9 @@ const loadRouteDocument = async () => {
   clearCreateDocumentTimeout();
   await flushPendingSave();
   const id = String(route.params.id ?? '');
-  const document = id ? documents.value.find((item) => item.id === id) : undefined;
+  const document = id
+    ? documents.value.find((item) => item.id === id)
+    : undefined;
 
   if (id && !document) {
     replaceSourceIfChanged('');
@@ -128,7 +135,9 @@ const loadRouteDocument = async () => {
   }
 
   if (window.location.hash.startsWith('#snippet=')) {
-    const snippet = await decodeSnippet(window.location.hash.slice('#snippet='.length));
+    const snippet = await decodeSnippet(
+      window.location.hash.slice('#snippet='.length),
+    );
     replaceSourceIfChanged(snippet ?? '');
     isRouteLoading.value = false;
     return;
@@ -166,7 +175,10 @@ const createDocumentFromInput = async (content: string) => {
       content,
     };
     await saveDocument(document);
-    await router.replace({ name: 'Playground', params: playgroundParams(document.id) });
+    await router.replace({
+      name: 'Playground',
+      params: playgroundParams(document.id),
+    });
   } finally {
     creatingDocument = false;
   }
@@ -192,14 +204,21 @@ watch(source, (content) => {
   scheduleSave(id, content);
 });
 
-watch(isReady, (ready) => {
-  if (ready) void loadRouteDocument().catch(console.error);
-}, { immediate: true });
+watch(
+  isReady,
+  (ready) => {
+    if (ready) void loadRouteDocument().catch(console.error);
+  },
+  { immediate: true },
+);
 
-watch(() => route.params.id, () => {
-  isRouteLoading.value = true;
-  void loadRouteDocument().catch(console.error);
-});
+watch(
+  () => route.params.id,
+  () => {
+    isRouteLoading.value = true;
+    void loadRouteDocument().catch(console.error);
+  },
+);
 </script>
 
 <style>
@@ -208,5 +227,29 @@ watch(() => route.params.id, () => {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+}
+
+.preview {
+  .tab-container {
+    flex-shrink: 0;
+    margin: 0;
+
+    .tab-item {
+      align-items: stretch;
+    }
+  }
+
+  .output-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
 }
 </style>

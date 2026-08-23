@@ -9,7 +9,11 @@
       @format="formatDocument"
       @tool="applyTool"
     />
-    <div class="editor-scroll-container" @scroll="syncScroll" ref="scrollContainer">
+    <div
+      class="editor-scroll-container"
+      @scroll="syncScroll"
+      ref="scrollContainer"
+    >
       <div class="editor-line-numbers" aria-hidden="true">
         <div v-for="n in lineNumbers" :key="n" class="line-number">{{ n }}</div>
       </div>
@@ -17,15 +21,26 @@
         class="editor-content-wrapper"
         :style="{ minHeight: `calc(${lineNumbers.length} * 1.6em + 32px)` }"
       >
-        <div v-if="!supportsCustomHighlight" class="editor-highlight-layer" aria-hidden="true">
-          <div v-for="(html, i) in highlightedLines" :key="i" class="highlight-line" v-html="html"></div>
+        <div
+          v-if="!supportsCustomHighlight"
+          class="editor-highlight-layer"
+          aria-hidden="true"
+        >
+          <div
+            v-for="(html, i) in highlightedLines"
+            :key="i"
+            class="highlight-line"
+            v-html="html"
+          ></div>
         </div>
         <div
           v-else
           ref="highlightTarget"
           class="editor-highlight-layer custom-highlight-target"
           aria-hidden="true"
-        >{{ source + (source.endsWith('\n') ? ' ' : '') }}</div>
+        >
+          {{ source + (source.endsWith('\n') ? ' ' : '') }}
+        </div>
         <textarea
           ref="editor"
           v-model="source"
@@ -40,13 +55,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import MarkdownToolbar from '@/components/Playground/MarkdownToolbar.vue';
+
+import { ref } from 'vue';
 import { useMarkdownEditor } from '@/composables/useMarkdownEditor';
 import { usePlaygroundSource } from '@/composables/usePlaygroundSource';
 import { useMarkdownHighlighter } from '@/composables/useMarkdownHighlighter';
 
 const { source } = usePlaygroundSource();
+
 const editor = ref<HTMLTextAreaElement | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
 const highlightTarget = ref<HTMLElement | null>(null);
@@ -101,9 +118,8 @@ defineExpose({ editor, replaceSource });
   min-height: 0;
   flex: 1;
   overflow: auto;
-  background: var(--bg-primary, #ffffff);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 14px;
+  font-size: 1rem;
   line-height: 1.6;
 }
 
@@ -112,8 +128,8 @@ defineExpose({ editor, replaceSource });
   text-align: right;
   color: #a0aec0;
   user-select: none;
-  border-right: 1px solid #edf2f7;
-  background: #f8fafc;
+  border-right: var(--border-default);
+  background: var(--surface-top);
 }
 
 .line-number {
@@ -172,13 +188,39 @@ defineExpose({ editor, replaceSource });
 }
 
 /* Fallback Highlighting tokens */
-.hl-punctuation { color: #a0aec0; }
-.hl-heading { color: #553c9a; font-weight: 600; }
-.hl-quote { color: #718096; font-style: italic; }
-.hl-list { color: #2d3748; }
-.hl-bold { font-weight: 700; color: #1a202c; }
-.hl-italic { font-style: italic; color: #1a202c; }
-.hl-code { color: #d53f8c; background: #faf5ff; border-radius: 3px; padding: 0 2px; }
-.hl-strike { text-decoration: line-through; color: #a0aec0; }
-.hl-code-fence { color: #805ad5; }
+.hl-punctuation {
+  color: #a0aec0;
+}
+.hl-heading {
+  color: #553c9a;
+  font-weight: 600;
+}
+.hl-quote {
+  color: #718096;
+  font-style: italic;
+}
+.hl-list {
+  color: #2d3748;
+}
+.hl-bold {
+  font-weight: 700;
+  color: #1a202c;
+}
+.hl-italic {
+  font-style: italic;
+  color: #1a202c;
+}
+.hl-code {
+  color: #d53f8c;
+  background: #faf5ff;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.hl-strike {
+  text-decoration: line-through;
+  color: #a0aec0;
+}
+.hl-code-fence {
+  color: #805ad5;
+}
 </style>

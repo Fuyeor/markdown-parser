@@ -23,7 +23,10 @@
         class="document-item-wrapper"
       >
         <router-link
-          :to="{ name: 'Playground', params: { ...route.params, id: document.id } }"
+          :to="{
+            name: 'Playground',
+            params: { ...route.params, id: document.id },
+          }"
           class="document-item"
           :class="{ active: currentDocumentId === document.id }"
         >
@@ -126,44 +129,47 @@ const formatTime = (timestamp: number): string => {
 </script>
 
 <style>
+.foldable-content {
+  padding: 0 10px;
+}
+
 .document-history {
   margin: 10px;
 }
 
 .document-history-title {
   margin: 0;
-  color: var(--text-primary, #2d3748);
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
 }
 
 .document-search-container {
   position: relative;
-  padding: 8px 10px;
+  padding: 10px 0 20px;
 }
 
 .document-search-input {
   box-sizing: border-box;
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid var(--border-subtle, #e2e8f0);
-  border-radius: 6px;
-  color: var(--text-primary, #2d3748);
-  background: var(--surface-raised, #ffffff);
-  font-size: 13px;
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  background: var(--surface-raised);
+  font-size: 0.85rem;
   outline: none;
 }
 
 .document-search-input:focus {
-  border-color: #9f7aea;
+  border: var(--input-border-focus);
 }
 
 .document-list {
   display: flex;
   max-height: calc(100vh - 200px);
-  margin-top: 8px;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   overflow-y: auto;
 }
 
@@ -180,7 +186,7 @@ const formatTime = (timestamp: number): string => {
   align-items: center;
   padding: 10px 32px 10px 12px;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   color: inherit;
   background: transparent;
   font: inherit;
@@ -193,7 +199,7 @@ const formatTime = (timestamp: number): string => {
 .document-item:hover,
 .document-item:focus-visible,
 .document-item.active {
-  background-color: #f3ebff;
+  background-color: var(--surface-raised);
 }
 
 .document-icon {
@@ -208,9 +214,10 @@ const formatTime = (timestamp: number): string => {
 
 .document-info {
   display: flex;
-  min-width: 0;
   flex: 1;
+  gap: 8px;
   flex-direction: column;
+  min-width: 0;
 }
 
 .document-title,
@@ -221,18 +228,16 @@ const formatTime = (timestamp: number): string => {
 }
 
 .document-title {
-  margin-bottom: 4px;
-  color: var(--text-primary, #2d3748);
-  font-size: 14px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
 }
 
 .document-item.active .document-title {
-  color: #553c9a;
   font-weight: 500;
 }
 
 .document-time {
-  color: var(--text-secondary, #a0aec0);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 

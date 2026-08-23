@@ -61,13 +61,12 @@ const previewComponent = computed(() => ({
   flex: 1;
   overflow: auto;
   padding: 24px;
-  background: var(--bg-secondary, #f7fafc);
+  background-color: var(--surface-raised-hover);
 }
 
 .markdown-rendered {
   max-width: 900px;
   margin: 0 auto;
-  color: var(--text-primary, #1a202c);
 }
 
 .output-content pre {
