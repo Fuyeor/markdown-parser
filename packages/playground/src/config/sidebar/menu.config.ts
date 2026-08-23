@@ -10,7 +10,7 @@ export const sidebarItemsRaw: SidebarItemConfig[] = [
   },
   {
     target: '/playground',
-    icon: getIconUrl('home'),
+    icon: getIconUrl('palette'),
     textKey: 'playground',
   },
 ];

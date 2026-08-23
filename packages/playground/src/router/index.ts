@@ -57,7 +57,7 @@ const routes: Array<RouteRecord> = [
 const router = createRouter({ routes });
 
 // 路由守卫
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to) => {
   // 启动顶部进度条
   start();
 
@@ -67,15 +67,12 @@ router.beforeEach(async (to, from) => {
   // 从路由参数中获取 locale (例如 'en' 或 undefined)
   const routeLocale = to.params.locale as string | undefined;
 
-  // 如果路由中有语言参数，且与当前 store 中的不一致，强制切换
-  // 这会触发 initializeLocale 中的 loadLocaleMessages，加载新语言包
-  if (routeLocale && routeLocale !== localeStore.locale) {
-    try {
-      await localeStore.setLocale(routeLocale);
-    } catch (e) {
-      console.error('[RouterGuard] Failed to load locale:', e);
-      // 加载语言失败不应该阻塞跳转，只不过界面可能显示默认语言
-    }
+  // 如果没有语言参数就添加语言
+  if (!routeLocale) {
+    return {
+      name: to.name,
+      params: { ...to.params, locale: localeStore.locale },
+    };
   }
 
   // 如果代码能执行到这里，说明所有检查都通过了，允许导航

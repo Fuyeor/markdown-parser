@@ -1,10 +1,11 @@
 <!-- @/components/Playground/DocumentHistory.vue -->
 <template>
-  <Foldable :title="t('playground.documents')" :model-value="true" class="document-history-foldable">
-    <template #header>
-      <p class="document-history-title">{{ t('playground.documents') }}</p>
-    </template>
-
+  <Foldable
+    :title="t('playground.documents')"
+    :model-value="true"
+    :icon-url="getIconUrl('learn')"
+    class="document-history"
+  >
     <div class="document-search-container">
       <input
         v-model="searchQuery"
@@ -16,17 +17,29 @@
     </div>
 
     <div class="document-list">
-      <div v-for="document in filteredDocuments" :key="document.id" class="document-item-wrapper">
+      <div
+        v-for="document in filteredDocuments"
+        :key="document.id"
+        class="document-item-wrapper"
+      >
         <button
           type="button"
           class="document-item"
           :class="{ active: currentDocumentId === document.id }"
           @click="emit('select', document)"
         >
-          <span class="document-icon" aria-hidden="true"></span>
+          <img
+            class="document-icon"
+            aria-hidden="true"
+            :src="getIconUrl('bookmark')"
+          />
           <span class="document-info">
-            <span class="document-title">{{ document.title || t('playground.documents.untitled') }}</span>
-            <span class="document-time">{{ formatTime(document.updated_at) }}</span>
+            <span class="document-title">{{
+              document.title || t('playground.documents.untitled')
+            }}</span>
+            <span class="document-time">{{
+              formatTime(document.updated_at)
+            }}</span>
           </span>
         </button>
         <button
@@ -48,6 +61,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useLocale } from '@fuyeor/locale';
+import { getIconUrl } from '@fuyeor/commons';
 import { Foldable } from '@fuyeor/interactify';
 import type { HistoryDocument } from '@/composables/useIndexedDb';
 
@@ -68,9 +82,10 @@ const filteredDocuments = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase();
   if (!query) return props.documents;
 
-  return props.documents.filter((document) =>
-    document.title.toLocaleLowerCase().includes(query) ||
-    document.content.toLocaleLowerCase().includes(query),
+  return props.documents.filter(
+    (document) =>
+      document.title.toLocaleLowerCase().includes(query) ||
+      document.content.toLocaleLowerCase().includes(query),
   );
 });
 
@@ -78,11 +93,23 @@ const filteredDocuments = computed(() => {
 const formatTime = (timestamp: number): string => {
   const diff = Math.max(0, window.Date.now() - timestamp);
   if (diff < 60000) return t('playground.documents.justNow');
-  if (diff < 3600000) return t('playground.documents.minutesAgo', { value: Math.floor(diff / 60000) });
-  if (diff < 86400000) return t('playground.documents.hoursAgo', { value: Math.floor(diff / 3600000) });
+  if (diff < 3600000)
+    return t('playground.documents.minutesAgo', {
+      value: Math.floor(diff / 60000),
+    });
+  if (diff < 86400000)
+    return t('playground.documents.hoursAgo', {
+      value: Math.floor(diff / 3600000),
+    });
   if (diff < 172800000) return t('playground.documents.yesterday');
-  if (diff < 604800000) return t('playground.documents.daysAgo', { value: Math.floor(diff / 86400000) });
-  if (diff < 2592000000) return t('playground.documents.weeksAgo', { value: Math.floor(diff / 604800000) });
+  if (diff < 604800000)
+    return t('playground.documents.daysAgo', {
+      value: Math.floor(diff / 86400000),
+    });
+  if (diff < 2592000000)
+    return t('playground.documents.weeksAgo', {
+      value: Math.floor(diff / 604800000),
+    });
 
   return new window.Intl.DateTimeFormat(locale.value, {
     year: 'numeric',
@@ -93,8 +120,8 @@ const formatTime = (timestamp: number): string => {
 </script>
 
 <style>
-.document-history-foldable {
-  margin: 8px;
+.document-history {
+  margin: 10px;
 }
 
 .document-history-title {
@@ -144,7 +171,7 @@ const formatTime = (timestamp: number): string => {
   display: flex;
   width: 100%;
   min-width: 0;
-  align-items: flex-start;
+  align-items: center;
   padding: 10px 32px 10px 12px;
   border: 0;
   border-radius: 8px;
@@ -163,27 +190,8 @@ const formatTime = (timestamp: number): string => {
 }
 
 .document-icon {
-  position: relative;
   flex: 0 0 13px;
-  width: 13px;
-  height: 16px;
-  margin: 2px 12px 0 2px;
-  border: 1.5px solid currentColor;
-  border-radius: 2px;
-  color: #8a94a6;
-  opacity: 0.75;
-}
-
-.document-icon::before {
-  position: absolute;
-  top: -1.5px;
-  right: -1.5px;
-  width: 5px;
-  height: 5px;
-  border-bottom: 1.5px solid currentColor;
-  border-left: 1.5px solid currentColor;
-  background: var(--surface-raised, #ffffff);
-  content: '';
+  height: 20px;
 }
 
 .document-item.active .document-icon {
@@ -238,7 +246,9 @@ const formatTime = (timestamp: number): string => {
   opacity: 0;
   transform: translateY(-50%);
   cursor: pointer;
-  transition: opacity 0.16s ease-out, background-color 0.16s ease-out;
+  transition:
+    opacity 0.16s ease-out,
+    background-color 0.16s ease-out;
 }
 
 .document-item-wrapper:hover .document-delete-button,
