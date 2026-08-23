@@ -22,11 +22,10 @@
         :key="document.id"
         class="document-item-wrapper"
       >
-        <button
-          type="button"
+        <router-link
+          :to="`${route.params.locale ? `/${route.params.locale}` : ''}/playground/${document.id}`"
           class="document-item"
           :class="{ active: currentDocumentId === document.id }"
-          @click="emit('select', document)"
         >
           <img
             class="document-icon"
@@ -41,12 +40,12 @@
               formatTime(document.updated_at)
             }}</span>
           </span>
-        </button>
+        </router-link>
         <button
           type="button"
           class="document-delete-button"
           :aria-label="`${t('playground.documents.delete')}: ${document.title}`"
-          @click.stop="emit('delete', document)"
+          @click.prevent.stop="emit('delete', document)"
         >
           <span aria-hidden="true">×</span>
         </button>
@@ -60,6 +59,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useRoute } from '@fuyeor/vue-router';
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl } from '@fuyeor/commons';
 import { Foldable } from '@fuyeor/interactify';
@@ -71,10 +71,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  select: [document: HistoryDocument];
   delete: [document: HistoryDocument];
 }>();
 
+const route = useRoute();
 const { t, locale } = useLocale();
 const searchQuery = ref('');
 
@@ -179,6 +179,7 @@ const formatTime = (timestamp: number): string => {
   background: transparent;
   font: inherit;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: background-color 0.18s ease-out;
 }

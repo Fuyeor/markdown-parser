@@ -7,7 +7,6 @@
       <DocumentHistory
         :documents="documents"
         :current-document-id="currentDocumentId"
-        @select="selectDocument"
         @delete="deleteDocument"
       />
     </template>
@@ -53,12 +52,7 @@ const { processedItems: sidebarItems } = useSidebarItems(sidebarItemsRaw, {
   t,
 });
 
-const selectDocument = (document: HistoryDocument) => {
-  router.push({
-    name: 'Playground',
-    params: { ...route.params, id: document.id },
-  });
-};
+
 
 const deleteDocument = async (document: HistoryDocument) => {
   await removeDocument(document.id);
