@@ -3,6 +3,13 @@
   <LeftSidebar>
     <template #nav>
       <SidebarMenu :items="sidebarItems" />
+      <router-link
+        :to="{ name: 'Playground', params: { ...route.params, id: undefined } }"
+        class="nav-item"
+      >
+        <img :src="getIconUrl('palette')" class="nav-icon" alt="" />
+        <p class="nav-text">{{ t('playground') }}</p>
+      </router-link>
 
       <DocumentHistory />
     </template>
@@ -24,6 +31,7 @@ import DocumentHistory from '@/components/Playground/DocumentHistory.vue';
 import PlaygroundShare from '@/components/Playground/PlaygroundShare.vue';
 
 import { useLocale } from '@fuyeor/locale';
+import { getIconUrl } from '@fuyeor/commons';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import {
   LeftSidebar,
