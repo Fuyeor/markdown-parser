@@ -4,11 +4,7 @@
     <template #nav>
       <SidebarMenu :items="sidebarItems" />
 
-      <DocumentHistory
-        :documents="documents"
-        :current-document-id="currentDocumentId"
-        @delete="deleteDocument"
-      />
+      <DocumentHistory />
     </template>
 
     <template #footer>
@@ -27,7 +23,6 @@
 import DocumentHistory from '@/components/Playground/DocumentHistory.vue';
 import PlaygroundShare from '@/components/Playground/PlaygroundShare.vue';
 
-import { computed } from 'vue';
 import { useLocale } from '@fuyeor/locale';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import {
@@ -38,31 +33,16 @@ import {
 } from '@fuyeor/interactify';
 import { sidebarItemsRaw } from '@/config/sidebar/menu.config';
 import { SUPPORTED_LOCALES } from '@/config/locales';
-import { useIndexedDb, type HistoryDocument } from '@/composables/useIndexedDb';
 
 const route = useRoute();
 const router = useRouter();
 
 const { t } = useLocale();
-const { documents, deleteDocument: removeDocument } = useIndexedDb();
-
-const currentDocumentId = computed(() => String(route.params.id ?? ''));
 
 const { processedItems: sidebarItems } = useSidebarItems(sidebarItemsRaw, {
   t,
 });
 
-
-
-const deleteDocument = async (document: HistoryDocument) => {
-  await removeDocument(document.id);
-  if (currentDocumentId.value !== document.id) return;
-
-  router.replace({
-    name: 'Playground',
-    params: { ...route.params, id: undefined },
-  });
-};
 
 const handleLocaleChange = (newLocale: string) => {
   void router.replace({

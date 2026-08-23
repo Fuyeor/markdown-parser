@@ -23,7 +23,7 @@
         class="document-item-wrapper"
       >
         <router-link
-          :to="`${route.params.locale ? `/${route.params.locale}` : ''}/playground/${document.id}`"
+          :to="{ name: 'Playground', params: { ...route.params, id: document.id } }"
           class="document-item"
           :class="{ active: currentDocumentId === document.id }"
         >
@@ -45,7 +45,7 @@
           type="button"
           class="document-delete-button"
           :aria-label="`${t('playground.documents.delete')}: ${document.title}`"
-          @click.prevent.stop="emit('delete', document)"
+          @click.prevent.stop="handleDeleteDocument(document)"
         >
           <span aria-hidden="true">×</span>
         </button>
@@ -59,35 +59,41 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useRoute } from '@fuyeor/vue-router';
+import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl } from '@fuyeor/commons';
 import { Foldable } from '@fuyeor/interactify';
-import type { HistoryDocument } from '@/composables/useIndexedDb';
-
-const props = defineProps<{
-  documents: HistoryDocument[];
-  currentDocumentId: string;
-}>();
-
-const emit = defineEmits<{
-  delete: [document: HistoryDocument];
-}>();
+import { useIndexedDb, type HistoryDocument } from '@/composables/useIndexedDb';
 
 const route = useRoute();
+const router = useRouter();
 const { t, locale } = useLocale();
+const { documents, deleteDocument } = useIndexedDb();
 const searchQuery = ref('');
+
+const currentDocumentId = computed(() => String(route.params.id ?? ''));
 
 const filteredDocuments = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase();
-  if (!query) return props.documents;
+  if (!query) return documents.value;
 
-  return props.documents.filter(
+  return documents.value.filter(
     (document) =>
       document.title.toLocaleLowerCase().includes(query) ||
       document.content.toLocaleLowerCase().includes(query),
   );
 });
+
+// Delete the local document and clear the current route when needed.
+const handleDeleteDocument = async (document: HistoryDocument) => {
+  await deleteDocument(document.id);
+  if (currentDocumentId.value !== document.id) return;
+
+  void router.replace({
+    name: 'Playground',
+    params: { ...route.params, id: undefined },
+  });
+};
 
 // Format relative timestamps in the active locale.
 const formatTime = (timestamp: number): string => {
