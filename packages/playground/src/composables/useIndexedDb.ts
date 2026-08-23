@@ -1,5 +1,6 @@
 // @fuyeor/markdown-parser-playground/src/composables/useIndexedDb.ts
 import { onMounted, ref } from 'vue';
+import { countDocumentStats } from '@/composables/useDocumentStats';
 
 export interface HistoryDocument {
   id: string;
@@ -7,6 +8,7 @@ export interface HistoryDocument {
   created_at: number;
   updated_at: number;
   content: string;
+  word_count?: number;
 }
 
 const DB_NAME = 'fuyeor-markdown-playground';
@@ -27,23 +29,35 @@ const loadAllDocuments = (): Promise<void> => {
       return;
     }
 
-    const transaction = database.transaction(STORE_NAME, 'readonly');
-    const request = transaction.objectStore(STORE_NAME).index(UPDATED_AT_INDEX).openCursor(null, 'prev');
+    const transaction = database.transaction(STORE_NAME, 'readwrite');
+    const request = transaction
+      .objectStore(STORE_NAME)
+      .index(UPDATED_AT_INDEX)
+      .openCursor(null, 'prev');
     const result: HistoryDocument[] = [];
 
     request.onsuccess = () => {
       const cursor = request.result;
       if (!cursor) {
-        documents.value = result;
-        resolve();
+        transaction.oncomplete = () => {
+          documents.value = result;
+          resolve();
+        };
         return;
       }
 
-      result.push(cursor.value as HistoryDocument);
+      const document = cursor.value as HistoryDocument;
+      const normalizedDocument = document.word_count === undefined
+        ? { ...document, word_count: countDocumentStats(document.content).words }
+        : document;
+      result.push(normalizedDocument);
+      if (normalizedDocument !== document) cursor.update(normalizedDocument);
       cursor.continue();
     };
 
     request.onerror = () => reject(request.error ?? new Error('Failed to read documents'));
+    transaction.onerror = () => reject(transaction.error ?? new Error('Failed to read documents'));
+    transaction.onabort = () => reject(transaction.error ?? new Error('Failed to read documents'));
   });
 };
 

@@ -1,19 +1,24 @@
 <!-- @/views/Playground.vue -->
 <template>
   <section class="playground-layout">
-    <PlaygroundEditor ref="editorComponent" />
+    <PlaygroundEditor
+      ref="editorComponent"
+      :created-at="currentDocument?.created_at"
+      :updated-at="currentDocument?.updated_at"
+    />
     <PlaygroundPreview />
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useLocale } from '@fuyeor/locale';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { fetchExample } from '@/api/examples';
 import { decodeSnippet } from '@/composables/useCompression';
 import { usePlaygroundSource } from '@/composables/usePlaygroundSource';
 import { useIndexedDb, type HistoryDocument } from '@/composables/useIndexedDb';
+import { countDocumentStats } from '@/composables/useDocumentStats';
 import PlaygroundEditor from '@/components/Playground/PlaygroundEditor.vue';
 import PlaygroundPreview from '@/components/Playground/PlaygroundPreview.vue';
 
@@ -28,6 +33,10 @@ const {
   error: storageError,
 } = useIndexedDb();
 const editorComponent = ref<InstanceType<typeof PlaygroundEditor> | null>(null);
+const currentDocument = computed(() => {
+  const id = String(route.params.id ?? '');
+  return documents.value.find((document) => document.id === id);
+});
 const isRouteLoading = ref(true);
 let skipNextSourceChange = false;
 let creatingDocument = false;
@@ -58,11 +67,13 @@ const saveDocumentContent = async (id: string, content: string) => {
   const previous = documents.value.find((document) => document.id === id);
   if (!previous) return;
 
+  const stats = countDocumentStats(content);
   const document: HistoryDocument = {
     ...previous,
     title: extractTitle(content, t('playground.documents.untitled')),
     updated_at: window.Date.now(),
     content,
+    word_count: stats.words,
   };
   await saveDocument(document);
 };
@@ -167,12 +178,14 @@ const createDocumentFromInput = async (content: string) => {
 
   try {
     const now = window.Date.now();
+    const stats = countDocumentStats(content);
     const document: HistoryDocument = {
       id: window.crypto.randomUUID(),
       title: extractTitle(content, t('playground.documents.untitled')),
       created_at: now,
       updated_at: now,
       content,
+      word_count: stats.words,
     };
     await saveDocument(document);
     await router.replace({

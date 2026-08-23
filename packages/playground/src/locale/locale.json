@@ -23,6 +23,30 @@
     "ru": "Документы",
     "zh-hans": "文档"
   },
+  "playground.documents.characters": {
+    "ar": "الأحرف",
+    "de": "Zeichen",
+    "en": "Characters",
+    "es": "Caracteres",
+    "fr": "Caractères",
+    "ja": "文字",
+    "ko": "문자",
+    "pt": "Caracteres",
+    "ru": "Символы",
+    "zh-hans": "字符数"
+  },
+  "playground.documents.createdAt": {
+    "ar": "تاريخ الإنشاء",
+    "de": "Erstellt",
+    "en": "Created",
+    "es": "Creado",
+    "fr": "Créé",
+    "ja": "作成",
+    "ko": "생성",
+    "pt": "Criado",
+    "ru": "Создано",
+    "zh-hans": "创建于"
+  },
   "playground.documents.daysAgo": {
     "ar": "منذ {value} يوم",
     "de": "vor {value} Tagen",
@@ -95,6 +119,18 @@
     "ru": "Новый",
     "zh-hans": "新建"
   },
+  "playground.documents.paragraphs": {
+    "ar": "الفقرات",
+    "de": "Absätze",
+    "en": "Paragraphs",
+    "es": "Párrafos",
+    "fr": "Paragraphes",
+    "ja": "段落",
+    "ko": "단락",
+    "pt": "Parágrafos",
+    "ru": "Абзацы",
+    "zh-hans": "段落数"
+  },
   "playground.documents.search": {
     "ar": "البحث في المستندات...",
     "de": "Dokumente durchsuchen...",
@@ -106,6 +142,18 @@
     "pt": "Pesquisar documentos...",
     "ru": "Поиск документов...",
     "zh-hans": "搜索文档..."
+  },
+  "playground.documents.sentences": {
+    "ar": "الجمل",
+    "de": "Sätze",
+    "en": "Sentences",
+    "es": "Oraciones",
+    "fr": "Phrases",
+    "ja": "文",
+    "ko": "문장",
+    "pt": "Frases",
+    "ru": "Предложения",
+    "zh-hans": "句子数"
   },
   "playground.documents.untitled": {
     "ar": "مستند بلا عنوان",
@@ -119,6 +167,18 @@
     "ru": "Документ без названия",
     "zh-hans": "未命名文档"
   },
+  "playground.documents.updatedAt": {
+    "ar": "تم التعديل",
+    "de": "Überarbeitet",
+    "en": "Revised",
+    "es": "Revisado",
+    "fr": "Révisé",
+    "ja": "修訂",
+    "ko": "수정됨",
+    "pt": "Revisado",
+    "ru": "Изменено",
+    "zh-hans": "修订于"
+  },
   "playground.documents.weeksAgo": {
     "ar": "منذ {value} أسبوع",
     "de": "vor {value} Wochen",
@@ -130,6 +190,30 @@
     "pt": "há {value} sem.",
     "ru": "{value} нед. назад",
     "zh-hans": "{value} 周前"
+  },
+  "playground.documents.wordCount": {
+    "ar": "{value} كلمة",
+    "de": "{value} Wörter",
+    "en": "{value} words",
+    "es": "{value} palabras",
+    "fr": "{value} mots",
+    "ja": "{value}語",
+    "ko": "{value}단어",
+    "pt": "{value} palavras",
+    "ru": "{value} слов",
+    "zh-hans": "{value} 词"
+  },
+  "playground.documents.words": {
+    "ar": "الكلمات",
+    "de": "Wörter",
+    "en": "Words",
+    "es": "Palabras",
+    "fr": "Mots",
+    "ja": "単語",
+    "ko": "단어",
+    "pt": "Palavras",
+    "ru": "Слова",
+    "zh-hans": "词数"
   },
   "playground.documents.yesterday": {
     "ar": "أمس",

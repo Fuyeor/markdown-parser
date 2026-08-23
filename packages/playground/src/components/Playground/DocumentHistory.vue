@@ -39,9 +39,12 @@
             <span class="document-title">{{
               document.title || t('playground.documents.untitled')
             }}</span>
-            <span class="document-time">{{
-              formatTime(document.updated_at)
-            }}</span>
+            <span class="document-time">
+              {{ formatTime(document.updated_at) }}
+              <span v-if="document.word_count !== undefined" class="document-word-count">
+                · {{ t('playground.documents.wordCount', { value: document.word_count }) }}
+              </span>
+            </span>
           </span>
         </router-link>
         <button
@@ -239,6 +242,10 @@ const formatTime = (timestamp: number): string => {
 .document-time {
   color: var(--text-secondary);
   font-size: 12px;
+}
+
+.document-word-count {
+  margin-left: 2px;
 }
 
 .document-delete-button {

@@ -51,16 +51,34 @@
         />
       </div>
     </div>
+    <DocumentStatsBar
+      :created-at="props.createdAt"
+      :updated-at="props.updatedAt"
+      :stats="stats"
+    />
   </article>
 </template>
 
 <script setup lang="ts">
 import MarkdownToolbar from '@/components/Playground/MarkdownToolbar.vue';
+import DocumentStatsBar from '@/components/Playground/DocumentStatsBar.vue';
 
 import { ref } from 'vue';
 import { useMarkdownEditor } from '@/composables/useMarkdownEditor';
 import { usePlaygroundSource } from '@/composables/usePlaygroundSource';
 import { useMarkdownHighlighter } from '@/composables/useMarkdownHighlighter';
+import { useDocumentStats } from '@/composables/useDocumentStats';
+
+const props = withDefaults(
+  defineProps<{
+    createdAt?: number;
+    updatedAt?: number;
+  }>(),
+  {
+    createdAt: 0,
+    updatedAt: 0,
+  },
+);
 
 const { source } = usePlaygroundSource();
 
@@ -85,6 +103,7 @@ const { lineNumbers, highlightedLines } = useMarkdownHighlighter(
   highlightTarget,
   supportsCustomHighlight,
 );
+const { stats } = useDocumentStats(source);
 
 // The outer container owns scrolling so line numbers and the mirrored text stay aligned.
 const syncScroll = () => {};
