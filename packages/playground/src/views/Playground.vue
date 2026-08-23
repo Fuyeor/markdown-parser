@@ -10,6 +10,7 @@
 import { ref, watch } from 'vue';
 import { useLocale } from '@fuyeor/locale';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
+import { fetchExample } from '@/api/examples';
 import { decodeSnippet } from '@/composables/useCompression';
 import { usePlaygroundSource } from '@/composables/usePlaygroundSource';
 import { useIndexedDb, type HistoryDocument } from '@/composables/useIndexedDb';
@@ -18,7 +19,7 @@ import PlaygroundPreview from '@/components/Playground/PlaygroundPreview.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { t } = useLocale();
+const { t, locale } = useLocale();
 const { source } = usePlaygroundSource();
 const { documents, saveDocument, isReady, error: storageError } = useIndexedDb();
 const editorComponent = ref<InstanceType<typeof PlaygroundEditor> | null>(null);
@@ -120,11 +121,33 @@ const loadRouteDocument = async () => {
     return;
   }
 
-  if (document) replaceSourceIfChanged(document.content);
-  else if (window.location.hash.startsWith('#snippet=')) {
+  if (document) {
+    replaceSourceIfChanged(document.content);
+    isRouteLoading.value = false;
+    return;
+  }
+
+  if (window.location.hash.startsWith('#snippet=')) {
     const snippet = await decodeSnippet(window.location.hash.slice('#snippet='.length));
     replaceSourceIfChanged(snippet ?? '');
-  } else replaceSourceIfChanged('');
+    isRouteLoading.value = false;
+    return;
+  }
+
+  if (documents.value.length === 0 && !id) {
+    try {
+      const exampleContent = await fetchExample(locale.value);
+      if (exampleContent) {
+        await createDocumentFromInput(exampleContent);
+        isRouteLoading.value = false;
+        return;
+      }
+    } catch (e) {
+      console.error('Failed to load example:', e);
+    }
+  }
+
+  replaceSourceIfChanged('');
   isRouteLoading.value = false;
 };
 
