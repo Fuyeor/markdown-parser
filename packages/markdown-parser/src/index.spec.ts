@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { MarkdownParser } from './core/parser';
 import { createFuyeorMarkdownParser } from './default';
+import { render } from './core/render';
 import { headingRule, codeBlockRule, tableRule } from './rules/blocks';
 import { boldRule, linkRule } from './rules/inlines';
 
@@ -68,6 +69,53 @@ describe('test @fuyeor/markdown-parser', () => {
     expect(tableNode).toBeDefined();
     expect(tableNode.headers).toHaveLength(2);
     expect(tableNode.children![0].type).toBe('table_row');
+  });
+
+  it('renders aligned headed tables', () => {
+    const ast = createFuyeorMarkdownParser()(
+      '| 属性 | 类型 | 说明 |\n| :--- | :---: | ---: |\n| name | string | 用户名 |',
+    );
+
+    expect(render(ast)).toBe(`<table>
+<thead>
+<tr>
+<th align="left">属性</th>
+<th align="center">类型</th>
+<th align="right">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">name</td>
+<td align="center">string</td>
+<td align="right">用户名</td>
+</tr>
+</tbody>
+</table>
+`);
+  });
+
+  it('renders separator-first tables without a header', () => {
+    const ast = createFuyeorMarkdownParser()(
+      '| :--- | ---: |\n| Ray ID | a2c5ac427b7aa727 |\n| IP 地址 | 172.214.47.18 |',
+    );
+    const tableNode = ast.find((node) => node.type === 'table');
+
+    expect(tableNode?.headers).toBeUndefined();
+    expect(tableNode?.children).toHaveLength(2);
+    expect(render(ast)).toBe(`<table>
+<tbody>
+<tr>
+<td align="left">Ray ID</td>
+<td align="right">a2c5ac427b7aa727</td>
+</tr>
+<tr>
+<td align="left">IP 地址</td>
+<td align="right">172.214.47.18</td>
+</tr>
+</tbody>
+</table>
+`);
   });
 
   it('rejects unsafe link schemes', () => {
