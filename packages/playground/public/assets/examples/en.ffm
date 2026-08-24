@@ -1,0 +1,203 @@
+# Welcome to the Markdown Playground
+
+This is a sample document designed to showcase and test the syntax of Fuyeor Flavored Markdown. Feel free to edit and preview your changes in real time.
+
+## Basic Syntax
+
+### Headings
+
+```ffm
+# Level 1 Heading
+
+## Level 2 Heading
+
+### Level 3 Heading
+
+#### Level 4 Heading
+
+##### Level 5 Heading
+
+###### Level 6 Heading
+```
+
+### Emphasis
+
+- **Bold text**: use `**text**`
+- *Italic text*: use `*text*`
+- --Strikethrough--: use `--text--`
+- `Inline code`: use backticks `` `code` ``
+
+### Paragraphs & Line Breaks
+
+This is the first paragraph.
+In Markdown, consecutive lines without a blank line are merged into a single paragraph.
+
+This is the second paragraph. An empty line creates a new paragraph.
+
+## Lists
+
+### Unordered List
+
+- Apple
+- Banana
+  - Lady Finger Banana
+  - Cavendish Banana
+- Orange
+
+### Ordered List
+
+1. Step 1: Open the editor
+2. Step 2: Write your Markdown
+3. Step 3: Preview the rendered output
+  1. Live preview
+  2. Export HTML
+
+## Links & Images
+
+### Links
+
+[Example link with text](https://www.example.com) and an autolink: https://www.example.com
+
+### Images
+
+![](/favicon.svg)
+
+## Quotes
+
+```quote
+A small syntax can make a large pause.
+
+- Format in one breath
+- Preview as you write
+- Keep every idea close
+```
+
+## Code
+
+### Inline Code
+
+In Python, use `print("Hello, Markdown!")` to print text.
+
+### Code Blocks
+
+```fon
+{
+  identifier = `reference.fuyeor.com`
+  params = {
+    locale = .en
+    module = `ffm`
+    slug = [`tutorials`, `overview`]
+  }
+}
+```
+
+## Tables
+
+| Left-aligned | Center-aligned | Right-aligned |
+| :--- | :---: | ---: |
+| Content | Content | Content |
+| Longer content | Longer content | Longer content |
+
+## Horizontal Rule
+
+---
+
+## Interactive Components
+
+### Carousel Slides
+
+```slide
+**Ф social**
+- Character limit: 3,000 - 5,000 characters
+- Content format: Fuyeor Flavored Markdown
+
+---
+
+**Bluesky**
+- Character limit: 300 characters
+- Content format: Plain text
+
+---
+
+**Mastodon**
+- Character limit: Varies by instance (default is 500)
+- Content format: Plain text
+```
+
+### Chain of Thought
+
+```chain
+**[x] Book the party venue**
+Reserved the board game café everyone agreed on; the deposit has been paid.
+
+**[x] Confirm attendance**
+Everyone responded in the group chat; 8 people confirmed in total.
+
+**[ ] Buy snacks and drinks**
+Shopping list ready; planning to pick them up Saturday morning before heading over.
+
+**[ ] Prepare the mystery birthday gift**
+Ordered online and currently in transit; expected delivery by Friday afternoon.
+
+**Share on social media**
+Don't forget to post the party photos on social media afterward~
+```
+
+### Accordion
+
+```accordion
+**How can I join the volunteer team?**
+Click "Join Us" at the top right of the homepage to fill out a short form. Our coordinators will get in touch within three business days.
+
+**Do I need to bring my own tools to events?**
+Not at all! All necessary materials and tools will be provided on-site free of charge.
+
+**What if I can no longer make it?**
+No problem. Simply go to your profile and click "Cancel Booking" at least 24 hours prior to the event.
+```
+
+## Academic Extensions
+
+### LaTeX
+
+Inline formula: $E = mc^2$
+
+Block formula:
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+
+### Diagrams & Flowcharts
+
+```mermaid
+graph TD
+    A[Start] --> B(Processing)
+    B --> C{Decision}
+    C -- Approve --> D[End]
+    C -- Reject --> E[Revise]
+```
+
+### Chemical Formulas
+
+When it comes to pain relief, the well-known structural formula for aspirin is #[smiles = `CC(=O)OC1=CC=CC=C1C(=O)O`]; its counterpart, ibuprofen, has the molecular formula #[smiles = `CC(C)CC1=CC=C(C=C1)C(C)C(=O)O`].
+
+### Musical Score
+
+```abc
+X: 1
+T: Scale Example
+M: 4/4
+L: 1/4
+K: C
+C D E F | G A B c |
+```
+
+## Summary
+
+Congratulations on completing the Markdown Playground tutorial! You are now ready to craft your own Markdown documents:
+
+- Switch documents from the left sidebar (or the menu in the top-left corner on mobile).
+- All documents are saved locally and accessible only to you.
+
+Happy writing!

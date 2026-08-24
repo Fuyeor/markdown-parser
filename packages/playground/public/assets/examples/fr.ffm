@@ -1,0 +1,203 @@
+# Bienvenue sur l'Espace Markdown
+
+Ce document est un exemple conçu pour tester et découvrir la syntaxe du Fuyeor Flavored Markdown. Vous pouvez le modifier et prévisualiser le rendu en temps réel.
+
+## Syntaxe de base
+
+### Titres
+
+```ffm
+# Titre de niveau 1
+
+## Titre de niveau 2
+
+### Titre de niveau 3
+
+#### Titre de niveau 4
+
+##### Titre de niveau 5
+
+###### Titre de niveau 6
+```
+
+### Emphase
+
+- **Texte en gras** : utilisez `**texte**`
+- *Texte en italique* : utilisez `*texte*`
+- --Texte barré-- : utilisez `--texte--`
+- `Code en ligne` : utilisez les accents graves `` `code` ``
+
+### Paragraphes et retours à la ligne
+
+Ceci est le premier paragraphe.
+En Markdown, deux lignes consécutives sans ligne vide sont fusionnées dans le même paragraphe.
+
+Ceci est le second paragraphe. Une ligne vide crée un nouveau paragraphe.
+
+## Listes
+
+### Liste à puces
+
+- Pomme
+- Banane
+  - Banane Frécinette
+  - Banane Cavendish
+- Orange
+
+### Liste numérotée
+
+1. Étape 1 : Ouvrez l'éditeur
+2. Étape 2 : Rédigez votre Markdown
+3. Étape 3 : Prévisualisez le résultat
+  1. Aperçu en temps réel
+  2. Exporter en HTML
+
+## Liens et images
+
+### Liens
+
+[Exemple de lien avec texte](https://www.example.com) et lien brut : https://www.example.com
+
+### Images
+
+![](/favicon.svg)
+
+## Citations
+
+```quote
+A small syntax can make a large pause.
+
+- Format in one breath
+- Preview as you write
+- Keep every idea close
+```
+
+## Code
+
+### Code en ligne
+
+En Python, utilisez `print("Hello, Markdown!")` pour afficher du texte.
+
+### Blocs de code
+
+```fon
+{
+  identifier = `reference.fuyeor.com`
+  params = {
+    locale = .en
+    module = `ffm`
+    slug = [`tutorials`, `overview`]
+  }
+}
+```
+
+## Tableaux
+
+| Aligné à gauche | Centré | Aligné à droite |
+| :--- | :---: | ---: |
+| Contenu | Contenu | Contenu |
+| Contenu plus long | Contenu plus long | Contenu plus long |
+
+## Ligne de séparation
+
+---
+
+## Composants interactifs
+
+### Diapositives
+
+```slide
+**Ф social**
+- Limite de caractères : 3 000 - 5 000 caractères
+- Format de contenu : Fuyeor Flavored Markdown
+
+---
+
+**Bluesky**
+- Limite de caractères : 300 caractères
+- Format de contenu : Texte brut
+
+---
+
+**Mastodon**
+- Limite de caractères : Variable selon l'instance (500 par défaut)
+- Format de contenu : Texte brut
+```
+
+### Fil de pensée
+
+```chain
+**[x] Réserver le lieu de la soirée**
+Le bar à jeux choisi à l'unanimité est réservé, et l'acompte est versé.
+
+**[x] Confirmer le nombre de participants**
+Tout le monde a répondu sur le groupe de discussion ; 8 personnes confirmées au total.
+
+**[ ] Acheter les boissons et les collations**
+Liste de courses prête ; prévu de faire les achats samedi matin avant de s'y rendre.
+
+**[ ] Préparer le cadeau d'anniversaire surprise**
+Cadeau commandé en ligne, en cours de livraison ; arrivée prévue vendredi après-midi.
+
+**Publier sur les réseaux sociaux**
+N'oubliez pas de partager les photos de la fête sur les réseaux sociaux ensuite~
+```
+
+### Accordéon
+
+```accordion
+**Comment rejoindre notre équipe de bénévoles ?**
+Cliquez sur « Rejoignez-nous » en haut à droite de la page d'accueil pour remplir un court formulaire. Notre équipe vous contactera sous trois jours ouvrés.
+
+**Dois-je apporter mes propres outils pour les événements ?**
+Pas du tout ! Tout le matériel et les outils nécessaires sont fournis gratuitement sur place.
+
+**Que faire en cas d'empêchement ?**
+Aucun problème. Il vous suffit de vous rendre dans votre espace personnel et de cliquer sur « Annuler la réservation » au moins 24 heures avant l'événement.
+```
+
+## Extensions académiques
+
+### Formules mathématiques
+
+Formule en ligne : $E = mc^2$
+
+Formule en bloc :
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+
+### Diagrammes et organigrammes
+
+```mermaid
+graph TD
+    A[Début] --> B(Traitement)
+    B --> C{Condition}
+    C -- Approuvé --> D[Fin]
+    C -- Refusé --> E[À modifier]
+```
+
+### Formules chimiques
+
+Pour soulager la douleur, la structure de l'aspirine la plus connue est #[smiles = `CC(=O)OC1=CC=CC=C1C(=O)O`] ; son pendant, l'ibuprofène, a pour formule moléculaire #[smiles = `CC(C)CC1=CC=C(C=C1)C(C)C(=O)O`].
+
+### Partition de musique
+
+```abc
+X: 1
+T: Exemple de gamme (Scale Example)
+M: 4/4
+L: 1/4
+K: C
+C D E F | G A B c |
+```
+
+## Conclusion
+
+Félicitations pour avoir terminé le guide de l'espace Markdown ! Vous êtes maintenant prêt(e) à rédiger vos propres documents :
+
+- Changez de document depuis la barre latérale gauche (ou le menu en haut à gauche sur mobile).
+- Tous vos documents sont enregistrés localement et vous êtes la seule personne à pouvoir y accéder.
+
+Bonne rédaction !

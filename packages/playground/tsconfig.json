@@ -1,20 +1,16 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@fuyeor/tsconfig/base.json",
   "compilerOptions": {
     "paths": {
-      "#/*": ["./src/*"]
+      "@/*": ["./src/*"]
     },
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "lib": ["ESNext", "DOM"],
-    "strict": true,
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false
+    "types": ["vite/client", "node"]
   },
-  "include": ["src/**/*.ts", "vite.config.ts"]
+  "include": [
+    "vite.config.ts",
+    "vite-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.vue"
+  ]
 }
