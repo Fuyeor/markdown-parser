@@ -1,6 +1,8 @@
 <!-- @/components/Playground/DocumentHistory.vue -->
 <template>
+  <!-- only shows when user created example doc -->
   <Foldable
+    v-if="filteredDocuments.length !== 0"
     :title="t('documents')"
     :model-value="true"
     :icon-url="getIconUrl('learn')"
@@ -14,14 +16,12 @@
         :placeholder="t('documents.search')"
         :aria-label="t('documents.search')"
       />
+
+      <img class="document-icon" :src="getIconUrl('close')" />
     </div>
 
     <div class="document-list">
-      <div
-        v-for="document in filteredDocuments"
-        :key="document.id"
-        class="document-item-wrapper"
-      >
+      <template v-for="document in filteredDocuments" :key="document.id">
         <router-link
           :to="{
             name: 'Playground',
@@ -30,11 +30,6 @@
           class="document-item"
           :class="{ active: currentDocumentId === document.id }"
         >
-          <img
-            class="document-icon"
-            aria-hidden="true"
-            :src="getIconUrl('bookmark')"
-          />
           <span class="document-info">
             <span class="document-title">{{
               document.title || t('documents.untitled')
@@ -45,31 +40,20 @@
                 v-if="document.word_count !== undefined"
                 class="document-word-count"
               >
-                ·
                 {{
                   t('documents.stats.words', {
                     count: document.word_count,
                   })
                 }}
               </span>
+              <DropdownMenu
+                :aria-label="`${t('delete')}: ${document.title}`"
+                :items="documentMenuItems(document)"
+              />
             </span>
           </span>
         </router-link>
-        <DropdownMenu
-          as="button"
-          class="document-menu"
-          :aria-label="`${t('delete')}: ${document.title}`"
-          menu-position="right"
-          :items="documentMenuItems(document)"
-        >
-          <template #trigger>
-            <span aria-hidden="true" class="document-menu-trigger">⋯</span>
-          </template>
-        </DropdownMenu>
-      </div>
-      <p v-if="filteredDocuments.length === 0" class="no-documents">
-        {{ t('documents.empty') }}
-      </p>
+      </template>
     </div>
   </Foldable>
 </template>
@@ -93,7 +77,7 @@ const currentDocumentId = computed(() => String(route.params.id ?? ''));
 const documentMenuItems = (document: HistoryDocument): DropdownItem[] => [
   {
     label: t('delete'),
-    action: () => void handleDeleteDocument(document),
+    action: () => handleDeleteDocument(document),
     class: 'text-danger',
   },
 ];
@@ -114,7 +98,7 @@ const handleDeleteDocument = async (document: HistoryDocument) => {
   await deleteDocument(document.id);
   if (currentDocumentId.value !== document.id) return;
 
-  void router.replace({
+  router.replace({
     name: 'Playground',
     params: { ...route.params, id: undefined },
   });
@@ -167,7 +151,7 @@ const formatTime = (timestamp: number): string => {
 }
 
 .document-search-container {
-  position: relative;
+  display: flex;
   padding: 10px 0 20px;
 }
 
@@ -195,23 +179,17 @@ const formatTime = (timestamp: number): string => {
   overflow-y: auto;
 }
 
-.document-item-wrapper {
-  position: relative;
-  display: flex;
-  align-items: stretch;
-}
-
 .document-item {
   display: flex;
   width: 100%;
   min-width: 0;
   align-items: center;
-  padding: 10px 32px 10px 12px;
+  padding: 14px 20px;
   border: 0;
   border-radius: var(--radius-lg);
   color: inherit;
   background: transparent;
-  font: inherit;
+  font-weight: unset;
   text-align: left;
   text-decoration: none;
   cursor: pointer;
@@ -224,11 +202,6 @@ const formatTime = (timestamp: number): string => {
   background-color: var(--surface-raised);
 }
 
-.document-icon {
-  flex: 0 0 13px;
-  height: 20px;
-}
-
 .document-item.active .document-icon {
   color: #6b46c1;
   opacity: 1;
@@ -237,7 +210,7 @@ const formatTime = (timestamp: number): string => {
 .document-info {
   display: flex;
   flex: 1;
-  gap: 8px;
+  gap: 6px;
   flex-direction: column;
   min-width: 0;
 }
@@ -254,49 +227,26 @@ const formatTime = (timestamp: number): string => {
   font-size: 0.9rem;
 }
 
-.document-item.active .document-title {
-  font-weight: 500;
+.document-item.active {
+  .document-title {
+    font-weight: 500;
+  }
 }
 
 .document-time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 0.7rem;
 }
 
 .document-word-count {
   margin-left: 2px;
 }
 
-.document-menu {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  padding: 0;
-  border: 0;
-  color: var(--text-secondary);
-  background: transparent;
-  transform: translateY(-50%);
-  opacity: 0;
-  transition: opacity 0.16s ease-out;
-}
-
-.document-menu-trigger {
-  display: block;
-  width: 22px;
-  font-size: 20px;
-  line-height: 22px;
-}
-
 .document-item-wrapper:hover .document-menu,
 .document-item-wrapper:focus-within .document-menu {
   opacity: 1;
-}
-
-.no-documents {
-  margin: 0;
-  padding: 20px;
-  color: var(--text-secondary, #a0aec0);
-  font-size: 13px;
-  text-align: center;
 }
 </style>

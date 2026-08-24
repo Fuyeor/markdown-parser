@@ -35,18 +35,6 @@
     "ru": "{value} дн. назад",
     "zh-hans": "{value} 天前"
   },
-  "documents.empty": {
-    "ar": "لا توجد مستندات",
-    "de": "Keine Dokumente",
-    "en": "No documents",
-    "es": "No hay documentos",
-    "fr": "Aucun document",
-    "ja": "ドキュメントはありません",
-    "ko": "문서가 없습니다",
-    "pt": "Nenhum documento",
-    "ru": "Нет документов",
-    "zh-hans": "暂无文档"
-  },
   "documents.hoursAgo": {
     "ar": "منذ {value} ساعة",
     "de": "vor {value} Std.",
