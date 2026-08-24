@@ -11,7 +11,11 @@
       <template #ast>JSON/AST</template>
       <template #html>HTML</template>
     </Tabs>
-    <div class="output-content">
+    <div
+      class="output-content"
+      ref="outputContent"
+      @scroll="handleScroll"
+    >
       <div v-if="activeTab === 'preview'" class="markdown-rendered">
         <component :is="previewComponent" />
       </div>
@@ -35,6 +39,27 @@ import { usePlaygroundSource } from '@/composables/usePlaygroundSource';
 const { t } = useLocale();
 const { source } = usePlaygroundSource();
 const activeTab = ref('preview');
+const outputContent = ref<HTMLElement | null>(null);
+const emit = defineEmits<{
+  (event: 'scroll', percentage: number): void;
+}>();
+
+const handleScroll = (event: Event) => {
+  const target = event.target as HTMLElement;
+  const maxScroll = target.scrollHeight - target.clientHeight;
+  const percentage = maxScroll > 0 ? target.scrollTop / maxScroll : 0;
+  emit('scroll', percentage);
+};
+
+const scrollToPercentage = (percentage: number) => {
+  if (!outputContent.value) return;
+  const target = outputContent.value;
+  const maxScroll = target.scrollHeight - target.clientHeight;
+  if (maxScroll > 0) {
+    target.scrollTop = maxScroll * percentage;
+  }
+};
+
 const tabs: TabItem[] = [
   { value: 'preview' },
   { value: 'ast' },
@@ -48,6 +73,8 @@ const renderedHtml = computed(() => renderMarkdown(ast.value));
 const previewComponent = computed(() => ({
   render: () => h('div', renderToVue(ast.value)),
 }));
+
+defineExpose({ scrollToPercentage, renderedHtml });
 </script>
 
 <style>

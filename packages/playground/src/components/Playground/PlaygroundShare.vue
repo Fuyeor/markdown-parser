@@ -1,23 +1,23 @@
 <!-- @/components/Playground/PlaygroundShare.vue -->
 <template>
-  <button type="button" class="sidebar-share-btn" @click="openShareModal">
-      <svg
-        viewBox="0 0 24 24"
-        width="15"
-        height="15"
-        stroke="currentColor"
-        stroke-width="2"
-        fill="none"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="18" cy="5" r="3"></circle>
-        <circle cx="6" cy="12" r="3"></circle>
-        <circle cx="18" cy="19" r="3"></circle>
-        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-      </svg>
-      <span>{{ t('playground.share.button') }}</span>
+  <button type="button" class="toolbar-share-btn" title="Share" @click="openShareModal">
+    <svg
+      viewBox="0 0 24 24"
+      width="15"
+      height="15"
+      stroke="currentColor"
+      stroke-width="2"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="18" cy="5" r="3"></circle>
+      <circle cx="6" cy="12" r="3"></circle>
+      <circle cx="18" cy="19" r="3"></circle>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+    </svg>
+    <span>{{ t('playground.share.button') }}</span>
   </button>
 
   <Modal v-model="isShareModalOpen">
@@ -71,24 +71,26 @@ const copyShareLink = async () => {
 </script>
 
 <style>
-.sidebar-share-btn {
+.toolbar-share-btn {
   display: flex;
+  min-width: 30px;
+  height: 30px;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #dfe4e8;
+  gap: 4px;
+  padding: 0 7px;
+  border: 0;
   border-radius: 6px;
-  background: #ffffff;
-  color: #3855ae;
-  font-size: 13px;
-  font-weight: 600;
+  color: #53606d;
+  background: transparent;
+  font:
+    600 13px ui-monospace,
+    monospace;
   cursor: pointer;
-  transition: background 0.15s ease;
 }
 
-.sidebar-share-btn:hover {
+.toolbar-share-btn:hover {
+  color: #3855ae;
   background: #edf1ff;
 }
 

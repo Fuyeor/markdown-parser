@@ -15,8 +15,6 @@
     </template>
 
     <template #footer>
-      <PlaygroundShare />
-
       <LocaleSwitcher
         :supported-locales="SUPPORTED_LOCALES"
         @change="handleLocaleChange"
@@ -27,7 +25,6 @@
 
 <script setup lang="ts">
 import DocumentHistory from '@/components/Playground/DocumentHistory.vue';
-import PlaygroundShare from '@/components/Playground/PlaygroundShare.vue';
 
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl } from '@fuyeor/commons';

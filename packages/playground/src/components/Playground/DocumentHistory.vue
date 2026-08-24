@@ -55,14 +55,17 @@
             </span>
           </span>
         </router-link>
-        <button
-          type="button"
-          class="document-delete-button"
-          :aria-label="`${t('documents.delete')}: ${document.title}`"
-          @click.prevent.stop="handleDeleteDocument(document)"
+        <DropdownMenu
+          as="button"
+          class="document-menu"
+          :aria-label="`${t('delete')}: ${document.title}`"
+          menu-position="right"
+          :items="documentMenuItems(document)"
         >
-          <span aria-hidden="true">×</span>
-        </button>
+          <template #trigger>
+            <span aria-hidden="true" class="document-menu-trigger">⋯</span>
+          </template>
+        </DropdownMenu>
       </div>
       <p v-if="filteredDocuments.length === 0" class="no-documents">
         {{ t('documents.empty') }}
@@ -76,7 +79,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl } from '@fuyeor/commons';
-import { Foldable } from '@fuyeor/interactify';
+import { DropdownMenu, Foldable, type DropdownItem } from '@fuyeor/interactify';
 import { useIndexedDb, type HistoryDocument } from '@/composables/useIndexedDb';
 
 const route = useRoute();
@@ -86,6 +89,14 @@ const { documents, deleteDocument } = useIndexedDb();
 const searchQuery = ref('');
 
 const currentDocumentId = computed(() => String(route.params.id ?? ''));
+
+const documentMenuItems = (document: HistoryDocument): DropdownItem[] => [
+  {
+    label: t('delete'),
+    action: () => void handleDeleteDocument(document),
+    class: 'text-danger',
+  },
+];
 
 const filteredDocuments = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase();
@@ -256,37 +267,29 @@ const formatTime = (timestamp: number): string => {
   margin-left: 2px;
 }
 
-.document-delete-button {
+.document-menu {
   position: absolute;
   top: 50%;
   right: 8px;
-  display: grid;
-  width: 22px;
-  height: 22px;
-  place-items: center;
+  padding: 0;
   border: 0;
-  border-radius: 50%;
-  color: var(--text-secondary, #8a94a6);
+  color: var(--text-secondary);
   background: transparent;
-  font-size: 18px;
-  line-height: 1;
-  opacity: 0;
   transform: translateY(-50%);
-  cursor: pointer;
-  transition:
-    opacity 0.16s ease-out,
-    background-color 0.16s ease-out;
+  opacity: 0;
+  transition: opacity 0.16s ease-out;
 }
 
-.document-item-wrapper:hover .document-delete-button,
-.document-item-wrapper:focus-within .document-delete-button {
+.document-menu-trigger {
+  display: block;
+  width: 22px;
+  font-size: 20px;
+  line-height: 22px;
+}
+
+.document-item-wrapper:hover .document-menu,
+.document-item-wrapper:focus-within .document-menu {
   opacity: 1;
-}
-
-.document-delete-button:hover,
-.document-delete-button:focus-visible {
-  color: #c53030;
-  background: #fff5f5;
 }
 
 .no-documents {

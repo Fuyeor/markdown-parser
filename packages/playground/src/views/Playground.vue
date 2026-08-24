@@ -1,21 +1,42 @@
 <!-- @/views/Playground.vue -->
 <template>
-  <section class="playground-layout">
-    <PlaygroundEditor
-      ref="editorComponent"
+  <div class="playground-wrapper">
+    <section class="playground-layout">
+      <PlaygroundEditor
+        ref="editorComponent"
+        :created-at="currentDocument?.created_at"
+        :updated-at="currentDocument?.updated_at"
+        @scroll="handleEditorScroll"
+        @copy-source="handleCopySource"
+        @copy-html="handleCopyHtml"
+      >
+        <template #share>
+          <PlaygroundShare />
+        </template>
+      </PlaygroundEditor>
+      <PlaygroundPreview
+        ref="previewComponent"
+        @scroll="handlePreviewScroll"
+      />
+    </section>
+    <DocumentStatsBar
+      v-if="editorComponent?.stats"
       :created-at="currentDocument?.created_at"
       :updated-at="currentDocument?.updated_at"
+      :stats="editorComponent.stats"
     />
-    <PlaygroundPreview />
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">
 import PlaygroundEditor from '@/components/Playground/PlaygroundEditor.vue';
 import PlaygroundPreview from '@/components/Playground/PlaygroundPreview.vue';
+import DocumentStatsBar from '@/components/Playground/DocumentStatsBar.vue';
+import PlaygroundShare from '@/components/Playground/PlaygroundShare.vue';
 
 import { computed, ref, watch } from 'vue';
 import { useLocale } from '@fuyeor/locale';
+import { useToast } from '@fuyeor/interactify';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { fetchExample } from '@/api/examples';
 import { decodeSnippet } from '@/composables/useCompression';
@@ -27,6 +48,7 @@ const route = useRoute();
 const router = useRouter();
 
 const { t, locale } = useLocale();
+const { showToast } = useToast();
 const { source } = usePlaygroundSource();
 
 const {
@@ -36,6 +58,45 @@ const {
   error: storageError,
 } = useIndexedDb();
 const editorComponent = ref<InstanceType<typeof PlaygroundEditor> | null>(null);
+const previewComponent = ref<InstanceType<typeof PlaygroundPreview> | null>(null);
+let synchronizingScroll = false;
+
+const releaseScrollSync = () => {
+  window.requestAnimationFrame(() => {
+    synchronizingScroll = false;
+  });
+};
+
+const handleCopySource = async () => {
+  await window.navigator.clipboard.writeText(source.value);
+  showToast(t('copy.success'), { type: 'success' });
+};
+
+const handleCopyHtml = async () => {
+  const html = previewComponent.value?.renderedHtml;
+  if (!html) return;
+
+  const clipboardItem = new window.ClipboardItem({
+    'text/html': new window.Blob([html], { type: 'text/html' }),
+    'text/plain': new window.Blob([source.value], { type: 'text/plain' }),
+  });
+  await window.navigator.clipboard.write([clipboardItem]);
+  showToast(t('copy.success'), { type: 'success' });
+};
+
+const handleEditorScroll = (percentage: number) => {
+  if (synchronizingScroll) return;
+  synchronizingScroll = true;
+  previewComponent.value?.scrollToPercentage(percentage);
+  releaseScrollSync();
+};
+
+const handlePreviewScroll = (percentage: number) => {
+  if (synchronizingScroll) return;
+  synchronizingScroll = true;
+  editorComponent.value?.scrollToPercentage(percentage);
+  releaseScrollSync();
+};
 const currentDocument = computed(() => {
   const id = String(route.params.id ?? '');
   return documents.value.find((document) => document.id === id);
@@ -238,11 +299,19 @@ watch(
 </script>
 
 <style>
-.playground-layout {
+.playground-wrapper {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100vh;
   overflow: hidden;
+}
+
+.playground-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
 }
 
 .preview {

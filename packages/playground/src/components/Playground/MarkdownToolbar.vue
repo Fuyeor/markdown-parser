@@ -1,75 +1,89 @@
 <!-- @/components/Playground/MarkdownToolbar.vue -->
 <template>
   <nav class="editor-toolbar">
-    <button
-      type="button"
-      :disabled="!canUndo"
-      title="Undo"
-      @click="$emit('undo')"
-    >
-      ↶
-    </button>
-    <button
-      type="button"
-      :disabled="!canRedo"
-      title="Redo"
-      @click="$emit('redo')"
-    >
-      ↷
-    </button>
-    <span class="toolbar-divider" aria-hidden="true" />
-    <button type="button" title="Format Document" @click="$emit('format')">
-      ✨
-    </button>
-    <span class="toolbar-divider" aria-hidden="true" />
-    <button type="button" title="Bold" @click="$emit('tool', 'bold')">
-      <strong>B</strong>
-    </button>
-    <button type="button" title="Italic" @click="$emit('tool', 'italic')">
-      <em>I</em>
-    </button>
-    <button type="button" title="Heading" @click="$emit('tool', 'heading')">
-      H
-    </button>
-    <button
-      type="button"
-      title="Strikethrough"
-      @click="$emit('tool', 'strike')"
-    >
-      <s>S</s>
-    </button>
-    <button
-      type="button"
-      title="Unordered list"
-      @click="$emit('tool', 'unordered-list')"
-    >
-      ☷
-    </button>
-    <button
-      type="button"
-      title="Ordered list"
-      @click="$emit('tool', 'ordered-list')"
-    >
-      №
-    </button>
-    <button type="button" title="Checklist" @click="$emit('tool', 'checklist')">
-      ☑
-    </button>
-    <button type="button" title="Blockquote" @click="$emit('tool', 'quote')">
-      ❯
-    </button>
-    <button type="button" title="Code" @click="$emit('tool', 'code')">
-      &lt;/&gt;
-    </button>
-    <button type="button" title="Link" @click="$emit('tool', 'link')">↗</button>
-    <button type="button" title="Table" @click="$emit('tool', 'table')">
-      ▦
-    </button>
+    <div class="toolbar-row">
+      <button
+        type="button"
+        :disabled="!canUndo"
+        title="Undo"
+        @click="$emit('undo')"
+      >
+        ↶
+      </button>
+      <button
+        type="button"
+        :disabled="!canRedo"
+        title="Redo"
+        @click="$emit('redo')"
+      >
+        ↷
+      </button>
+      <span class="toolbar-divider" aria-hidden="true" />
+      <button type="button" title="Format Document" @click="$emit('format')">
+        ✨
+      </button>
+      <span class="toolbar-divider" aria-hidden="true" />
+      <slot name="share" />
+      <button type="button" title="Copy Source" @click="$emit('copy-source')">
+        {{ t('copy') }} {{ t('playground.editor.source') }}
+      </button>
+      <button type="button" title="Copy Rich Text" @click="$emit('copy-html')">
+        {{ t('copy') }} {{ t('playground.editor.richText') }}
+      </button>
+    </div>
+    <div class="toolbar-row">
+      <button type="button" title="Bold" @click="$emit('tool', 'bold')">
+        <strong>B</strong>
+      </button>
+      <button type="button" title="Italic" @click="$emit('tool', 'italic')">
+        <em>I</em>
+      </button>
+      <button type="button" title="Heading" @click="$emit('tool', 'heading')">
+        H
+      </button>
+      <button
+        type="button"
+        title="Strikethrough"
+        @click="$emit('tool', 'strike')"
+      >
+        <s>S</s>
+      </button>
+      <button
+        type="button"
+        title="Unordered list"
+        @click="$emit('tool', 'unordered-list')"
+      >
+        ☷
+      </button>
+      <button
+        type="button"
+        title="Ordered list"
+        @click="$emit('tool', 'ordered-list')"
+      >
+        №
+      </button>
+      <button type="button" title="Checklist" @click="$emit('tool', 'checklist')">
+        ☑
+      </button>
+      <button type="button" title="Blockquote" @click="$emit('tool', 'quote')">
+        ❯
+      </button>
+      <button type="button" title="Code" @click="$emit('tool', 'code')">
+        &lt;/&gt;
+      </button>
+      <button type="button" title="Link" @click="$emit('tool', 'link')">↗</button>
+      <button type="button" title="Table" @click="$emit('tool', 'table')">
+        ▦
+      </button>
+    </div>
   </nav>
 </template>
 
 <script setup lang="ts">
+import { useLocale } from '@fuyeor/locale';
 import type { MarkdownTool } from '../../composables/useMarkdownEditor';
+
+const { t } = useLocale();
 
 defineProps<{
   canUndo: boolean;
@@ -80,6 +94,8 @@ defineEmits<{
   (event: 'undo'): void;
   (event: 'redo'): void;
   (event: 'format'): void;
+  (event: 'copy-source'): void;
+  (event: 'copy-html'): void;
   (event: 'tool', tool: MarkdownTool): void;
 }>();
 </script>
@@ -87,9 +103,15 @@ defineEmits<{
 <style scoped>
 .editor-toolbar {
   display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  border-bottom: var(--border-subtle);
+}
+
+.toolbar-row {
+  display: flex;
   align-items: center;
   gap: 2px;
-  padding: 4px 10px;
   overflow-x: auto;
   scrollbar-width: none;
 }

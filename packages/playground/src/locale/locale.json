@@ -215,6 +215,18 @@
     "ru": "Песочница",
     "zh-hans": "实验场"
   },
+  "playground.editor.richText": {
+    "ar": "نص منسق",
+    "de": "Rich-Text",
+    "en": "Rich text",
+    "es": "Texto enriquecido",
+    "fr": "Texte enrichi",
+    "ja": "リッチテキスト",
+    "ko": "서식 있는 텍스트",
+    "pt": "Texto formatado",
+    "ru": "Форматированный текст",
+    "zh-hans": "富文本"
+  },
   "playground.editor.source": {
     "ar": "مصدر Markdown",
     "de": "Markdown-Quelle",

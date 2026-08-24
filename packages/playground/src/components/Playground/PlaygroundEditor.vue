@@ -8,7 +8,13 @@
       @redo="redo"
       @format="formatDocument"
       @tool="applyTool"
-    />
+      @copy-source="emit('copy-source')"
+      @copy-html="emit('copy-html')"
+    >
+      <template #share>
+        <slot name="share" />
+      </template>
+    </MarkdownToolbar>
     <div
       class="editor-scroll-container"
       @scroll="syncScroll"
@@ -51,17 +57,11 @@
         />
       </div>
     </div>
-    <DocumentStatsBar
-      :created-at="props.createdAt"
-      :updated-at="props.updatedAt"
-      :stats="stats"
-    />
   </article>
 </template>
 
 <script setup lang="ts">
 import MarkdownToolbar from '@/components/Playground/MarkdownToolbar.vue';
-import DocumentStatsBar from '@/components/Playground/DocumentStatsBar.vue';
 
 import { ref } from 'vue';
 import { useMarkdownEditor } from '@/composables/useMarkdownEditor';
@@ -106,14 +106,33 @@ const { lineNumbers, highlightedLines } = useMarkdownHighlighter(
 const { stats } = useDocumentStats(source);
 
 // The outer container owns scrolling so line numbers and the mirrored text stay aligned.
-const syncScroll = () => {};
+const emit = defineEmits<{
+  (e: 'scroll', percentage: number): void;
+  (e: 'copy-source'): void;
+  (e: 'copy-html'): void;
+}>();
+
+// The outer container owns scrolling so line numbers and the mirrored text stay aligned.
+const syncScroll = (event: Event) => {
+  const target = event.target as HTMLElement;
+  const maxScroll = target.scrollHeight - target.clientHeight;
+  const percentage = maxScroll > 0 ? target.scrollTop / maxScroll : 0;
+  emit('scroll', percentage);
+};
 
 const syncTextareaScroll = (event: Event) => {
   const target = event.target as HTMLElement;
   if (scrollContainer.value) scrollContainer.value.scrollTop = target.scrollTop;
 };
 
-defineExpose({ editor, replaceSource });
+const scrollToPercentage = (percentage: number) => {
+  const target = scrollContainer.value;
+  if (!target) return;
+  const maxScroll = target.scrollHeight - target.clientHeight;
+  if (maxScroll > 0) target.scrollTop = maxScroll * percentage;
+};
+
+defineExpose({ editor, replaceSource, stats, scrollToPercentage });
 </script>
 
 <style>
@@ -126,7 +145,6 @@ defineExpose({ editor, replaceSource });
   flex-direction: column;
 }
 
-.editor-toolbar,
 .tab-container {
   height: 3rem;
   border-bottom: var(--border-subtle);
