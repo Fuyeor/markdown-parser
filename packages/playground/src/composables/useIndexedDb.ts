@@ -47,17 +47,24 @@ const loadAllDocuments = (): Promise<void> => {
       }
 
       const document = cursor.value as HistoryDocument;
-      const normalizedDocument = document.word_count === undefined
-        ? { ...document, word_count: countDocumentStats(document.content).words }
-        : document;
+      const normalizedDocument =
+        document.word_count === undefined
+          ? {
+              ...document,
+              word_count: countDocumentStats(document.content).words,
+            }
+          : document;
       result.push(normalizedDocument);
       if (normalizedDocument !== document) cursor.update(normalizedDocument);
       cursor.continue();
     };
 
-    request.onerror = () => reject(request.error ?? new Error('Failed to read documents'));
-    transaction.onerror = () => reject(transaction.error ?? new Error('Failed to read documents'));
-    transaction.onabort = () => reject(transaction.error ?? new Error('Failed to read documents'));
+    request.onerror = () =>
+      reject(request.error ?? new Error('Failed to read documents'));
+    transaction.onerror = () =>
+      reject(transaction.error ?? new Error('Failed to read documents'));
+    transaction.onabort = () =>
+      reject(transaction.error ?? new Error('Failed to read documents'));
   });
 };
 
@@ -72,7 +79,8 @@ const initialize = (): Promise<void> => {
 
     const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onerror = () => reject(request.error ?? new Error('Failed to open IndexedDB'));
+    request.onerror = () =>
+      reject(request.error ?? new Error('Failed to open IndexedDB'));
     request.onupgradeneeded = () => {
       const upgradedDatabase = request.result;
       const upgradeTransaction = request.transaction;
@@ -94,7 +102,8 @@ const initialize = (): Promise<void> => {
       isReady.value = true;
     },
     (reason: unknown) => {
-      error.value = reason instanceof Error ? reason : new Error(String(reason));
+      error.value =
+        reason instanceof Error ? reason : new Error(String(reason));
       isReady.value = true;
       throw error.value;
     },
@@ -117,8 +126,10 @@ export function useIndexedDb() {
       const transaction = activeDatabase.transaction(STORE_NAME, 'readwrite');
       const request = transaction.objectStore(STORE_NAME).put({ ...document });
 
-      request.onerror = () => reject(request.error ?? new Error('Failed to save document'));
-      transaction.onabort = () => reject(transaction.error ?? new Error('Failed to save document'));
+      request.onerror = () =>
+        reject(request.error ?? new Error('Failed to save document'));
+      transaction.onabort = () =>
+        reject(transaction.error ?? new Error('Failed to save document'));
       transaction.oncomplete = resolve;
     });
 
@@ -135,12 +146,32 @@ export function useIndexedDb() {
       const transaction = activeDatabase.transaction(STORE_NAME, 'readwrite');
       const request = transaction.objectStore(STORE_NAME).delete(id);
 
-      request.onerror = () => reject(request.error ?? new Error('Failed to delete document'));
-      transaction.onabort = () => reject(transaction.error ?? new Error('Failed to delete document'));
+      request.onerror = () =>
+        reject(request.error ?? new Error('Failed to delete document'));
+      transaction.onabort = () =>
+        reject(transaction.error ?? new Error('Failed to delete document'));
       transaction.oncomplete = resolve;
     });
 
     documents.value = documents.value.filter((item) => item.id !== id);
+  };
+
+  // Clear every local document in one transaction and update shared state after commit.
+  const clearDocuments = async (): Promise<void> => {
+    const activeDatabase = await requireDatabase();
+
+    await new Promise<void>((resolve, reject) => {
+      const transaction = activeDatabase.transaction(STORE_NAME, 'readwrite');
+      const request = transaction.objectStore(STORE_NAME).clear();
+
+      request.onerror = () =>
+        reject(request.error ?? new Error('Failed to clear documents'));
+      transaction.onabort = () =>
+        reject(transaction.error ?? new Error('Failed to clear documents'));
+      transaction.oncomplete = resolve;
+    });
+
+    documents.value = [];
   };
 
   onMounted(() => {
@@ -153,6 +184,7 @@ export function useIndexedDb() {
     error,
     saveDocument,
     deleteDocument,
+    clearDocuments,
     loadAllDocuments,
   };
 }

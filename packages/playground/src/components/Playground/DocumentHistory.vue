@@ -17,8 +17,43 @@
         :aria-label="t('documents.search')"
       />
 
-      <img class="document-icon" :src="getIconUrl('close')" />
+      <button
+        type="button"
+        class="clear-documents-button"
+        :aria-label="t('documents.clear')"
+        :title="t('documents.clear')"
+        @click="isClearDocumentsModalOpen = true"
+      >
+        <img class="document-icon" :src="getIconUrl('close')" alt="" />
+      </button>
     </div>
+
+    <Modal v-model="isClearDocumentsModalOpen" size="small">
+      <template #header>
+        <h3>{{ t('documents.clear') }}</h3>
+      </template>
+      <div class="clear-documents-content">
+        <p>{{ t('documents.clearConfirm') }}</p>
+      </div>
+      <template #footer>
+        <div class="clear-documents-actions">
+          <button
+            type="button"
+            class="clear-documents-cancel"
+            @click="isClearDocumentsModalOpen = false"
+          >
+            {{ t('cancel') }}
+          </button>
+          <button
+            type="button"
+            class="clear-documents-confirm"
+            @click="handleClearDocuments"
+          >
+            {{ t('confirm') }}
+          </button>
+        </div>
+      </template>
+    </Modal>
 
     <div class="document-list">
       <template v-for="document in filteredDocuments" :key="document.id">
@@ -63,14 +98,20 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl } from '@fuyeor/commons';
-import { DropdownMenu, Foldable, type DropdownItem } from '@fuyeor/interactify';
+import {
+  DropdownMenu,
+  Foldable,
+  Modal,
+  type DropdownItem,
+} from '@fuyeor/interactify';
 import { useIndexedDb, type HistoryDocument } from '@/composables/useIndexedDb';
 
 const route = useRoute();
 const router = useRouter();
 const { t, locale } = useLocale();
-const { documents, deleteDocument } = useIndexedDb();
+const { documents, deleteDocument, clearDocuments } = useIndexedDb();
 const searchQuery = ref('');
+const isClearDocumentsModalOpen = ref(false);
 
 const currentDocumentId = computed(() => String(route.params.id ?? ''));
 
@@ -99,6 +140,18 @@ const handleDeleteDocument = async (document: HistoryDocument) => {
   if (currentDocumentId.value !== document.id) return;
 
   router.replace({
+    name: 'Playground',
+    params: { ...route.params, id: undefined },
+  });
+};
+
+// Clear all local documents and leave the active document route when necessary.
+const handleClearDocuments = async () => {
+  await clearDocuments();
+  isClearDocumentsModalOpen.value = false;
+  if (route.name !== 'Playground' || !currentDocumentId.value) return;
+
+  await router.replace({
     name: 'Playground',
     params: { ...route.params, id: undefined },
   });
@@ -152,12 +205,15 @@ const formatTime = (timestamp: number): string => {
 
 .document-search-container {
   display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 0 20px;
 }
 
 .document-search-input {
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
   padding: 8px 12px;
   border: var(--border-subtle);
   border-radius: var(--radius-md);
@@ -169,6 +225,69 @@ const formatTime = (timestamp: number): string => {
 
 .document-search-input:focus {
   border: var(--input-border-focus);
+}
+
+.clear-documents-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+}
+
+.clear-documents-button:hover,
+.clear-documents-button:focus-visible {
+  background: var(--surface-raised);
+}
+
+.clear-documents-button .document-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.65;
+}
+
+.clear-documents-button:hover .document-icon,
+.clear-documents-button:focus-visible .document-icon {
+  opacity: 1;
+}
+
+.clear-documents-content p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.clear-documents-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.clear-documents-actions button {
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+}
+
+.clear-documents-cancel {
+  border: var(--border-subtle);
+  color: var(--text-secondary);
+  background: var(--surface-raised);
+}
+
+.clear-documents-confirm {
+  border: 1px solid var(--color-danger, #c84c4a);
+  color: #ffffff;
+  background: var(--color-danger, #c84c4a);
+}
+
+.clear-documents-confirm:hover {
+  filter: brightness(0.92);
 }
 
 .document-list {

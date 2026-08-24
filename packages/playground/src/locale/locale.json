@@ -11,6 +11,30 @@
     "ru": "Документы",
     "zh-hans": "文档"
   },
+  "documents.clear": {
+    "ar": "مسح المستندات",
+    "de": "Dokumente löschen",
+    "en": "Clear documents",
+    "es": "Borrar documentos",
+    "fr": "Effacer les documents",
+    "ja": "ドキュメントを消去",
+    "ko": "문서 지우기",
+    "pt": "Limpar documentos",
+    "ru": "Очистить документы",
+    "zh-hans": "清空文档"
+  },
+  "documents.clearConfirm": {
+    "ar": "سيؤدي هذا إلى إزالة جميع المستندات المحلية نهائيًا. هل تريد المتابعة؟",
+    "de": "Dadurch werden alle lokalen Dokumente dauerhaft entfernt. Fortfahren?",
+    "en": "This will permanently remove all local documents. Continue?",
+    "es": "Esto eliminará permanentemente todos los documentos locales. ¿Continuar?",
+    "fr": "Tous les documents locaux seront supprimés définitivement. Continuer ?",
+    "ja": "すべてのローカルドキュメントが完全に削除されます。続行しますか？",
+    "ko": "모든 로컬 문서가 영구적으로 삭제됩니다. 계속하시겠습니까?",
+    "pt": "Isso removerá permanentemente todos os documentos locais. Continuar?",
+    "ru": "Все локальные документы будут удалены навсегда. Продолжить?",
+    "zh-hans": "这将永久删除所有本地文档。是否继续？"
+  },
   "documents.createdAt": {
     "ar": "تاريخ الإنشاء",
     "de": "Erstellt",
