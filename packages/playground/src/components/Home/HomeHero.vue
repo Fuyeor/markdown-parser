@@ -1,51 +1,55 @@
 <!-- @/components/Home/HomeHero.vue -->
 <template>
-  <section class="hero-section" aria-labelledby="hero-title">
+  <section class="hero-section" :aria-labelledby="'hero-title'">
     <div class="hero-copy">
       <div class="eyebrow">
-        <span aria-hidden="true">✦</span> Syntax, with room to breathe
+        <span aria-hidden="true">✦</span> {{ t('home.hero.eyebrow') }}
       </div>
-      <p class="hero-kicker">FFM / 01</p>
-      <h1 id="hero-title">让格式退后，<br /><em>让表达出现。</em></h1>
-      <p class="hero-description">
-        一个为认真写作的人设计的 Markdown
-        空间。它清楚、有感觉，并且始终把文字放在前面。
-      </p>
+      <p class="hero-kicker">{{ t('home.hero.kicker') }}</p>
+      <h1 id="hero-title">
+        {{ t('home.hero.titleLead') }}<br /><em>{{
+          t('home.hero.titleEmphasis')
+        }}</em>
+      </h1>
+      <p class="hero-description">{{ t('home.hero.description') }}</p>
       <div class="hero-actions">
         <router-link :to="playgroundLink" class="button-primary"
-          >打开这一页 <span aria-hidden="true">↗</span></router-link
+          >{{ t('home.hero.openPage') }}
+          <span aria-hidden="true">↗</span></router-link
         >
         <a class="button-quiet" href="#editorial"
-          >认识 FFM <span aria-hidden="true">›</span></a
+          >{{ t('home.hero.learnMore') }} <span aria-hidden="true">›</span></a
         >
       </div>
       <div class="hero-caption">
-        <span>Keep the sentence close</span>
+        <span>{{ t('home.hero.captionSentence') }}</span>
         <span class="caption-rule" aria-hidden="true" />
-        <span>Made for the margin</span>
+        <span>{{ t('home.hero.captionMargin') }}</span>
       </div>
     </div>
     <div class="hero-portrait-wrap">
       <div class="portrait-halo" aria-hidden="true" />
       <HomeImagePlaceholder
         class-name="hero-portrait"
-        label="Hero portrait placeholder"
+        :label="t('home.hero.portraitPlaceholder')"
       />
       <div class="portrait-paper portrait-paper-top">
-        <span aria-hidden="true">#</span> a title knows where to rest
+        <span aria-hidden="true">#</span> {{ t('home.hero.sampleTitle') }}
       </div>
       <div class="portrait-attribution">
         <span class="attribution-mark" aria-hidden="true">*</span>
-        <span>写作不必被工具打断</span>
+        <span>{{ t('home.hero.attribution') }}</span>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { useLocale } from '@fuyeor/locale';
 import HomeImagePlaceholder from './HomeImagePlaceholder.vue';
 import { usePlaygroundLink } from '@/composables/usePlaygroundLink';
 
+const { t } = useLocale();
 const playgroundLink = usePlaygroundLink();
 </script>
 

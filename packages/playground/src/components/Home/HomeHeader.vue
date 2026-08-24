@@ -1,10 +1,10 @@
 <!-- @/components/Home/HomeHeader.vue -->
 <template>
   <header class="topbar">
-    <a class="brand-lockup" href="#top" aria-label="FFM 首页">
+    <a class="brand-lockup" href="#top" :aria-label="t('home.brand.ariaLabel')">
       <img
         src="https://deliver.fuyeor.net/@fu/trademark/tm/official.png"
-        alt="FFM 图形标志"
+        :alt="t('home.brand.alt')"
       />
       <span class="editorial-wordmark">
         <b>fuyeor</b>
@@ -12,11 +12,11 @@
       </span>
     </a>
 
-    <nav class="desktop-nav" aria-label="主导航">
-      <a href="#editorial">Why FFM</a>
-      <router-link :to="playgroundLink">Playground</router-link>
-      <a href="#features">Features</a>
-      <a href="#notes">Notes</a>
+    <nav class="desktop-nav" :aria-label="t('home.header.navigation')">
+      <a href="#editorial">{{ t('home.header.why') }}</a>
+      <router-link :to="playgroundLink">{{ t('playground') }}</router-link>
+      <a href="#features">{{ t('home.header.features') }}</a>
+      <a href="#notes">{{ t('home.header.notes') }}</a>
     </nav>
 
     <div class="header-actions">
@@ -24,20 +24,24 @@
         class="theme-toggle"
         type="button"
         :aria-pressed="isDark"
-        aria-label="切换颜色主题"
+        :aria-label="t('home.header.theme.toggle')"
         @click="$emit('toggle-theme')"
       >
         <span aria-hidden="true">{{ isDark ? '☀' : '☾' }}</span>
-        <span>{{ isDark ? 'Light' : 'Night' }}</span>
+        <span>{{
+          isDark ? t('home.header.theme.light') : t('home.header.theme.night')
+        }}</span>
       </button>
       <router-link :to="playgroundLink" class="top-cta"
-        >Write a line <span aria-hidden="true">↗</span></router-link
+        >{{ t('home.header.writeLine') }}
+        <span aria-hidden="true">↗</span></router-link
       >
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
+import { useLocale } from '@fuyeor/locale';
 import { usePlaygroundLink } from '@/composables/usePlaygroundLink';
 
 defineProps<{
@@ -48,6 +52,7 @@ defineEmits<{
   'toggle-theme': [];
 }>();
 
+const { t } = useLocale();
 const playgroundLink = usePlaygroundLink();
 </script>
 

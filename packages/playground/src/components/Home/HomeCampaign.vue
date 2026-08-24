@@ -2,24 +2,19 @@
 <template>
   <section id="notes" class="campaign-section">
     <div class="campaign-copy">
-      <HomeSectionLabel number="05"
-        >A word from the ambassador</HomeSectionLabel
-      >
-      <blockquote>
-        “当你不再需要思考工具该怎么用时，你才能听见自己脑海里的声音。”
-      </blockquote>
-      <p>
-        FFM
-        的设计初衷，是让每一次换行、每一个加粗，都成为写作节奏的一部分，而不是干扰。
-      </p>
-      <router-link :to="playgroundLink" class="button-primary"
-        >开始你的第一页 <span aria-hidden="true">↗</span></router-link
-      >
+      <HomeSectionLabel number="05">
+        {{ t('home.campaign.label') }}
+      </HomeSectionLabel>
+      <blockquote>{{ t('home.campaign.quote') }}</blockquote>
+      <p>{{ t('home.campaign.description') }}</p>
+      <router-link :to="playgroundLink" class="button-primary">
+        {{ t('home.campaign.cta') }} <span aria-hidden="true">↗</span>
+      </router-link>
     </div>
     <div class="campaign-image">
       <HomeImagePlaceholder
         class-name="campaign-main-img"
-        label="Campaign image placeholder"
+        :label="t('home.campaign.imagePlaceholder')"
       />
       <div class="campaign-stamp">FFM<br /><span>2026</span></div>
     </div>
@@ -27,10 +22,12 @@
 </template>
 
 <script setup lang="ts">
+import { useLocale } from '@fuyeor/locale';
 import HomeImagePlaceholder from './HomeImagePlaceholder.vue';
 import HomeSectionLabel from './HomeSectionLabel.vue';
 import { usePlaygroundLink } from '@/composables/usePlaygroundLink';
 
+const { t } = useLocale();
 const playgroundLink = usePlaygroundLink();
 </script>
 

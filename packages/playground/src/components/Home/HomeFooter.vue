@@ -1,18 +1,24 @@
 <!-- @/components/Home/HomeFooter.vue -->
 <template>
-  <footer class="site-footer">
+  <footer class="site-footer" :aria-label="t('home.footer.ariaLabel')">
     <div class="footer-brand">
       <span class="editorial-wordmark"
         ><b>fuyeor</b><i>flavored markdown</i></span
       >
     </div>
-    <p>© 2026 Fuyeor. All rights reserved.</p>
+    <p>{{ t('home.footer.copyright') }}</p>
     <div class="footer-links">
-      <a href="#">Terms</a>
-      <a href="#">Privacy</a>
+      <a href="#">{{ t('home.footer.terms') }}</a>
+      <a href="#">{{ t('home.footer.privacy') }}</a>
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+import { useLocale } from '@fuyeor/locale';
+
+const { t } = useLocale();
+</script>
 
 <style scoped>
 .site-footer {

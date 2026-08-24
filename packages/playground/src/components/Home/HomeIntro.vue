@@ -1,10 +1,22 @@
 <!-- @/components/Home/HomeIntro.vue -->
 <template>
-  <section id="editorial" class="intro-strip" aria-label="FFM 理念">
-    <p>不是更复杂的编辑器，而是<strong>更轻松的写作状态。</strong></p>
-    <span>↓ one mark at a time</span>
+  <section
+    id="editorial"
+    class="intro-strip"
+    :aria-label="t('home.intro.ariaLabel')"
+  >
+    <p>
+      {{ t('home.intro.lead') }}<strong>{{ t('home.intro.emphasis') }}</strong>
+    </p>
+    <span>{{ t('home.intro.caption') }}</span>
   </section>
 </template>
+
+<script setup lang="ts">
+import { useLocale } from '@fuyeor/locale';
+
+const { t } = useLocale();
+</script>
 
 <style scoped>
 .intro-strip {

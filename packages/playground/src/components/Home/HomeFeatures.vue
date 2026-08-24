@@ -8,16 +8,22 @@
     <div class="feature-image-block">
       <HomeImagePlaceholder
         class-name="feature-main-img"
-        label="Feature image placeholder"
+        :label="t('home.features.imagePlaceholder')"
       />
       <div class="feature-image-label">
-        <span>Designed for the margin</span>
-        <strong>Write without leaving the page.</strong>
+        <span>{{ t('home.features.imageCaption') }}</span>
+        <strong>{{ t('home.features.imageTitle') }}</strong>
       </div>
     </div>
     <div class="feature-list-wrap">
-      <HomeSectionLabel number="04">Features built for focus</HomeSectionLabel>
-      <h2 id="feature-title">写给专注时刻的<br /><em>每一项功能。</em></h2>
+      <HomeSectionLabel number="04">{{
+        t('home.features.label')
+      }}</HomeSectionLabel>
+      <h2 id="feature-title">
+        {{ t('home.features.titleLead') }}<br /><em>{{
+          t('home.features.titleEmphasis')
+        }}</em>
+      </h2>
       <div class="feature-list">
         <div
           v-for="feature in features"
@@ -26,8 +32,8 @@
         >
           <span class="feature-index">{{ feature.index }}</span>
           <div>
-            <h3>{{ feature.title }}</h3>
-            <p>{{ feature.description }}</p>
+            <h3>{{ t(feature.titleKey) }}</h3>
+            <p>{{ t(feature.descriptionKey) }}</p>
           </div>
           <span class="feature-arrow" aria-hidden="true">↗</span>
         </div>
@@ -37,24 +43,27 @@
 </template>
 
 <script setup lang="ts">
+import { useLocale } from '@fuyeor/locale';
 import HomeImagePlaceholder from './HomeImagePlaceholder.vue';
 import HomeSectionLabel from './HomeSectionLabel.vue';
+
+const { t } = useLocale();
 
 const features = [
   {
     index: '01',
-    title: '格式化如呼吸般自然',
-    description: '在行内完成所有样式，无需频繁离开键盘或寻找菜单。',
+    titleKey: 'home.features.items.format.title',
+    descriptionKey: 'home.features.items.format.description',
   },
   {
     index: '02',
-    title: '所见即所得的节奏',
-    description: '文字与预览同时呈现，每一段都有它该有的留白。',
+    titleKey: 'home.features.items.preview.title',
+    descriptionKey: 'home.features.items.preview.description',
   },
   {
     index: '03',
-    title: '为发布准备的输出',
-    description: '生成的结构干净标准，随时准备好进入任何发布流。',
+    titleKey: 'home.features.items.output.title',
+    descriptionKey: 'home.features.items.output.description',
   },
 ];
 </script>

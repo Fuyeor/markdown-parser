@@ -1,31 +1,34 @@
 <!-- @/components/Home/HomeStatement.vue -->
 <template>
   <section class="statement-section">
-    <HomeSectionLabel number="02" syntax="# > **"
-      >A small system for real thoughts</HomeSectionLabel
-    >
+    <HomeSectionLabel number="02" syntax="# > **">
+      {{ t('home.statement.label') }}
+    </HomeSectionLabel>
     <div class="statement-grid">
       <div class="statement-main">
-        <p class="statement-overline">Readable by default</p>
-        <h2>每一个符号，<br />都有它的<strong>呼吸位置。</strong></h2>
+        <p class="statement-overline">{{ t('home.statement.overline') }}</p>
+        <h2>
+          {{ t('home.statement.titleLead') }}<br />
+          {{ t('home.statement.titleMiddle')
+          }}<strong>{{ t('home.statement.titleEmphasis') }}</strong>
+        </h2>
       </div>
       <div class="statement-side">
-        <p>
-          FFM 将熟悉的 Markdown
-          语法，放进一套更注重层级、节奏与预览反馈的体验里。你不需要学习新语言，只需要继续写下去。
-        </p>
-        <router-link :to="playgroundLink"
-          >探索写作节奏 <span aria-hidden="true">↗</span></router-link
-        >
+        <p>{{ t('home.statement.description') }}</p>
+        <router-link :to="playgroundLink">
+          {{ t('home.statement.cta') }} <span aria-hidden="true">↗</span>
+        </router-link>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { useLocale } from '@fuyeor/locale';
 import HomeSectionLabel from './HomeSectionLabel.vue';
 import { usePlaygroundLink } from '@/composables/usePlaygroundLink';
 
+const { t } = useLocale();
 const playgroundLink = usePlaygroundLink();
 </script>
 

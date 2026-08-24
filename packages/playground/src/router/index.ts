@@ -75,6 +75,9 @@ router.beforeEach(async (to) => {
     };
   }
 
+  // Load the route locale before rendering so all translated components stay in sync.
+  await localeStore.setLocale(routeLocale);
+
   // 如果代码能执行到这里，说明所有检查都通过了，允许导航
   return true;
 });
