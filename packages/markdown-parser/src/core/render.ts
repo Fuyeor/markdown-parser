@@ -25,6 +25,12 @@ const getHeadingLevel = (level: unknown) =>
     ? level
     : null;
 
+// Keep table alignment attributes within the supported HTML grammar.
+const getTableAlignment = (align: unknown) =>
+  align === 'left' || align === 'center' || align === 'right'
+    ? ` align="${align}"`
+    : '';
+
 export function render(nodes?: ASTNode[]): string {
   let html = '';
 
@@ -96,18 +102,21 @@ export function render(nodes?: ASTNode[]): string {
       case 'list_item':
         html += `<li>${render(node.children)}</li>\n`;
         break;
-      case 'table':
-        html += '<table>\n<thead>\n<tr>\n';
-        (node.headers ?? []).forEach((cell) => {
-          html += `<th>${render(cell.children)}</th>\n`;
-        });
-        html += '</tr>\n</thead>\n';
+      case 'table': {
+        html += '<table>\n';
+        if (node.headers) {
+          html += '<thead>\n<tr>\n';
+          node.headers.forEach((cell) => {
+            html += `<th${getTableAlignment(cell.align)}>${render(cell.children)}</th>\n`;
+          });
+          html += '</tr>\n</thead>\n';
+        }
         if (node.children && node.children.length > 0) {
           html += '<tbody>\n';
           node.children.forEach((row) => {
             html += '<tr>\n';
             row.children?.forEach((cell) => {
-              html += `<td>${render(cell.children)}</td>\n`;
+              html += `<td${getTableAlignment(cell.align)}>${render(cell.children)}</td>\n`;
             });
             html += '</tr>\n';
           });
@@ -115,6 +124,7 @@ export function render(nodes?: ASTNode[]): string {
         }
         html += '</table>\n';
         break;
+      }
       case 'hr':
         html += '<hr />\n';
         break;
