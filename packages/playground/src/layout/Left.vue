@@ -15,13 +15,12 @@
     </template>
 
     <template #footer>
-      <div class="sidebar-footer">
-        <PlaygroundShare />
-        <LocaleSwitcher
-          :supported-locales="SUPPORTED_LOCALES"
-          @change="handleLocaleChange"
-        />
-      </div>
+      <PlaygroundShare />
+
+      <LocaleSwitcher
+        :supported-locales="SUPPORTED_LOCALES"
+        @change="handleLocaleChange"
+      />
     </template>
   </LeftSidebar>
 </template>
@@ -51,7 +50,6 @@ const { processedItems: sidebarItems } = useSidebarItems(sidebarItemsRaw, {
   t,
 });
 
-
 const handleLocaleChange = (newLocale: string) => {
   void router.replace({
     name: route.name,
@@ -75,7 +73,7 @@ const handleLocaleChange = (newLocale: string) => {
   }
 
   /* Sidebar footer layout */
-  .sidebar-footer {
+  .footer {
     display: flex;
     flex-direction: column;
     gap: 12px;

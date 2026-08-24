@@ -11,6 +11,9 @@
 </template>
 
 <script setup lang="ts">
+import PlaygroundEditor from '@/components/Playground/PlaygroundEditor.vue';
+import PlaygroundPreview from '@/components/Playground/PlaygroundPreview.vue';
+
 import { computed, ref, watch } from 'vue';
 import { useLocale } from '@fuyeor/locale';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
@@ -19,13 +22,13 @@ import { decodeSnippet } from '@/composables/useCompression';
 import { usePlaygroundSource } from '@/composables/usePlaygroundSource';
 import { useIndexedDb, type HistoryDocument } from '@/composables/useIndexedDb';
 import { countDocumentStats } from '@/composables/useDocumentStats';
-import PlaygroundEditor from '@/components/Playground/PlaygroundEditor.vue';
-import PlaygroundPreview from '@/components/Playground/PlaygroundPreview.vue';
 
 const route = useRoute();
 const router = useRouter();
+
 const { t, locale } = useLocale();
 const { source } = usePlaygroundSource();
+
 const {
   documents,
   saveDocument,
@@ -70,7 +73,7 @@ const saveDocumentContent = async (id: string, content: string) => {
   const stats = countDocumentStats(content);
   const document: HistoryDocument = {
     ...previous,
-    title: extractTitle(content, t('playground.documents.untitled')),
+    title: extractTitle(content, t('documents.untitled')),
     updated_at: window.Date.now(),
     content,
     word_count: stats.words,
@@ -181,7 +184,7 @@ const createDocumentFromInput = async (content: string) => {
     const stats = countDocumentStats(content);
     const document: HistoryDocument = {
       id: window.crypto.randomUUID(),
-      title: extractTitle(content, t('playground.documents.untitled')),
+      title: extractTitle(content, t('documents.untitled')),
       created_at: now,
       updated_at: now,
       content,

@@ -1,7 +1,7 @@
 <!-- @/components/Playground/DocumentHistory.vue -->
 <template>
   <Foldable
-    :title="t('playground.documents')"
+    :title="t('documents')"
     :model-value="true"
     :icon-url="getIconUrl('learn')"
     class="document-history"
@@ -11,8 +11,8 @@
         v-model="searchQuery"
         type="search"
         class="document-search-input"
-        :placeholder="t('playground.documents.search')"
-        :aria-label="t('playground.documents.search')"
+        :placeholder="t('documents.search')"
+        :aria-label="t('documents.search')"
       />
     </div>
 
@@ -37,12 +37,20 @@
           />
           <span class="document-info">
             <span class="document-title">{{
-              document.title || t('playground.documents.untitled')
+              document.title || t('documents.untitled')
             }}</span>
             <span class="document-time">
               {{ formatTime(document.updated_at) }}
-              <span v-if="document.word_count !== undefined" class="document-word-count">
-                · {{ t('playground.documents.wordCount', { value: document.word_count }) }}
+              <span
+                v-if="document.word_count !== undefined"
+                class="document-word-count"
+              >
+                ·
+                {{
+                  t('documents.stats.words', {
+                    count: document.word_count,
+                  })
+                }}
               </span>
             </span>
           </span>
@@ -50,14 +58,14 @@
         <button
           type="button"
           class="document-delete-button"
-          :aria-label="`${t('playground.documents.delete')}: ${document.title}`"
+          :aria-label="`${t('documents.delete')}: ${document.title}`"
           @click.prevent.stop="handleDeleteDocument(document)"
         >
           <span aria-hidden="true">×</span>
         </button>
       </div>
       <p v-if="filteredDocuments.length === 0" class="no-documents">
-        {{ t('playground.documents.empty') }}
+        {{ t('documents.empty') }}
       </p>
     </div>
   </Foldable>
@@ -104,22 +112,22 @@ const handleDeleteDocument = async (document: HistoryDocument) => {
 // Format relative timestamps in the active locale.
 const formatTime = (timestamp: number): string => {
   const diff = Math.max(0, window.Date.now() - timestamp);
-  if (diff < 60000) return t('playground.documents.justNow');
+  if (diff < 60000) return t('documents.justNow');
   if (diff < 3600000)
-    return t('playground.documents.minutesAgo', {
+    return t('documents.minutesAgo', {
       value: Math.floor(diff / 60000),
     });
   if (diff < 86400000)
-    return t('playground.documents.hoursAgo', {
+    return t('documents.hoursAgo', {
       value: Math.floor(diff / 3600000),
     });
-  if (diff < 172800000) return t('playground.documents.yesterday');
+  if (diff < 172800000) return t('documents.yesterday');
   if (diff < 604800000)
-    return t('playground.documents.daysAgo', {
+    return t('documents.daysAgo', {
       value: Math.floor(diff / 86400000),
     });
   if (diff < 2592000000)
-    return t('playground.documents.weeksAgo', {
+    return t('documents.weeksAgo', {
       value: Math.floor(diff / 604800000),
     });
 

@@ -5,13 +5,15 @@
   <main>
     <router-view />
   </main>
+
+  <toast-provider />
 </template>
 
 <script setup lang="ts">
 import LeftSidebar from '@/layout/Left.vue';
 
 import { useHeadManager } from '@fuyeor/commons';
-import { useFontLoader } from '@fuyeor/interactify';
+import { ToastProvider, useFontLoader } from '@fuyeor/interactify';
 
 // load font
 useFontLoader();

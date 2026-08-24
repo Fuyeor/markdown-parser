@@ -1,17 +1,30 @@
 <!-- @/components/Playground/DocumentStatsBar.vue -->
 <template>
-  <footer class="document-stats-bar" aria-label="Document statistics">
-    <span>{{ t('playground.documents.createdAt') }}: {{ formatDate(createdAt) }}</span>
-    <span>{{ t('playground.documents.updatedAt') }}: {{ formatDate(updatedAt) }}</span>
-    <span>{{ t('playground.documents.words') }}: {{ stats.words }}</span>
-    <span>{{ t('playground.documents.characters') }}: {{ stats.characters }}</span>
-    <span>{{ t('playground.documents.sentences') }}: {{ stats.sentences }}</span>
-    <span>{{ t('playground.documents.paragraphs') }}: {{ stats.paragraphs }}</span>
+  <footer class="document-stats-bar">
+    <span
+      >{{ t('documents.createdAt') }}:
+      {{ formatDate(createdAt, { preset: 'relative', short: true }) }}</span
+    >
+    <span
+      >{{ t('documents.updatedAt') }}:
+      {{ formatDate(updatedAt, { preset: 'relative', short: true }) }}</span
+    >
+    <span>{{ t('documents.stats.words', { count: stats.words }) }}</span>
+    <span>{{
+      t('documents.stats.characters', { count: stats.characters })
+    }}</span>
+    <span>{{
+      t('documents.stats.sentences', { count: stats.sentences })
+    }}</span>
+    <span>{{
+      t('documents.stats.paragraphs', { count: stats.paragraphs })
+    }}</span>
   </footer>
 </template>
 
 <script setup lang="ts">
 import { useLocale } from '@fuyeor/locale';
+import { useDateFormatter } from '@fuyeor/commons';
 import type { DocumentStats } from '@/composables/useDocumentStats';
 
 withDefaults(
@@ -26,16 +39,8 @@ withDefaults(
   },
 );
 
-const { t, locale } = useLocale();
-
-// Format document timestamps consistently with the active locale.
-const formatDate = (timestamp: number): string => {
-  if (!timestamp) return '—';
-  return new window.Intl.DateTimeFormat(locale.value, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(timestamp);
-};
+const { t } = useLocale();
+const { formatDate } = useDateFormatter();
 </script>
 
 <style>

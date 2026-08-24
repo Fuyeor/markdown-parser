@@ -1,17 +1,5 @@
 {
-  "playground": {
-    "ar": "ساحة التجربة",
-    "de": "Spielwiese",
-    "en": "Playground",
-    "es": "Área de pruebas",
-    "fr": "Aire de jeux",
-    "ja": "プレイグラウンド",
-    "ko": "플레이그라운드",
-    "pt": "Área de testes",
-    "ru": "Песочница",
-    "zh-hans": "实验场"
-  },
-  "playground.documents": {
+  "documents": {
     "ar": "المستندات",
     "de": "Dokumente",
     "en": "Documents",
@@ -23,19 +11,7 @@
     "ru": "Документы",
     "zh-hans": "文档"
   },
-  "playground.documents.characters": {
-    "ar": "الأحرف",
-    "de": "Zeichen",
-    "en": "Characters",
-    "es": "Caracteres",
-    "fr": "Caractères",
-    "ja": "文字",
-    "ko": "문자",
-    "pt": "Caracteres",
-    "ru": "Символы",
-    "zh-hans": "字符数"
-  },
-  "playground.documents.createdAt": {
+  "documents.createdAt": {
     "ar": "تاريخ الإنشاء",
     "de": "Erstellt",
     "en": "Created",
@@ -47,7 +23,7 @@
     "ru": "Создано",
     "zh-hans": "创建于"
   },
-  "playground.documents.daysAgo": {
+  "documents.daysAgo": {
     "ar": "منذ {value} يوم",
     "de": "vor {value} Tagen",
     "en": "{value} days ago",
@@ -59,7 +35,7 @@
     "ru": "{value} дн. назад",
     "zh-hans": "{value} 天前"
   },
-  "playground.documents.empty": {
+  "documents.empty": {
     "ar": "لا توجد مستندات",
     "de": "Keine Dokumente",
     "en": "No documents",
@@ -71,7 +47,7 @@
     "ru": "Нет документов",
     "zh-hans": "暂无文档"
   },
-  "playground.documents.hoursAgo": {
+  "documents.hoursAgo": {
     "ar": "منذ {value} ساعة",
     "de": "vor {value} Std.",
     "en": "{value} hr ago",
@@ -83,7 +59,7 @@
     "ru": "{value} ч назад",
     "zh-hans": "{value} 小时前"
   },
-  "playground.documents.justNow": {
+  "documents.justNow": {
     "ar": "الآن",
     "de": "Gerade eben",
     "en": "Just now",
@@ -95,7 +71,7 @@
     "ru": "Только что",
     "zh-hans": "刚刚"
   },
-  "playground.documents.minutesAgo": {
+  "documents.minutesAgo": {
     "ar": "منذ {value} دقيقة",
     "de": "vor {value} Min.",
     "en": "{value} min ago",
@@ -107,7 +83,7 @@
     "ru": "{value} мин назад",
     "zh-hans": "{value} 分钟前"
   },
-  "playground.documents.new": {
+  "documents.new": {
     "ar": "جديد",
     "de": "Neu",
     "en": "New",
@@ -119,19 +95,7 @@
     "ru": "Новый",
     "zh-hans": "新建"
   },
-  "playground.documents.paragraphs": {
-    "ar": "الفقرات",
-    "de": "Absätze",
-    "en": "Paragraphs",
-    "es": "Párrafos",
-    "fr": "Paragraphes",
-    "ja": "段落",
-    "ko": "단락",
-    "pt": "Parágrafos",
-    "ru": "Абзацы",
-    "zh-hans": "段落数"
-  },
-  "playground.documents.search": {
+  "documents.search": {
     "ar": "البحث في المستندات...",
     "de": "Dokumente durchsuchen...",
     "en": "Search documents...",
@@ -143,19 +107,55 @@
     "ru": "Поиск документов...",
     "zh-hans": "搜索文档..."
   },
-  "playground.documents.sentences": {
-    "ar": "الجمل",
-    "de": "Sätze",
-    "en": "Sentences",
-    "es": "Oraciones",
-    "fr": "Phrases",
-    "ja": "文",
-    "ko": "문장",
-    "pt": "Frases",
-    "ru": "Предложения",
-    "zh-hans": "句子数"
+  "documents.stats.characters": {
+    "ar": "{count} حرف",
+    "de": "{count} Zeichen",
+    "en": "{count} characters",
+    "es": "{count} caracteres",
+    "fr": "{count} caractères",
+    "ja": "{count} 文字",
+    "ko": "{count}자",
+    "pt": "{count} caracteres",
+    "ru": "{count} символов",
+    "zh-hans": "{count} 字符"
   },
-  "playground.documents.untitled": {
+  "documents.stats.paragraphs": {
+    "ar": "{count} فقرة",
+    "de": "{count} Absätze",
+    "en": "{count} paragraphs",
+    "es": "{count} párrafos",
+    "fr": "{count} paragraphes",
+    "ja": "{count} 段落",
+    "ko": "{count}개의 문단",
+    "pt": "{count} parágrafos",
+    "ru": "{count} абзацев",
+    "zh-hans": "{count} 段落"
+  },
+  "documents.stats.sentences": {
+    "ar": "{count} جملة",
+    "de": "{count} Sätze",
+    "en": "{count} sentences",
+    "es": "{count} oraciones",
+    "fr": "{count} phrases",
+    "ja": "{count} 文",
+    "ko": "{count}개의 문장",
+    "pt": "{count} frases",
+    "ru": "{count} предложений",
+    "zh-hans": "{count} 句"
+  },
+  "documents.stats.words": {
+    "ar": "{count} كلمة",
+    "de": "{count} Wörter",
+    "en": "{count} words",
+    "es": "{count} palabras",
+    "fr": "{count} mots",
+    "ja": "{count} 単語",
+    "ko": "{count}단어",
+    "pt": "{count} palavras",
+    "ru": "{count} слов",
+    "zh-hans": "{count} 词"
+  },
+  "documents.untitled": {
     "ar": "مستند بلا عنوان",
     "de": "Unbenanntes Dokument",
     "en": "Untitled document",
@@ -167,7 +167,7 @@
     "ru": "Документ без названия",
     "zh-hans": "未命名文档"
   },
-  "playground.documents.updatedAt": {
+  "documents.updatedAt": {
     "ar": "تم التعديل",
     "de": "Überarbeitet",
     "en": "Revised",
@@ -179,7 +179,7 @@
     "ru": "Изменено",
     "zh-hans": "修订于"
   },
-  "playground.documents.weeksAgo": {
+  "documents.weeksAgo": {
     "ar": "منذ {value} أسبوع",
     "de": "vor {value} Wochen",
     "en": "{value} wk ago",
@@ -191,31 +191,7 @@
     "ru": "{value} нед. назад",
     "zh-hans": "{value} 周前"
   },
-  "playground.documents.wordCount": {
-    "ar": "{value} كلمة",
-    "de": "{value} Wörter",
-    "en": "{value} words",
-    "es": "{value} palabras",
-    "fr": "{value} mots",
-    "ja": "{value}語",
-    "ko": "{value}단어",
-    "pt": "{value} palavras",
-    "ru": "{value} слов",
-    "zh-hans": "{value} 词"
-  },
-  "playground.documents.words": {
-    "ar": "الكلمات",
-    "de": "Wörter",
-    "en": "Words",
-    "es": "Palabras",
-    "fr": "Mots",
-    "ja": "単語",
-    "ko": "단어",
-    "pt": "Palavras",
-    "ru": "Слова",
-    "zh-hans": "词数"
-  },
-  "playground.documents.yesterday": {
+  "documents.yesterday": {
     "ar": "أمس",
     "de": "Gestern",
     "en": "Yesterday",
@@ -226,6 +202,18 @@
     "pt": "Ontem",
     "ru": "Вчера",
     "zh-hans": "昨天"
+  },
+  "playground": {
+    "ar": "ساحة التجربة",
+    "de": "Spielwiese",
+    "en": "Playground",
+    "es": "Área de pruebas",
+    "fr": "Aire de jeux",
+    "ja": "プレイグラウンド",
+    "ko": "플레이그라운드",
+    "pt": "Área de testes",
+    "ru": "Песочница",
+    "zh-hans": "实验场"
   },
   "playground.editor.source": {
     "ar": "مصدر Markdown",
