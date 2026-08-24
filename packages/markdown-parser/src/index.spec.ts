@@ -57,6 +57,16 @@ describe('test @fuyeor/markdown-parser', () => {
     expect(children[3].url).toBe('https://fuyeor.com');
   });
 
+  it('uses linkify for internationalized fuzzy domains', () => {
+    const ast = createFuyeorMarkdownParser()('Visit fuyeor.xn--p1ai');
+    const link = ast[0].children?.find((node) => node.type === 'link');
+
+    expect(link).toMatchObject({
+      url: 'https://fuyeor.рф',
+      children: [{ type: 'text', content: 'fuyeor.рф' }],
+    });
+  });
+
   it('parse table', () => {
     const content = `
 | title 1 | title 2 |

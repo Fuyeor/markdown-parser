@@ -18,6 +18,9 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "dependencies": {
+    "@fuyeor/linkify": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3",

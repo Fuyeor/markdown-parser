@@ -7,6 +7,7 @@ on:
     # Only trigger when relevant code changes to save resources
     paths:
       - '.github/workflows/ci.yml'
+      - 'packages/linkify/**'
       - 'packages/markdown-parser/**'
       - 'packages/markdown-parser-lit/**'
       - 'packages/markdown-parser-vue/**'
@@ -18,6 +19,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/ci.yml'
+      - 'packages/linkify/**'
       - 'packages/markdown-parser/**'
       - 'packages/markdown-parser-lit/**'
       - 'packages/markdown-parser-vue/**'
@@ -53,6 +55,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Build linkify package
+        run: pnpm --filter @fuyeor/linkify build
       - name: Typecheck parser package
         run: pnpm --filter @fuyeor/markdown-parser typecheck
       - name: Run parser unit tests
