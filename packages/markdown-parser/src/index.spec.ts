@@ -87,4 +87,35 @@ describe('test @fuyeor/markdown-parser', () => {
       RangeError,
     );
   });
+
+  it.each([
+    ['modern two-space indentation', '  - example'],
+    ['legacy three-space marker alignment', '   - example'],
+  ])('recognizes %s as a nested list', (_description, childLine) => {
+    const ast = createFuyeorMarkdownParser()(`1. example\n${childLine}`);
+    const rootList = ast[0];
+
+    expect(rootList.type).toBe('list');
+    expect(rootList.children).toHaveLength(1);
+    expect(
+      rootList.children?.[0].children?.some((node) => node.type === 'list'),
+    ).toBe(true);
+  });
+
+  it('uses two-space steps for deeper list nesting', () => {
+    const ast = createFuyeorMarkdownParser()(
+      '1. root\n   - level 1\n    - level 2',
+    );
+    const rootItem = ast[0].children?.[0];
+    const levelOneList = rootItem?.children?.find(
+      (node) => node.type === 'list',
+    );
+    const levelOneItem = levelOneList?.children?.[0];
+    const levelTwoList = levelOneItem?.children?.find(
+      (node) => node.type === 'list',
+    );
+
+    expect(levelOneList).toBeDefined();
+    expect(levelTwoList).toBeDefined();
+  });
 });

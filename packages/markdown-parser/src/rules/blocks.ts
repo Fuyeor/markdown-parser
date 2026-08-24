@@ -234,6 +234,9 @@ export const blockquoteRule: BlockRule = {
   },
 };
 
+const LIST_ITEM_PATTERN = /^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)/;
+const LIST_INDENT_STEP = 2;
+
 /**
  * parse list syntax (- xxx)
  */
@@ -245,7 +248,7 @@ export const listRule: BlockRule = {
     if (!line) return null;
 
     // match list header: supports -, *, + and 1., 99)
-    const match = line.match(/^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)/);
+    const match = line.match(LIST_ITEM_PATTERN);
     if (!match) return null;
 
     const baseIndent = match[1].length;
@@ -258,7 +261,7 @@ export const listRule: BlockRule = {
 
     while (state.lineIndex + consumedLines < state.lineCount) {
       const currentLine = state.lines[state.lineIndex + consumedLines];
-      const itemMatch = currentLine.match(/^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)/);
+      const itemMatch = currentLine.match(LIST_ITEM_PATTERN);
 
       // to determine if an item is a new list item:
       // the indentation must be consistent with the baseline
@@ -269,6 +272,8 @@ export const listRule: BlockRule = {
         // detect subsequent lines belonging to this item
         // (lines with indentation deeper than the marker).
         const markerTotalWidth = baseIndent + marker.length + 1;
+        // Normalize nested list markers to two-space logical levels, tolerating odd legacy indentation.
+        const nestedListIndent = baseIndent + LIST_INDENT_STEP;
 
         while (
           state.lineIndex + consumedLines + itemConsumedLines <
@@ -283,7 +288,28 @@ export const listRule: BlockRule = {
           }
 
           const nextIndent = nextLine.match(/^(\s*)/)![1].length;
-          if (nextIndent >= markerTotalWidth) {
+          const firstContentChar = nextLine[nextIndent];
+          const isListMarkerCandidate =
+            firstContentChar === '-' ||
+            firstContentChar === '*' ||
+            firstContentChar === '+' ||
+            (firstContentChar >= '0' && firstContentChar <= '9');
+          let normalizedContentStart = markerTotalWidth;
+
+          if (nextIndent >= nestedListIndent && isListMarkerCandidate) {
+            const relativeIndent = nextIndent - baseIndent;
+            const nestingLevel = Math.floor(relativeIndent / LIST_INDENT_STEP);
+            const contentIndent = (nestingLevel - 1) * LIST_INDENT_STEP;
+            normalizedContentStart = nextIndent - contentIndent;
+          }
+
+          if (
+            normalizedContentStart !== markerTotalWidth &&
+            LIST_ITEM_PATTERN.test(nextLine)
+          ) {
+            itemLines.push(nextLine.slice(normalizedContentStart));
+            itemConsumedLines++;
+          } else if (nextIndent >= markerTotalWidth) {
             // remove the indentation corresponding to the width
             itemLines.push(nextLine.slice(markerTotalWidth));
             itemConsumedLines++;
