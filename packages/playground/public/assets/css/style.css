@@ -97,3 +97,62 @@ body {
     border-top: var(--border-subtle);
   }
 }
+
+/* FFM Ambassador Theme Tokens */
+:root {
+  --ink: #24354b;
+  --ink-soft: #64707d;
+  --paper: #fbfaf7;
+  --paper-deep: #f1efe8;
+  --lilac: #aea4e4;
+  --lilac-deep: #8275ce;
+  --lilac-pale: #eeebfb;
+  --sage: #8ba493;
+  --line: rgba(36, 53, 75, 0.12);
+  --card: rgba(255, 255, 255, 0.86);
+  --radius: 16px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--lilac-deep);
+  --primary-foreground: #fff;
+  --secondary: var(--lilac-pale);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--lilac-pale);
+  --accent-foreground: var(--ink);
+  --destructive: #c84c4a;
+  --destructive-foreground: #fff;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--lilac);
+}
+
+.night {
+  --ink: #f0eff5;
+  --ink-soft: #b7b6c4;
+  --paper: #11101c;
+  --paper-deep: #191827;
+  --lilac-pale: #292743;
+  --line: rgba(239, 238, 247, 0.12);
+  --card: rgba(30, 29, 44, 0.9);
+}
+
+body.home-page {
+  overflow: auto;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.home-page .paper-grain {
+  mix-blend-mode: multiply;
+}
+
+.night .paper-grain {
+  mix-blend-mode: screen;
+  opacity: 0.13;
+}
