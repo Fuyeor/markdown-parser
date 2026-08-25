@@ -1,0 +1,72 @@
+[
+  {
+    "section": "inline formatting",
+    "text": "<b>Bold</b> <strong>Strong</strong> <i>Italic</i> <em>Emphasis</em> <u>Underline</u> <ins>Insert</ins> <del>Delete</del> <code>code</code>",
+    "expect": "**Bold** **Strong** *Italic* *Emphasis* __Underline__ __Insert__ --Delete-- `code`"
+  },
+  {
+    "section": "paragraphs and headings",
+    "text": "<h1>Title</h1><p>First</p><div>Second</div><section>Third</section>",
+    "expect": "# Title\n\nFirst\n\nSecond\n\nThird"
+  },
+  {
+    "section": "line breaks and horizontal rules",
+    "text": "<p>Before<br>After<br><br>End</p><hr>",
+    "expect": "Before\nAfter\n\nEnd\n\n---"
+  },
+  {
+    "section": "styled text",
+    "text": "<span style=\"color:red\">Red</span> <span style=\"font-size:20px\">Large</span> <span style=\"color:#ABC;font-size:20px\">Both</span>",
+    "expect": "[Red](color = #ff0000) [Large](font = {size = 20px}) [Both](color = #aabbcc, font = {size = 20px})"
+  },
+  {
+    "section": "nested style and underline",
+    "text": "<span style=\"color: rgb(255, 0, 0); font-size: 1.25rem\"><u>Text</u></span>",
+    "expect": "[__Text__](color = #ff0000, font = {size = 1.25rem})"
+  },
+  {
+    "section": "alpha colors",
+    "text": "<span style=\"color:rgba(255, 0, 0, 0.5)\">Half</span> <span style=\"color:transparent\">Clear</span>",
+    "expect": "[Half](color = #ff000080) Clear"
+  },
+  {
+    "section": "entity decoding and unknown tags",
+    "text": "<custom><b>Tom &amp; Jerry</b></custom><script>bad</script><style>.x{color:red}</style>",
+    "expect": "**Tom & Jerry**"
+  },
+  {
+    "section": "links and images",
+    "text": "<a href=\"/docs?a=1&amp;b=2\">Docs</a> <a href=\"javascript:alert(1)\">Unsafe</a> <img src=\"cat.jpg\" alt=\"Cat &amp; friend\"> <img src=\"missing-alt.jpg\">",
+    "expect": "[Docs](/docs?a=1&b=2) Unsafe ![Cat & friend](cat.jpg) ![](missing-alt.jpg)"
+  },
+  {
+    "section": "nested ordered and unordered lists",
+    "text": "<ol start=\"3\"><li>Three<ul><li><b>Child</b></li><li>Child two</li></ul></li><li>Four</li></ol>",
+    "expect": "3. Three\n  - **Child**\n  - Child two\n4. Four"
+  },
+  {
+    "section": "blockquote",
+    "text": "<blockquote><p>One</p><p>Two</p><p>Three</p></blockquote>",
+    "expect": "```quote\nOne\nTwo\nThree\n```"
+  },
+  {
+    "section": "header table",
+    "text": "<table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td>A</td><td>1</td></tr></tbody></table>",
+    "expect": "| Name | Value |\n| --- | --- |\n| A | 1 |"
+  },
+  {
+    "section": "table without header",
+    "text": "<table><tr><td>A</td><td>1</td></tr><tr><td>B</td><td>2</td></tr></table>",
+    "expect": "| --- | --- |\n| A | 1 |\n| B | 2 |"
+  },
+  {
+    "section": "code block with a longer fence",
+    "text": "<pre><code>const value = ```text```;</code></pre>",
+    "expect": "````\nconst value = ```text```;\n````"
+  },
+  {
+    "section": "missing image source",
+    "text": "<img alt=\"No source\"><p>After</p>",
+    "expect": "After"
+  }
+]
