@@ -20,6 +20,7 @@ import {
 } from './rules/inlines';
 import { ffmBlockRule } from './rules/ffm';
 import { latexPlugin } from './plugins/latex';
+import { extensionsPlugin } from './plugins/extensions';
 
 export function createMarkdownParser(options: MarkdownParserOptions = {}) {
   return (
@@ -59,6 +60,7 @@ export function createFuyeorMarkdownParser(
       .addBlockRule(hrRule)
       .addBlockRule(blockquoteRule)
       .use(latexPlugin)
+      .use(extensionsPlugin)
 
       // inline order: Inline code -> Links -> Bold/Underline/Strikethrough
       .addInlineRule(hardBreakRule)

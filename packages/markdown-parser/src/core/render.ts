@@ -31,6 +31,29 @@ const getTableAlignment = (align: unknown) =>
     ? ` align="${align}"`
     : '';
 
+const displayLanguageNames: Record<string, string> = {
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  cpp: 'C++',
+  csharp: 'C#',
+  xml: 'XML',
+  json: 'JSON',
+  yaml: 'YAML',
+  ffm: 'Fuyeor Flavored Markdown',
+  fon: 'FON',
+  fer: 'Fer',
+};
+
+// Render a stable fenced-code contract for asynchronous highlight.js processing.
+const getCodeLanguage = (lang: unknown): string => {
+  if (typeof lang !== 'string') return '';
+  return lang.trim().split(/\s+/u)[0] ?? '';
+};
+
+const getDisplayLanguageName = (language: string): string =>
+  displayLanguageNames[language] ??
+  (language ? language.charAt(0).toUpperCase() + language.slice(1) : 'Text');
+
 export function render(nodes?: ASTNode[]): string {
   let html = '';
 
@@ -52,6 +75,13 @@ export function render(nodes?: ASTNode[]): string {
       case 'text':
         html += node.content ? escapeHtml(node.content) : '';
         break;
+      case 'emoji': {
+        const emoji = String(node.content ?? '');
+        const alt = String(node.alt ?? emoji);
+        const src = String(node.src ?? '');
+        html += `<img class="emoji" draggable="false" alt="${escapeHtml(alt)}" src="${escapeHtml(src)}"/>`;
+        break;
+      }
       case 'math_inline':
         html += `<span class="math-inline">${escapeHtml(String(node.content ?? ''))}</span>`;
         break;
@@ -89,13 +119,19 @@ export function render(nodes?: ASTNode[]): string {
           : render(node.children);
         break;
       }
-      case 'code_block':
+      case 'code_block': {
+        const language = getCodeLanguage(node.lang);
+        const displayLanguage = getDisplayLanguageName(language);
+        const preAttributes = language
+          ? `class="hljs language-${escapeHtml(language)}" data-language="${escapeHtml(language)}"`
+          : 'class="hljs language-plaintext"';
         html += `<div class="code-block-wrapper">`;
-        if (node.lang) {
-          html += `<div class="code-lang">${escapeHtml(node.lang)}</div>`;
+        if (language) {
+          html += `<div class="code-lang">${escapeHtml(displayLanguage)}</div>`;
         }
-        html += `<pre><code${node.lang ? ` class="language-${escapeHtml(node.lang)}"` : ''}>${node.content ? escapeHtml(node.content) : ''}\n</code></pre></div>\n`;
+        html += `<pre ${preAttributes}><code>${escapeHtml(String(node.content ?? ''))}\n</code></pre></div>\n`;
         break;
+      }
       case 'list': {
         const tag = node.ordered ? 'ol' : 'ul';
         const start =
@@ -108,6 +144,26 @@ export function render(nodes?: ASTNode[]): string {
       case 'list_item':
         html += `<li>${render(node.children)}</li>\n`;
         break;
+      case 'mermaid':
+        html += `<div class="language-mermaid">${escapeHtml(String(node.content ?? ''))}</div>\n`;
+        break;
+      case 'abc':
+        html += `<div class="language-abc">${escapeHtml(String(node.content ?? ''))}</div>\n`;
+        break;
+      case 'smiles_inline':
+        html += `<span class="language-smiles smiles-inline" data-smiles="${escapeHtml(String(node.content ?? ''))}"></span>`;
+        break;
+      case 'smiles_block': {
+        const blocks = String(node.content ?? '')
+          .split('\n')
+          .filter((line) => line.trim().length > 0)
+          .map(
+            (line) =>
+              `<div class="language-smiles smiles-block" data-smiles="${escapeHtml(line.trim())}"></div>`,
+          );
+        html += blocks.length > 0 ? `${blocks.join('\n')}\n` : '';
+        break;
+      }
       case 'table': {
         html += '<table>\n';
         if (node.headers) {

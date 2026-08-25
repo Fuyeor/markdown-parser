@@ -101,6 +101,70 @@ describe('test @fuyeor/markdown-parser', () => {
     );
   });
 
+  it('renders Twemoji while preserving inline code', () => {
+    const html = render(createFuyeorMarkdownParser()('Hello 😀 and `😀`.'));
+
+    expect(html).toBe(
+      '<p>Hello <img class="emoji" draggable="false" alt="😀" src="https://deliver.fuyeor.net/@libs/twemoji-new/svg/1f600.svg"/> and <code>😀</code>.</p>\n',
+    );
+  });
+
+  it('renders FFM Smiles inline placeholders safely', () => {
+    const html = render(
+      createFuyeorMarkdownParser()(
+        'Molecule #[smiles = `C=C`] and #[smiles=`<svg>`]',
+      ),
+    );
+
+    expect(html).toContain(
+      '<span class="language-smiles smiles-inline" data-smiles="C=C"></span>',
+    );
+    expect(html).toContain(
+      '<span class="language-smiles smiles-inline" data-smiles="&lt;svg&gt;"></span>',
+    );
+  });
+
+  it('renders Mermaid, ABC, and fenced Smiles placeholders', () => {
+    const ast = createFuyeorMarkdownParser()(
+      '```mermaid\ngraph TD\nA-->B\n```\n```abc\nX:1\nK:C\n```\n```smiles\nC=C\nCCO\n```',
+    );
+    const html = render(ast);
+
+    expect(ast.map((node) => node.type)).toEqual([
+      'mermaid',
+      'abc',
+      'smiles_block',
+    ]);
+    expect(html).toContain(
+      '<div class="language-mermaid">graph TD\nA--&gt;B</div>',
+    );
+    expect(html).toContain('<div class="language-abc">X:1\nK:C</div>');
+    expect(html).toContain(
+      '<div class="language-smiles smiles-block" data-smiles="C=C"></div>\n<div class="language-smiles smiles-block" data-smiles="CCO"></div>',
+    );
+  });
+
+  it('renders highlight.js-compatible language placeholders', () => {
+    const html = render(
+      createFuyeorMarkdownParser()(
+        '```js\nconst value = 1;\n```\n```fon\nvalue = 1\n```\n```fer\nvalue = 1\n```\n```ffm\n# Title\n```',
+      ),
+    );
+
+    expect(html).toContain(
+      '<pre class="hljs language-javascript" data-language="javascript">',
+    );
+    expect(html).toContain(
+      '<pre class="hljs language-fon" data-language="fon">',
+    );
+    expect(html).toContain(
+      '<pre class="hljs language-fer" data-language="fer">',
+    );
+    expect(html).toContain(
+      '<pre class="hljs language-ffm" data-language="ffm">',
+    );
+  });
+
   it('parse table', () => {
     const content = `
 | title 1 | title 2 |

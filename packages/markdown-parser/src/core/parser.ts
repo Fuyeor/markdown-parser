@@ -3,6 +3,7 @@ import { BlockState, InlineState } from './state';
 import { linkify } from '@fuyeor/linkify';
 import type {
   ASTNode,
+  ASTTransform,
   BlockRule,
   InlineRule,
   Linkifier,
@@ -23,6 +24,7 @@ function linkifyWithCandidateCheck(text: string): ReturnType<typeof linkify> {
 export class MarkdownParser {
   #blockRuleMap = new Map<string, BlockRule[]>();
   #inlineRuleMap = new Map<string, InlineRule[]>();
+  #astTransforms: ASTTransform[] = [];
   #idSequence = 0;
   #isPreflight = false;
   readonly #maxNestingDepth: number;
@@ -82,11 +84,21 @@ export class MarkdownParser {
     return this;
   }
 
+  // Register a post-parse AST transform for extensions such as Twemoji.
+  addAstTransform(transform: ASTTransform): this {
+    this.#astTransforms.push(transform);
+    return this;
+  }
+
   build(): (content: string) => ASTNode[] {
     return (content: string) => {
       this.#idSequence = 0;
       const state = new BlockState(content);
-      return this.#parseBlocks(state);
+      const nodes = this.#parseBlocks(state);
+      return this.#astTransforms.reduce(
+        (currentNodes, transform) => transform(currentNodes),
+        nodes,
+      );
     };
   }
 

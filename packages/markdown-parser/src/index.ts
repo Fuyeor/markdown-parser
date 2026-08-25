@@ -20,11 +20,36 @@ export {
   strikeRule,
 } from './rules/inlines';
 export { latexPlugin, latexInlineRule, latexBlockRule } from './plugins/latex';
+export {
+  twemojiPlugin,
+  nativeEmojiPlugin,
+  twemojiTransform,
+  transformTwemojiNode,
+  getTwemojiUrl,
+} from './plugins/twemoji';
+export { highlightPlugin, highlightTransform } from './plugins/highlight';
+export {
+  abcPlugin,
+  abcTransform,
+  mermaidPlugin,
+  mermaidTransform,
+  smilesBlockPlugin,
+  smilesBlockTransform,
+  smilesInlinePlugin,
+  smilesPlugin,
+  smilesInlineRule,
+  SPECIAL_BLOCK_LANGUAGES,
+  specialBlockPlugin,
+  specialBlockTransform,
+  transformSpecialBlockNode,
+} from './plugins/async-blocks';
+export { extensionsPlugin, extensionsTransform } from './plugins/extensions';
 export { createMarkdownParser, createFuyeorMarkdownParser } from './default';
 
 export type {
   NodeType,
   ASTNode,
+  ASTTransform,
   ParserContext,
   BlockRule,
   InlineRule,

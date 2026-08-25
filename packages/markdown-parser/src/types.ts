@@ -19,6 +19,11 @@ export type NodeType =
   | 'table_cell'
   | 'math_inline'
   | 'math_block'
+  | 'emoji'
+  | 'mermaid'
+  | 'abc'
+  | 'smiles_inline'
+  | 'smiles_block'
   | 'bold'
   | 'italic'
   | 'link'
@@ -83,4 +88,5 @@ export interface MarkdownParserOptions {
   linkifier?: Linkifier;
 }
 
+export type ASTTransform = (nodes: ASTNode[]) => ASTNode[];
 export type MarkdownPlugin = (parser: MarkdownParser) => void;
