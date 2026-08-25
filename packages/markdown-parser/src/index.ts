@@ -19,6 +19,7 @@ export {
   underlineRule,
   strikeRule,
 } from './rules/inlines';
+export { latexPlugin, latexInlineRule, latexBlockRule } from './plugins/latex';
 export { createMarkdownParser, createFuyeorMarkdownParser } from './default';
 
 export type {

@@ -165,7 +165,9 @@ export class MarkdownParser {
             // ` for code block and inline code
             firstChar === 96 ||
             // ~ equals `
-            firstChar === 126;
+            firstChar === 126 ||
+            // $ for block math
+            firstChar === 36;
 
           if (mayInterrupt) {
             const rules = this.#blockRuleMap.get(
@@ -182,6 +184,7 @@ export class MarkdownParser {
                     'blockquote',
                     'list',
                     'code_block',
+                    'math_block',
                     'ffm_blocks',
                   ].includes(rule.name)
                 ) {

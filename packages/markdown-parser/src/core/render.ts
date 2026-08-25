@@ -52,6 +52,12 @@ export function render(nodes?: ASTNode[]): string {
       case 'text':
         html += node.content ? escapeHtml(node.content) : '';
         break;
+      case 'math_inline':
+        html += `<span class="math-inline">${escapeHtml(String(node.content ?? ''))}</span>`;
+        break;
+      case 'math_block':
+        html += `<div class="math-block">${escapeHtml(String(node.content ?? ''))}</div>\n`;
+        break;
       case 'bold':
         html += `<strong>${render(node.children)}</strong>`;
         break;

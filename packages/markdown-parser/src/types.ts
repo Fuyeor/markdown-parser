@@ -17,6 +17,8 @@ export type NodeType =
   | 'table'
   | 'table_row'
   | 'table_cell'
+  | 'math_inline'
+  | 'math_block'
   | 'bold'
   | 'italic'
   | 'link'

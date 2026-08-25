@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { MarkdownParser } from './core/parser';
 import { createFuyeorMarkdownParser } from './default';
 import { render } from './core/render';
+import { latexPlugin } from './plugins/latex';
 import { headingRule, codeBlockRule, tableRule } from './rules/blocks';
 import { boldRule, linkRule } from './rules/inlines';
 
@@ -65,6 +66,39 @@ describe('test @fuyeor/markdown-parser', () => {
       url: 'https://fuyeor.рф',
       children: [{ type: 'text', content: 'fuyeor.рф' }],
     });
+  });
+
+  it('registers LaTeX as an explicit parser plugin', () => {
+    const latexParse = new MarkdownParser().use(latexPlugin).build();
+    const ast = latexParse('The formula is $x^2$.');
+
+    expect(ast[0].children).toEqual([
+      { type: 'text', content: 'The formula is ' },
+      { type: 'math_inline', content: 'x^2' },
+      { type: 'text', content: '.' },
+    ]);
+  });
+
+  it('renders inline and multiline block LaTeX through the FFM parser', () => {
+    const ast = createFuyeorMarkdownParser()(
+      'Inline $x^2$ formula.\n\n$$\nx^2 + y^2\n$$',
+    );
+
+    expect(ast.map((node) => node.type)).toEqual(['paragraph', 'math_block']);
+    expect(render(ast))
+      .toBe(`<p>Inline <span class="math-inline">x^2</span> formula.</p>
+<div class="math-block">x^2 + y^2</div>
+`);
+  });
+
+  it('escapes LaTeX placeholders and leaves unmatched delimiters as text', () => {
+    const ast = createFuyeorMarkdownParser()(
+      '$<script>alert(1)</script>$ and $unfinished',
+    );
+
+    expect(render(ast)).toBe(
+      '<p><span class="math-inline">&lt;script&gt;alert(1)&lt;/script&gt;</span> and $unfinished</p>\n',
+    );
   });
 
   it('parse table', () => {

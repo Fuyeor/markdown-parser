@@ -19,6 +19,7 @@ import {
   strikeRule,
 } from './rules/inlines';
 import { ffmBlockRule } from './rules/ffm';
+import { latexPlugin } from './plugins/latex';
 
 export function createMarkdownParser(options: MarkdownParserOptions = {}) {
   return (
@@ -57,6 +58,7 @@ export function createFuyeorMarkdownParser(
       .addBlockRule(tableRule)
       .addBlockRule(hrRule)
       .addBlockRule(blockquoteRule)
+      .use(latexPlugin)
 
       // inline order: Inline code -> Links -> Bold/Underline/Strikethrough
       .addInlineRule(hardBreakRule)
