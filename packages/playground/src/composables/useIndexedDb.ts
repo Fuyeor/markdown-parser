@@ -29,8 +29,7 @@ let initialization: Promise<void> | null = null;
 let broadcastChannel: BroadcastChannel | null = null;
 
 const initBroadcastChannel = () => {
-  if (broadcastChannel || typeof window.BroadcastChannel === 'undefined')
-    return;
+  if (broadcastChannel) return;
   broadcastChannel = new window.BroadcastChannel(
     'fuyeor_markdown_playground_sync',
   );
