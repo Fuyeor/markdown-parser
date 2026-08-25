@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { MarkdownParser } from './core/parser';
 import { createFuyeorMarkdownParser } from './default';
 import { render } from './core/render';
+import { latexPlugin } from './plugins/latex';
 import { headingRule, codeBlockRule, tableRule } from './rules/blocks';
 import { boldRule, linkRule } from './rules/inlines';
 
@@ -65,6 +66,103 @@ describe('test @fuyeor/markdown-parser', () => {
       url: 'https://fuyeor.рф',
       children: [{ type: 'text', content: 'fuyeor.рф' }],
     });
+  });
+
+  it('registers LaTeX as an explicit parser plugin', () => {
+    const latexParse = new MarkdownParser().use(latexPlugin).build();
+    const ast = latexParse('The formula is $x^2$.');
+
+    expect(ast[0].children).toEqual([
+      { type: 'text', content: 'The formula is ' },
+      { type: 'math_inline', content: 'x^2' },
+      { type: 'text', content: '.' },
+    ]);
+  });
+
+  it('renders inline and multiline block LaTeX through the FFM parser', () => {
+    const ast = createFuyeorMarkdownParser()(
+      'Inline $x^2$ formula.\n\n$$\nx^2 + y^2\n$$',
+    );
+
+    expect(ast.map((node) => node.type)).toEqual(['paragraph', 'math_block']);
+    expect(render(ast))
+      .toBe(`<p>Inline <span class="math-inline">x^2</span> formula.</p>
+<div class="math-block">x^2 + y^2</div>
+`);
+  });
+
+  it('escapes LaTeX placeholders and leaves unmatched delimiters as text', () => {
+    const ast = createFuyeorMarkdownParser()(
+      '$<script>alert(1)</script>$ and $unfinished',
+    );
+
+    expect(render(ast)).toBe(
+      '<p><span class="math-inline">&lt;script&gt;alert(1)&lt;/script&gt;</span> and $unfinished</p>\n',
+    );
+  });
+
+  it('renders Twemoji while preserving inline code', () => {
+    const html = render(createFuyeorMarkdownParser()('Hello 😀 and `😀`.'));
+
+    expect(html).toBe(
+      '<p>Hello <img class="emoji" draggable="false" alt="😀" src="https://deliver.fuyeor.net/@libs/twemoji-new/svg/1f600.svg"/> and <code>😀</code>.</p>\n',
+    );
+  });
+
+  it('renders FFM Smiles inline placeholders safely', () => {
+    const html = render(
+      createFuyeorMarkdownParser()(
+        'Molecule #[smiles = `C=C`] and #[smiles=`<svg>`]',
+      ),
+    );
+
+    expect(html).toContain(
+      '<span class="language-smiles smiles-inline" data-smiles="C=C"></span>',
+    );
+    expect(html).toContain(
+      '<span class="language-smiles smiles-inline" data-smiles="&lt;svg&gt;"></span>',
+    );
+  });
+
+  it('renders Mermaid, ABC, and fenced Smiles placeholders', () => {
+    const ast = createFuyeorMarkdownParser()(
+      '```mermaid\ngraph TD\nA-->B\n```\n```abc\nX:1\nK:C\n```\n```smiles\nC=C\nCCO\n```',
+    );
+    const html = render(ast);
+
+    expect(ast.map((node) => node.type)).toEqual([
+      'mermaid',
+      'abc',
+      'smiles_block',
+    ]);
+    expect(html).toContain(
+      '<div class="language-mermaid">graph TD\nA--&gt;B</div>',
+    );
+    expect(html).toContain('<div class="language-abc">X:1\nK:C</div>');
+    expect(html).toContain(
+      '<div class="language-smiles smiles-block" data-smiles="C=C"></div>\n<div class="language-smiles smiles-block" data-smiles="CCO"></div>',
+    );
+  });
+
+  it('renders highlight.js-compatible language placeholders', () => {
+    const html = render(
+      createFuyeorMarkdownParser()(
+        '```js\nconst value = 1;\n```\n```fon\nvalue = 1\n```\n```fer\nvalue = 1\n```\n```ffm\n# Title\n```',
+      ),
+    );
+
+    expect(html).toContain(
+      '<pre class="hljs language-javascript" data-language="javascript">',
+    );
+    expect(html).toContain(
+      '<pre class="hljs language-fon" data-language="fon">',
+    );
+    expect(html).toContain(
+      '<pre class="hljs language-fer" data-language="fer">',
+    );
+    expect(html).toContain(
+      '<pre class="hljs language-ffm" data-language="ffm">',
+    );
   });
 
   it('parse table', () => {
