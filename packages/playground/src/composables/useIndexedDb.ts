@@ -11,6 +11,11 @@ export interface HistoryDocument {
   word_count?: number;
 }
 
+type SyncMessage =
+  | { type: 'SAVE'; document: HistoryDocument }
+  | { type: 'DELETE'; id: string }
+  | { type: 'CLEAR' };
+
 const DB_NAME = 'fuyeor-markdown-playground';
 const STORE_NAME = 'documents';
 const UPDATED_AT_INDEX = 'updated_at';
@@ -21,6 +26,33 @@ const isReady = ref(false);
 const error = ref<Error | null>(null);
 let database: IDBDatabase | null = null;
 let initialization: Promise<void> | null = null;
+let broadcastChannel: BroadcastChannel | null = null;
+
+const initBroadcastChannel = () => {
+  if (broadcastChannel || typeof window.BroadcastChannel === 'undefined')
+    return;
+  broadcastChannel = new window.BroadcastChannel(
+    'fuyeor_markdown_playground_sync',
+  );
+
+  broadcastChannel.onmessage = (event: MessageEvent<SyncMessage>) => {
+    const message = event.data;
+    if (message.type === 'SAVE') {
+      const index = documents.value.findIndex(
+        (item) => item.id === message.document.id,
+      );
+      if (index >= 0) documents.value[index] = message.document;
+      else documents.value.push(message.document);
+      documents.value.sort((a, b) => b.updated_at - a.updated_at);
+    } else if (message.type === 'DELETE') {
+      documents.value = documents.value.filter(
+        (item) => item.id !== message.id,
+      );
+    } else if (message.type === 'CLEAR') {
+      documents.value = [];
+    }
+  };
+};
 
 const loadAllDocuments = (): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -137,6 +169,8 @@ export function useIndexedDb() {
     if (index >= 0) documents.value[index] = { ...document };
     else documents.value.push({ ...document });
     documents.value.sort((a, b) => b.updated_at - a.updated_at);
+
+    broadcastChannel?.postMessage({ type: 'SAVE', document });
   };
 
   const deleteDocument = async (id: string): Promise<void> => {
@@ -154,6 +188,7 @@ export function useIndexedDb() {
     });
 
     documents.value = documents.value.filter((item) => item.id !== id);
+    broadcastChannel?.postMessage({ type: 'DELETE', id });
   };
 
   // Clear every local document in one transaction and update shared state after commit.
@@ -172,9 +207,11 @@ export function useIndexedDb() {
     });
 
     documents.value = [];
+    broadcastChannel?.postMessage({ type: 'CLEAR' });
   };
 
   onMounted(() => {
+    initBroadcastChannel();
     void initialize().catch(() => undefined);
   });
 
