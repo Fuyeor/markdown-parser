@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "description": "Language-neutral standard Markdown parser fixtures.",
+  "cases": [
+    {
+      "input": "## Hello **World**",
+      "html": "<h2>Hello <strong>World</strong></h2>"
+    },
+    {
+      "input": "```ts\nconst a = 1;\n```",
+      "html": "<div class=\"code-block-wrapper\"><div class=\"code-lang\">ts</div><pre><code class=\"language-ts\">const a = 1;\n</code></pre></div>"
+    },
+    {
+      "input": "visit www.fuyeor.com or [click here](https://fuyeor.com)",
+      "html": "<p>visit <a href=\"https://www.fuyeor.com\">www.fuyeor.com</a> or <a href=\"https://fuyeor.com\">click here</a></p>"
+    },
+    {
+      "input": "line\\\nbreak",
+      "html": "<p>line<br />\nbreak</p>"
+    },
+    {
+      "input": "text <script>alert(1)</script>",
+      "html": "<p>text &lt;script&gt;alert(1)&lt;/script&gt;</p>",
+      "assert": [
+        {
+          "path": "/0/type",
+          "value": "paragraph"
+        },
+        {
+          "path": "/0/children/0/content",
+          "value": "text <script>alert(1)</script>"
+        }
+      ]
+    },
+    {
+      "input": "\n| title 1 | title 2 |\n|---|---|\n| content 1 | content 2 |\n",
+      "assert": [
+        {
+          "path": "/0/type",
+          "value": "table"
+        },
+        {
+          "path": "/0/headers/0/type",
+          "value": "table_cell"
+        },
+        {
+          "path": "/0/headers/1/type",
+          "value": "table_cell"
+        },
+        {
+          "path": "/0/children/0/type",
+          "value": "table_row"
+        }
+      ]
+    }
+  ]
+}

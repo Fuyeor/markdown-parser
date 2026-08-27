@@ -6,9 +6,10 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "test": "vitest run",
-    "test:unit": "vitest run src/index.spec.ts",
-    "test:ffm": "vitest run src/test/index.spec.ts -t \"Fuyeor Mark\"",
+    "test": "vitest run src/cross-language-fixtures.spec.ts",
+    "test:unit": "vitest run src/cross-language-fixtures.spec.ts -t \"standard Markdown fixtures\"",
+    "test:ffm": "vitest run src/cross-language-fixtures.spec.ts -t \"ffm fixtures\"",
+    "test:safety": "vitest run src/cross-language-fixtures.spec.ts -t \"safety fixtures\"",
     "test:compat": "vitest run src/test/index.spec.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
   },
