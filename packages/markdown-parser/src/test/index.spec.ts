@@ -18,10 +18,6 @@ const githubMark = JSON.parse(
   // githubMark: 0.29 edition
   readFileSync(resolve(__dirname, './specs/githubMark.json'), 'utf-8'),
 );
-const fuyeorMark = JSON.parse(
-  readFileSync(resolve(__dirname, './specs/fuyeorMark.json'), 'utf-8'),
-);
-
 /**
  * skip unimplemented test cases
  */
@@ -117,17 +113,6 @@ describe('markdown compatibility test', () => {
     });
   });
 
-  describe('Fuyeor Mark', () => {
-    fuyeorMark.forEach((caseItem: any) => {
-      it(caseItem.markdown, () => {
-        assertMarkdown(
-          `Fuyeor Mark ${caseItem.section}`,
-          caseItem.markdown,
-          caseItem.html,
-        );
-      });
-    });
-  });
 
   // after test complete, write error details into JSON
   afterAll(() => {

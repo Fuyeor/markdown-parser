@@ -74,8 +74,8 @@ jobs:
         run: pnpm --filter @fuyeor/markdown-parser test:unit
       - name: Run FFM regression tests
         run: pnpm --filter @fuyeor/markdown-parser test:ffm
-      - name: Run shared Markdown fixtures
-        run: pnpm --filter @fuyeor/markdown-parser exec vitest run src/cross-language-fixtures.spec.ts
+      - name: Run safety fixtures
+        run: pnpm --filter @fuyeor/markdown-parser test:safety
       - name: Run shared linkify fixtures
         run: pnpm --filter @fuyeor/linkify exec vitest run src/cross-language-fixtures.spec.ts
       - name: Check Rust parser

@@ -62,25 +62,3 @@ pub fn is_safe_color_value(value: &str) -> bool {
             character.is_ascii_digit() || matches!(character, ' ' | '\t' | ',' | '%' | '.')
         })
 }
-
-#[cfg(test)]
-mod tests {
-    use super::{is_safe_color_value, is_safe_link_url};
-
-    #[test]
-    fn accepts_safe_links_and_rejects_script_schemes() {
-        assert!(is_safe_link_url("https://fuyeor.com"));
-        assert!(is_safe_link_url("#section"));
-        assert!(is_safe_link_url("../doc"));
-        assert!(!is_safe_link_url("javascript:alert(1)"));
-        assert!(!is_safe_link_url("data:text/html,alert(1)"));
-    }
-
-    #[test]
-    fn accepts_only_supported_color_forms() {
-        assert!(is_safe_color_value("#fff"));
-        assert!(is_safe_color_value("rgba(0, 0, 0, 50%)"));
-        assert!(!is_safe_color_value("red"));
-        assert!(!is_safe_color_value("url(javascript:alert(1))"));
-    }
-}

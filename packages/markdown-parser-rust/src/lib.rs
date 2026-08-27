@@ -32,193 +32,13 @@ pub fn create_fuyeor_markdown_parser(options: ParserOptions) -> MarkdownParser {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::{
-        AstNode, NodeType, ParserOptions, create_fuyeor_markdown_parser, create_markdown_parser,
-        render,
-    };
-
-    fn ffm() -> super::MarkdownParser {
-        create_fuyeor_markdown_parser(ParserOptions::default())
-    }
-
-    #[test]
-    fn parses_atx_heading_with_nested_bold() {
-        let ast = create_markdown_parser(ParserOptions::default()).parse("## Hello **World**");
-        assert_eq!(ast[0].node_type, NodeType::Heading);
-        assert_eq!(ast[0].level, Some(2));
-        assert_eq!(ast[0].children[0], AstNode::text("Hello "));
-        assert_eq!(ast[0].children[1].node_type, NodeType::Bold);
-    }
-
-    #[test]
-    fn parses_fenced_code_block() {
-        let ast =
-            create_markdown_parser(ParserOptions::default()).parse("```ts\nconst a = 1;\n```");
-        assert_eq!(ast[0].node_type, NodeType::CodeBlock);
-        assert_eq!(ast[0].lang.as_deref(), Some("ts"));
-        assert_eq!(ast[0].content.as_deref(), Some("const a = 1;"));
-    }
-
-    #[test]
-    fn parses_safe_links_and_keeps_unsafe_links_as_text() {
-        let ast = create_markdown_parser(ParserOptions::default()).parse(
-            "visit www.fuyeor.com or [click here](https://fuyeor.com) [bad](javascript:alert(1))",
-        );
-        let children = &ast[0].children;
-        assert_eq!(children[1].node_type, NodeType::Link);
-        assert_eq!(children[1].url.as_deref(), Some("https://www.fuyeor.com"));
-        assert_eq!(children[3].node_type, NodeType::Link);
-        assert!(
-            !children
-                .iter()
-                .any(|node| node.url.as_deref() == Some("javascript:alert(1)"))
-        );
-    }
-
-    #[test]
-    fn parses_internationalized_fuzzy_domains() {
-        let ast = ffm().parse("Visit fuyeor.xn--p1ai");
-        let link = ast[0]
-            .children
-            .iter()
-            .find(|node| node.node_type == NodeType::Link)
-            .expect("linkify should find the IDN");
-        assert_eq!(link.url.as_deref(), Some("https://fuyeor.рф"));
-        assert_eq!(link.children, vec![AstNode::text("fuyeor.рф")]);
-    }
-
-    #[test]
-    fn renders_aligned_headed_table() {
-        let ast = ffm()
-            .parse("| 属性 | 类型 | 说明 |\n| :--- | :---: | ---: |\n| name | string | 用户名 |");
-        assert_eq!(
-            render(&ast),
-            "<table>\n<thead>\n<tr>\n<th align=\"left\">属性</th>\n<th align=\"center\">类型</th>\n<th align=\"right\">说明</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"left\">name</td>\n<td align=\"center\">string</td>\n<td align=\"right\">用户名</td>\n</tr>\n</tbody>\n</table>\n"
-        );
-    }
-
-    #[test]
-    fn renders_separator_first_table_without_header() {
-        let ast = ffm()
-            .parse("| :--- | ---: |\n| Ray ID | a2c5ac427b7aa727 |\n| IP 地址 | 172.214.47.18 |");
-        assert!(ast[0].headers.is_none());
-        assert_eq!(ast[0].children.len(), 2);
-        assert!(render(&ast).starts_with("<table>\n<tbody>"));
-    }
-
-    #[test]
-    fn preserves_ffm_inline_and_block_nodes() {
-        let ast = ffm().parse("__under__ and --strike--\n\n```quote\n## nested\n```");
-        assert_eq!(ast[0].children[0].node_type, NodeType::Underline);
-        assert_eq!(ast[0].children[2].node_type, NodeType::Strike);
-        assert_eq!(ast[1].node_type, NodeType::Blockquote);
-        assert_eq!(ast[1].children[0].node_type, NodeType::Heading);
-    }
-
-    #[test]
-    fn accepts_spaced_slide_separators() {
-        let ast = ffm().parse("```slide\nFirst\n\n  ---  \n\nSecond\n```");
-        assert_eq!(ast[0].node_type, NodeType::Slide);
-        assert_eq!(ast[0].children.len(), 2);
-    }
-
-    #[test]
-    fn parses_accordion_and_chain_state() {
-        let ast = ffm().parse("```accordion\n**First**\nBody\n\n**Second**\nMore\n```");
-        assert_eq!(ast[0].node_type, NodeType::Accordion);
-        assert_eq!(ast[0].children.len(), 2);
-        assert_eq!(ast[0].children[0].name.as_deref(), Some("acc-0"));
-
-        let chain = ffm().parse("```chain\n**[x] Done**\nBody\n```");
-        assert_eq!(chain[0].children[0].is_completed, Some(true));
-        assert_eq!(chain[0].children[0].has_checkbox, Some(true));
-    }
-
-    #[test]
-    fn matches_ffm_golden_fixtures() {
-        let cases = [
-            ("--Fuyeor--", "<p><del>Fuyeor</del></p>\n"),
-            ("__Fuyeor__", "<p><u>Fuyeor</u></p>\n"),
-            (
-                "`#ff0000`",
-                "<p><code class=\"ffm-color-code\"><span class=\"ffm-color-swatch\" style=\"display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:#ff0000;vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;\"></span>#ff0000</code></p>\n",
-            ),
-            (
-                "```quote\n## Title\n```",
-                "<blockquote>\n<h2>Title</h2>\n</blockquote>\n",
-            ),
-            (
-                "```accordion\n**One**\nContent\n```",
-                "<div class=\"ffm-accordion\"><details name=\"acc-0\"><summary>One</summary><div class=\"accordion-content\"><p>Content</p>\n</div></details></div>",
-            ),
-            (
-                "```chain\n**[x] Done**\nBody\n```",
-                "<div class=\"chain-container\"><div class=\"chain-item is-completed\"><div class=\"chain-marker\"></div><div class=\"chain-content-wrapper\"><div class=\"chain-title\">Done</div><div class=\"chain-body\"><p>Body</p>\n</div></div></div></div>",
-            ),
-            (
-                "```slide\nFirst\n\n---\n\nSecond\n```",
-                "<div class=\"slide-container-wrapper\"><div class=\"slide-container\"><div class=\"slide-item\"><p>First</p>\n</div><div class=\"slide-item\"><p>Second</p>\n</div></div></div>",
-            ),
-            (
-                "[x](javascript:alert(1))",
-                "<p>[x](javascript:alert(1))</p>\n",
-            ),
-            (
-                "[x](data:text/html,<script>alert(1)</script>)",
-                "<p>[x](data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;)</p>\n",
-            ),
-            (
-                "[x](file:///etc/passwd)",
-                "<p>[x](file:///etc/passwd)</p>\n",
-            ),
-        ];
-        for (source, expected) in cases {
-            assert_eq!(render(&ffm().parse(source)), expected, "fixture: {source}");
-        }
-    }
-
-    #[test]
-    fn bounds_recursive_block_parsing_and_rejects_zero_depth() {
-        let bounded = create_fuyeor_markdown_parser(ParserOptions {
-            max_nesting_depth: 8,
-            ..ParserOptions::default()
-        });
-        let _ = bounded.parse(&format!("{} value", ">".repeat(100)));
-        assert!(
-            super::MarkdownParser::try_new(ParserOptions {
-                max_nesting_depth: 0,
-                ..ParserOptions::default()
-            })
-            .is_err()
-        );
-    }
-
-    #[test]
-    fn uses_two_space_steps_for_deeper_lists() {
-        let ast = ffm().parse("1. root\n   - level 1\n    - level 2");
-        assert_eq!(ast[0].node_type, NodeType::List);
-        let level_one = ast[0].children[0]
-            .children
-            .iter()
-            .find(|node| node.node_type == NodeType::List)
-            .expect("first nested list");
-        assert_eq!(level_one.node_type, NodeType::List);
-        let level_two = level_one.children[0]
-            .children
-            .iter()
-            .find(|node| node.node_type == NodeType::List)
-            .expect("second nested list");
-        assert_eq!(level_two.node_type, NodeType::List);
-    }
-}
-
-#[cfg(test)]
 mod cross_language_fixtures {
     use serde::Deserialize;
+    use serde_json::{Map, Value, json};
 
     use super::{
-        ParserOptions, create_fuyeor_markdown_parser, create_markdown_parser, linkify, render,
+        AstNode, MarkdownParser, ParserOptions, create_fuyeor_markdown_parser,
+        create_markdown_parser, is_safe_color_value, is_safe_link_url, linkify, render,
     };
 
     #[derive(Deserialize)]
@@ -231,8 +51,28 @@ mod cross_language_fixtures {
     struct MarkdownFixture {
         id: String,
         parser: String,
-        source: String,
-        expected_html: String,
+        operation: Option<String>,
+        source: Option<String>,
+        value: Option<String>,
+        expected: Option<bool>,
+        expected_html: Option<String>,
+        expected_error: Option<String>,
+        expect_no_throw: Option<bool>,
+        options: Option<FixtureOptions>,
+        #[serde(default)]
+        assertions: Vec<FixtureAssertion>,
+    }
+
+    #[derive(Deserialize)]
+    struct FixtureOptions {
+        max_nesting_depth: Option<usize>,
+    }
+
+    #[derive(Deserialize)]
+    struct FixtureAssertion {
+        path: String,
+        equals: Option<Value>,
+        length: Option<usize>,
     }
 
     #[derive(Deserialize)]
@@ -268,33 +108,176 @@ mod cross_language_fixtures {
             .expect("linkify fixture must be valid JSON")
     }
 
-    #[test]
-    fn matches_shared_markdown_fixtures() {
-        let fixtures = markdown_fixtures();
-        assert_eq!(fixtures.schema_version, 1);
-        let standard = create_markdown_parser(ParserOptions::default());
-        let ffm = create_fuyeor_markdown_parser(ParserOptions::default());
-
-        for fixture in fixtures.cases {
-            let parser = if fixture.parser == "ffm" {
-                &ffm
-            } else {
-                &standard
-            };
-            assert_eq!(
-                render(&parser.parse(&fixture.source)),
-                fixture.expected_html,
-                "fixture: {}",
-                fixture.id
+    // Convert the Rust AST into the TypeScript-compatible wire projection.
+    fn normalize_node(node: &AstNode) -> Value {
+        let mut object = Map::new();
+        object.insert("type".into(), json!(node.node_type.as_str()));
+        if let Some(content) = &node.content {
+            object.insert("content".into(), json!(content));
+        }
+        if !node.children.is_empty() {
+            object.insert(
+                "children".into(),
+                Value::Array(node.children.iter().map(normalize_node).collect()),
             );
+        }
+        if let Some(level) = node.level {
+            object.insert("level".into(), json!(level));
+        }
+        if let Some(lang) = &node.lang {
+            object.insert("lang".into(), json!(lang));
+        }
+        if let Some(url) = &node.url {
+            object.insert("url".into(), json!(url));
+        }
+        if let Some(ordered) = node.ordered {
+            object.insert("ordered".into(), json!(ordered));
+        }
+        if let Some(start) = node.start {
+            object.insert("start".into(), json!(start));
+        }
+        if let Some(headers) = &node.headers {
+            object.insert(
+                "headers".into(),
+                Value::Array(headers.iter().map(normalize_node).collect()),
+            );
+        }
+        if let Some(name) = &node.name {
+            object.insert("name".into(), json!(name));
+        }
+        if let Some(title) = &node.title {
+            object.insert(
+                "title".into(),
+                Value::Array(title.iter().map(normalize_node).collect()),
+            );
+        }
+        if let Some(is_completed) = node.is_completed {
+            object.insert("isCompleted".into(), json!(is_completed));
+        }
+        if let Some(has_checkbox) = node.has_checkbox {
+            object.insert("hasCheckbox".into(), json!(has_checkbox));
+        }
+        if let Some(align) = node.align {
+            object.insert("align".into(), json!(align.as_str()));
+        }
+        Value::Object(object)
+    }
+
+    // Read a JSON Pointer from the normalized AST projection.
+    fn read_json_pointer<'a>(root: &'a Value, pointer: &str) -> Option<&'a Value> {
+        pointer
+            .split('/')
+            .skip(1)
+            .try_fold(root, |value, segment| match value {
+                Value::Array(values) => values.get(segment.parse::<usize>().ok()?),
+                Value::Object(values) => values.get(segment),
+                _ => None,
+            })
+    }
+
+    // Translate fixture options into the Rust parser API.
+    fn parser_options(fixture: &MarkdownFixture) -> ParserOptions {
+        ParserOptions {
+            max_nesting_depth: fixture
+                .options
+                .as_ref()
+                .and_then(|options| options.max_nesting_depth)
+                .unwrap_or(64),
+            ..ParserOptions::default()
+        }
+    }
+
+    // Execute one canonical Markdown fixture against the Rust implementation.
+    fn execute_markdown_fixture(fixture: &MarkdownFixture) {
+        let options = parser_options(fixture);
+        match fixture.operation.as_deref() {
+            Some("safe_link") => {
+                assert_eq!(
+                    is_safe_link_url(fixture.value.as_deref().unwrap_or("")),
+                    fixture.expected.expect("safe_link fixture expected value"),
+                    "fixture: {}",
+                    fixture.id
+                );
+                return;
+            }
+            Some("safe_color") => {
+                assert_eq!(
+                    is_safe_color_value(fixture.value.as_deref().unwrap_or("")),
+                    fixture.expected.expect("safe_color fixture expected value"),
+                    "fixture: {}",
+                    fixture.id
+                );
+                return;
+            }
+            Some("construct") => {
+                assert!(
+                    MarkdownParser::try_new(options).is_err(),
+                    "fixture: {}",
+                    fixture.id
+                );
+                assert_eq!(
+                    fixture.expected_error.as_deref(),
+                    Some("invalid_nesting_depth"),
+                    "fixture: {}",
+                    fixture.id
+                );
+                return;
+            }
+            Some("parse") | None => {}
+            Some(operation) => panic!("unknown Markdown fixture operation: {operation}"),
+        }
+
+        let parser = if fixture.parser == "ffm" {
+            create_fuyeor_markdown_parser(options)
+        } else {
+            create_markdown_parser(options)
+        };
+        let ast = parser.parse(fixture.source.as_deref().unwrap_or(""));
+        if let Some(expected_html) = &fixture.expected_html {
+            assert_eq!(render(&ast), *expected_html, "fixture: {}", fixture.id);
+        }
+        let normalized = Value::Array(ast.iter().map(normalize_node).collect());
+        for assertion in &fixture.assertions {
+            let actual = read_json_pointer(&normalized, &assertion.path).unwrap_or_else(|| {
+                panic!(
+                    "missing AST path {} in fixture {}",
+                    assertion.path, fixture.id
+                )
+            });
+            if let Some(length) = assertion.length {
+                assert_eq!(
+                    actual.as_array().map(Vec::len),
+                    Some(length),
+                    "fixture: {}",
+                    fixture.id
+                );
+            } else {
+                assert_eq!(
+                    Some(actual),
+                    assertion.equals.as_ref(),
+                    "fixture: {}",
+                    fixture.id
+                );
+            }
+        }
+        if fixture.expect_no_throw == Some(true) {
+            assert!(normalized.is_array(), "fixture: {}", fixture.id);
         }
     }
 
     #[test]
-    fn matches_shared_linkify_fixtures() {
+    fn executes_all_shared_markdown_fixtures() {
+        let fixtures = markdown_fixtures();
+        assert_eq!(fixtures.schema_version, 1);
+        for fixture in &fixtures.cases {
+            execute_markdown_fixture(fixture);
+        }
+    }
+
+    #[test]
+    fn executes_all_shared_linkify_fixtures() {
         let fixtures = linkify_fixtures();
         assert_eq!(fixtures.schema_version, 1);
-
         for fixture in fixtures.cases {
             let actual = linkify(&fixture.source)
                 .into_iter()
