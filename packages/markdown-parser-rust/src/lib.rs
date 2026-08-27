@@ -212,3 +212,107 @@ mod tests {
         assert_eq!(level_two.node_type, NodeType::List);
     }
 }
+
+#[cfg(test)]
+mod cross_language_fixtures {
+    use serde::Deserialize;
+
+    use super::{
+        ParserOptions, create_fuyeor_markdown_parser, create_markdown_parser, linkify, render,
+    };
+
+    #[derive(Deserialize)]
+    struct MarkdownFixtureFile {
+        schema_version: u32,
+        cases: Vec<MarkdownFixture>,
+    }
+
+    #[derive(Deserialize)]
+    struct MarkdownFixture {
+        id: String,
+        parser: String,
+        source: String,
+        expected_html: String,
+    }
+
+    #[derive(Deserialize)]
+    struct LinkifyFixtureFile {
+        schema_version: u32,
+        cases: Vec<LinkifyFixture>,
+    }
+
+    #[derive(Deserialize)]
+    struct LinkifyFixture {
+        id: String,
+        source: String,
+        expected: Vec<ExpectedLink>,
+    }
+
+    #[derive(Deserialize)]
+    struct ExpectedLink {
+        text: String,
+        url: String,
+    }
+
+    // Load the shared Markdown fixture from the repository root.
+    fn markdown_fixtures() -> MarkdownFixtureFile {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../fixtures/markdown.json");
+        serde_json::from_str(&std::fs::read_to_string(path).expect("markdown fixture must exist"))
+            .expect("markdown fixture must be valid JSON")
+    }
+
+    // Load the shared linkify fixture from the repository root.
+    fn linkify_fixtures() -> LinkifyFixtureFile {
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../fixtures/linkify.json");
+        serde_json::from_str(&std::fs::read_to_string(path).expect("linkify fixture must exist"))
+            .expect("linkify fixture must be valid JSON")
+    }
+
+    #[test]
+    fn matches_shared_markdown_fixtures() {
+        let fixtures = markdown_fixtures();
+        assert_eq!(fixtures.schema_version, 1);
+        let standard = create_markdown_parser(ParserOptions::default());
+        let ffm = create_fuyeor_markdown_parser(ParserOptions::default());
+
+        for fixture in fixtures.cases {
+            let parser = if fixture.parser == "ffm" {
+                &ffm
+            } else {
+                &standard
+            };
+            assert_eq!(
+                render(&parser.parse(&fixture.source)),
+                fixture.expected_html,
+                "fixture: {}",
+                fixture.id
+            );
+        }
+    }
+
+    #[test]
+    fn matches_shared_linkify_fixtures() {
+        let fixtures = linkify_fixtures();
+        assert_eq!(fixtures.schema_version, 1);
+
+        for fixture in fixtures.cases {
+            let actual = linkify(&fixture.source)
+                .into_iter()
+                .map(|matched| ExpectedLink {
+                    text: matched.text,
+                    url: matched.url,
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(
+                actual.len(),
+                fixture.expected.len(),
+                "fixture: {}",
+                fixture.id
+            );
+            for (actual, expected) in actual.iter().zip(fixture.expected.iter()) {
+                assert_eq!(actual.text, expected.text, "fixture: {}", fixture.id);
+                assert_eq!(actual.url, expected.url, "fixture: {}", fixture.id);
+            }
+        }
+    }
+}

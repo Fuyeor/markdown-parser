@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "description": "Language-neutral Markdown and Fuyeor Flavored Markdown render fixtures.",
+  "cases": [
+    {
+      "id": "heading-with-bold",
+      "parser": "standard",
+      "source": "## Hello **World**",
+      "expected_html": "<h2>Hello <strong>World</strong></h2>\n",
+      "tags": ["heading", "bold"]
+    },
+    {
+      "id": "fenced-code",
+      "parser": "standard",
+      "source": "```ts\nconst a = 1;\n```",
+      "expected_html": "<div class=\"code-block-wrapper\"><div class=\"code-lang\">ts</div><pre><code class=\"language-ts\">const a = 1;\n</code></pre></div>\n",
+      "tags": ["code"]
+    },
+    {
+      "id": "safe-links",
+      "parser": "standard",
+      "source": "visit www.fuyeor.com or [click here](https://fuyeor.com)",
+      "expected_html": "<p>visit <a href=\"https://www.fuyeor.com\">www.fuyeor.com</a> or <a href=\"https://fuyeor.com\">click here</a></p>\n",
+      "tags": ["link", "linkify"]
+    },
+    {
+      "id": "aligned-table",
+      "parser": "ffm",
+      "source": "| 属性 | 类型 | 说明 |\n| :--- | :---: | ---: |\n| name | string | 用户名 |",
+      "expected_html": "<table>\n<thead>\n<tr>\n<th align=\"left\">属性</th>\n<th align=\"center\">类型</th>\n<th align=\"right\">说明</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"left\">name</td>\n<td align=\"center\">string</td>\n<td align=\"right\">用户名</td>\n</tr>\n</tbody>\n</table>\n",
+      "tags": ["table", "alignment"]
+    },
+    {
+      "id": "headerless-table",
+      "parser": "ffm",
+      "source": "| :--- | ---: |\n| Ray ID | a2c5ac427b7aa727 |\n| IP 地址 | 172.214.47.18 |",
+      "expected_html": "<table>\n<tbody>\n<tr>\n<td align=\"left\">Ray ID</td>\n<td align=\"right\">a2c5ac427b7aa727</td>\n</tr>\n<tr>\n<td align=\"left\">IP 地址</td>\n<td align=\"right\">172.214.47.18</td>\n</tr>\n</tbody>\n</table>\n",
+      "tags": ["table", "headerless"]
+    },
+    {
+      "id": "hardbreak",
+      "parser": "standard",
+      "source": "line\\\nbreak",
+      "expected_html": "<p>line<br />\nbreak</p>\n",
+      "tags": ["break"]
+    },
+    {
+      "id": "unsafe-link",
+      "parser": "ffm",
+      "source": "[x](javascript:alert(1))",
+      "expected_html": "<p>[x](javascript:alert(1))</p>\n",
+      "tags": ["security", "link"]
+    },
+    {
+      "id": "ffm-strike",
+      "parser": "ffm",
+      "source": "--Fuyeor--",
+      "expected_html": "<p><del>Fuyeor</del></p>\n",
+      "tags": ["ffm", "strike"]
+    },
+    {
+      "id": "ffm-underline",
+      "parser": "ffm",
+      "source": "__Fuyeor__",
+      "expected_html": "<p><u>Fuyeor</u></p>\n",
+      "tags": ["ffm", "underline"]
+    },
+    {
+      "id": "ffm-color-code",
+      "parser": "ffm",
+      "source": "`#ff0000`",
+      "expected_html": "<p><code class=\"ffm-color-code\"><span class=\"ffm-color-swatch\" style=\"display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:#ff0000;vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;\"></span>#ff0000</code></p>\n",
+      "tags": ["ffm", "color"]
+    },
+    {
+      "id": "ffm-quote",
+      "parser": "ffm",
+      "source": "```quote\n## Title\n```",
+      "expected_html": "<blockquote>\n<h2>Title</h2>\n</blockquote>\n",
+      "tags": ["ffm", "quote"]
+    },
+    {
+      "id": "ffm-accordion",
+      "parser": "ffm",
+      "source": "```accordion\n**One**\nContent\n```",
+      "expected_html": "<div class=\"ffm-accordion\"><details name=\"acc-0\"><summary>One</summary><div class=\"accordion-content\"><p>Content</p>\n</div></details></div>",
+      "tags": ["ffm", "accordion"]
+    },
+    {
+      "id": "ffm-chain",
+      "parser": "ffm",
+      "source": "```chain\n**[x] Done**\nBody\n```",
+      "expected_html": "<div class=\"chain-container\"><div class=\"chain-item is-completed\"><div class=\"chain-marker\"></div><div class=\"chain-content-wrapper\"><div class=\"chain-title\">Done</div><div class=\"chain-body\"><p>Body</p>\n</div></div></div></div>",
+      "tags": ["ffm", "chain", "checkbox"]
+    },
+    {
+      "id": "ffm-slide",
+      "parser": "ffm",
+      "source": "```slide\nFirst\n\n---\n\nSecond\n```",
+      "expected_html": "<div class=\"slide-container-wrapper\"><div class=\"slide-container\"><div class=\"slide-item\"><p>First</p>\n</div><div class=\"slide-item\"><p>Second</p>\n</div></div></div>",
+      "tags": ["ffm", "slide"]
+    },
+    {
+      "id": "ffm-unsafe-data-link",
+      "parser": "ffm",
+      "source": "[x](data:text/html,<script>alert(1)</script>)",
+      "expected_html": "<p>[x](data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;)</p>\n",
+      "tags": ["ffm", "security", "link"]
+    },
+    {
+      "id": "ffm-unsafe-file-link",
+      "parser": "ffm",
+      "source": "[x](file:///etc/passwd)",
+      "expected_html": "<p>[x](file:///etc/passwd)</p>\n",
+      "tags": ["ffm", "security", "link"]
+    }
+  ]
+}

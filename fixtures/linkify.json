@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "description": "Language-neutral linkify fixtures with visible text and normalized URLs.",
+  "cases": [
+    {
+      "id": "domain-with-period",
+      "source": "Visit fuyeor.com.",
+      "expected": [{"text": "fuyeor.com", "url": "https://fuyeor.com"}]
+    },
+    {
+      "id": "domain-without-period",
+      "source": "Visit fuyeor.com",
+      "expected": [{"text": "fuyeor.com", "url": "https://fuyeor.com"}]
+    },
+    {
+      "id": "domain-with-semicolon",
+      "source": "Visit fuyeor.com;",
+      "expected": [{"text": "fuyeor.com", "url": "https://fuyeor.com"}]
+    },
+    {
+      "id": "domain-in-parentheses",
+      "source": "(fuyeor.com)",
+      "expected": [{"text": "fuyeor.com", "url": "https://fuyeor.com"}]
+    },
+    {
+      "id": "cc-tld-cn",
+      "source": "Visit fuyeor.cn.",
+      "expected": [{"text": "fuyeor.cn", "url": "https://fuyeor.cn"}]
+    },
+    {
+      "id": "multi-label-cc-tld",
+      "source": "Visit fuyeor.co.uk.",
+      "expected": [{"text": "fuyeor.co.uk", "url": "https://fuyeor.co.uk"}]
+    },
+    {
+      "id": "g-tld-dev",
+      "source": "Visit web.dev.",
+      "expected": [{"text": "web.dev", "url": "https://web.dev"}]
+    },
+    {
+      "id": "g-tld-app",
+      "source": "Visit vercel.app",
+      "expected": [{"text": "vercel.app", "url": "https://vercel.app"}]
+    },
+    {
+      "id": "unicode-russian-tld",
+      "source": "Visit fuyeor.рф.",
+      "expected": [{"text": "fuyeor.рф", "url": "https://fuyeor.рф"}]
+    },
+    {
+      "id": "punycode-russian-tld",
+      "source": "Visit fuyeor.xn--p1ai.",
+      "expected": [{"text": "fuyeor.рф", "url": "https://fuyeor.рф"}]
+    },
+    {
+      "id": "explicit-url-with-path",
+      "source": "Profile: https://fuyeor.com/@Fuyeor",
+      "expected": [{"text": "https://fuyeor.com/@Fuyeor", "url": "https://fuyeor.com/@Fuyeor"}]
+    },
+    {
+      "id": "explicit-url-with-parentheses",
+      "source": "A link with parens: https://en.wikipedia.org/wiki/Link_(disambiguation)",
+      "expected": [{"text": "https://en.wikipedia.org/wiki/Link_(disambiguation)", "url": "https://en.wikipedia.org/wiki/Link_(disambiguation)"}]
+    },
+    {
+      "id": "unsupported-numeric-tld",
+      "source": "Visit fuyeor.123",
+      "expected": []
+    },
+    {
+      "id": "unsupported-long-tld",
+      "source": "Visit fuyeor.enterprise",
+      "expected": []
+    },
+    {
+      "id": "unsupported-md-tld",
+      "source": "Visit fuyeor.md",
+      "expected": []
+    },
+    {
+      "id": "empty-domain-label",
+      "source": "Visit fuyeor..com",
+      "expected": []
+    },
+    {
+      "id": "comma-domain",
+      "source": "Visit fuyeor,com",
+      "expected": []
+    },
+    {
+      "id": "tld-with-suffix-digits",
+      "source": "Visit fuyeor.com123",
+      "expected": []
+    },
+    {
+      "id": "unicode-word-continuation",
+      "source": "Visit fuyeor.comあ",
+      "expected": []
+    },
+    {
+      "id": "emoji-after-domain",
+      "source": "fuyeor.com💜",
+      "expected": [{"text": "fuyeor.com", "url": "https://fuyeor.com"}]
+    }
+  ]
+}
