@@ -9,9 +9,13 @@ on:
       - '.github/workflows/ci.yml'
       - 'packages/linkify/**'
       - 'packages/markdown-parser/**'
+      - 'packages/markdown-parser-rust/**'
       - 'packages/markdown-parser-lit/**'
       - 'packages/markdown-parser-vue/**'
       - 'packages/playground/**'
+      - 'fixtures/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'Dockerfile'
@@ -21,9 +25,13 @@ on:
       - '.github/workflows/ci.yml'
       - 'packages/linkify/**'
       - 'packages/markdown-parser/**'
+      - 'packages/markdown-parser-rust/**'
       - 'packages/markdown-parser-lit/**'
       - 'packages/markdown-parser-vue/**'
       - 'packages/playground/**'
+      - 'fixtures/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'Dockerfile'
@@ -47,7 +55,12 @@ jobs:
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11.20.0
+          version: 11.22.0
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -63,6 +76,16 @@ jobs:
         run: pnpm --filter @fuyeor/markdown-parser test:unit
       - name: Run FFM regression tests
         run: pnpm --filter @fuyeor/markdown-parser test:ffm
+      - name: Run shared Markdown fixtures
+        run: pnpm --filter @fuyeor/markdown-parser exec vitest run src/cross-language-fixtures.spec.ts
+      - name: Run shared linkify fixtures
+        run: pnpm --filter @fuyeor/linkify exec vitest run src/cross-language-fixtures.spec.ts
+      - name: Check Rust parser
+        run: |
+          cargo fmt --all -- --check
+          cargo check --workspace --all-targets --all-features
+          cargo clippy --workspace --all-targets --all-features -- -D warnings
+          cargo test --workspace --all-targets --all-features
 
   build-markdown-playground:
     needs: test-markdown-parser
