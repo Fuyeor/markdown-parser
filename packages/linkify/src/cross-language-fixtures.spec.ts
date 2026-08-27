@@ -10,9 +10,8 @@ type LinkFixtureMatch = {
 };
 
 type LinkFixture = {
-  id: string;
-  source: string;
-  expected: LinkFixtureMatch[];
+  input: string;
+  links: LinkFixtureMatch[];
 };
 
 type LinkFixtureFile = {
@@ -28,17 +27,17 @@ const fixtures = JSON.parse(
   ),
 ) as LinkFixtureFile;
 
-// Execute every language-neutral linkify fixture against the TypeScript reference implementation.
+// Execute every language-neutral linkify fixture against the TypeScript implementation.
 describe('language-neutral linkify fixtures', () => {
   expect(fixtures.schema_version).toBe(1);
 
-  for (const fixture of fixtures.cases) {
-    it(fixture.id, () => {
-      const actual = linkify(fixture.source).map(({ text, url }) => ({
+  for (const [index, fixture] of fixtures.cases.entries()) {
+    it(String(index), () => {
+      const actual = linkify(fixture.input).map(({ text, url }) => ({
         text,
         url,
       }));
-      expect(actual).toEqual(fixture.expected);
+      expect(actual).toEqual(fixture.links);
     });
   }
 });

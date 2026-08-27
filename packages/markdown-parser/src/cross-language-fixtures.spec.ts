@@ -8,43 +8,43 @@ import { isSafeLinkUrl } from './core/url';
 import { render } from './core/render';
 import { createFuyeorMarkdownParser, createMarkdownParser } from './default';
 
-type FixtureSuite = 'unit' | 'ffm' | 'safety';
-
-type FixtureAssertion = {
+type MarkdownAssertion = {
   path: string;
-  equals?: unknown;
+  value?: unknown;
   length?: number;
 };
 
-type MarkdownFixture = {
-  id: string;
-  parser: 'standard' | 'ffm';
-  source_suite: FixtureSuite;
-  operation?: 'parse' | 'construct' | 'safe_link' | 'safe_color';
-  source?: string;
-  value?: string;
-  expected?: boolean;
-  expected_html?: string;
-  output_normalization?: 'trim';
-  expected_error?: 'invalid_nesting_depth';
-  expect_no_throw?: boolean;
+type MarkdownCase = {
+  input?: string;
+  html?: string;
+  assert?: MarkdownAssertion[];
+  error?: 'invalid_nesting_depth';
+  no_throw?: boolean;
   options?: { max_nesting_depth?: number };
-  assertions?: FixtureAssertion[];
-  tags: string[];
 };
 
 type MarkdownFixtureFile = {
   schema_version: number;
   description: string;
-  cases: MarkdownFixture[];
+  cases: MarkdownCase[];
 };
 
-const fixtures = JSON.parse(
-  readFileSync(
-    resolve(import.meta.dirname, '../../../fixtures/markdown.json'),
-    'utf8',
-  ),
-) as MarkdownFixtureFile;
+type SafetyCase = { input: string; valid: boolean };
+type SafetyFixtureFile = {
+  schema_version: number;
+  description: string;
+  links: SafetyCase[];
+  colors: SafetyCase[];
+};
+
+const loadJson = <T>(name: string): T =>
+  JSON.parse(
+    readFileSync(resolve(import.meta.dirname, `../../../fixtures/${name}`), 'utf8'),
+  ) as T;
+
+const standardFixtures = loadJson<MarkdownFixtureFile>('markdown.json');
+const ffmFixtures = loadJson<MarkdownFixtureFile>('ffm.json');
+const safetyFixtures = loadJson<SafetyFixtureFile>('safety.json');
 
 // Read a portable JSON Pointer path from a TypeScript AST value.
 function readJsonPointer(root: unknown, pointer: string): unknown {
@@ -65,46 +65,27 @@ function readJsonPointer(root: unknown, pointer: string): unknown {
 }
 
 // Map the wire-level snake_case options to the TypeScript API.
-function parserOptions(fixture: MarkdownFixture) {
+function parserOptions(fixture: MarkdownCase) {
   return fixture.options === undefined
     ? undefined
     : { maxNestingDepth: fixture.options.max_nesting_depth };
 }
 
-// Execute one canonical fixture against the TypeScript reference implementation.
-function executeFixture(fixture: MarkdownFixture): void {
+// Execute one canonical Markdown case against a selected parser dialect.
+function executeMarkdownCase(fixture: MarkdownCase, ffm: boolean): void {
   const options = parserOptions(fixture);
-  if (fixture.operation === 'safe_link') {
-    expect(isSafeLinkUrl(fixture.value ?? '')).toBe(fixture.expected);
-    return;
-  }
-  if (fixture.operation === 'safe_color') {
-    expect(isSafeColorValue(fixture.value ?? '')).toBe(fixture.expected);
-    return;
-  }
-  if (fixture.operation === 'construct') {
+  if (fixture.error === 'invalid_nesting_depth') {
     expect(() => new MarkdownParser(options)).toThrow(RangeError);
     return;
   }
 
-  const parser =
-    fixture.parser === 'ffm'
-      ? createFuyeorMarkdownParser(options)
-      : createMarkdownParser(options);
-  const ast = parser(fixture.source ?? '');
+  const parser = ffm
+    ? createFuyeorMarkdownParser(options)
+    : createMarkdownParser(options);
+  const ast = parser(fixture.input ?? '');
+  if (fixture.html !== undefined) expect(render(ast).trim()).toBe(fixture.html);
 
-  if (fixture.expected_html !== undefined) {
-    const actualHtml = render(ast);
-    const expectedHtml =
-      fixture.output_normalization === 'trim'
-        ? fixture.expected_html.trim()
-        : fixture.expected_html;
-    expect(
-      fixture.output_normalization === 'trim' ? actualHtml.trim() : actualHtml,
-    ).toBe(expectedHtml);
-  }
-
-  for (const assertion of fixture.assertions ?? []) {
+  for (const assertion of fixture.assert ?? []) {
     const value = readJsonPointer(ast, assertion.path);
     if (assertion.length !== undefined) {
       expect(Array.isArray(value) ? value.length : undefined).toBe(
@@ -112,27 +93,35 @@ function executeFixture(fixture: MarkdownFixture): void {
       );
       continue;
     }
-    expect(value).toEqual(assertion.equals);
+    expect(value).toEqual(assertion.value);
   }
 
-  if (fixture.expect_no_throw) expect(ast).toEqual(expect.any(Array));
+  if (fixture.no_throw) expect(ast).toEqual(expect.any(Array));
 }
 
-// Execute one named fixture suite while keeping all cases in the JSON file.
-function executeSuite(suite: FixtureSuite): void {
-  describe(`${suite} fixtures`, () => {
-    for (const fixture of fixtures.cases.filter(
-      (candidate) => candidate.source_suite === suite,
-    )) {
-      it(fixture.id, () => executeFixture(fixture));
+// Execute every case in one language-neutral fixture file.
+function executeMarkdownSuite(
+  name: string,
+  fixtureFile: MarkdownFixtureFile,
+  ffm: boolean,
+): void {
+  describe(name, () => {
+    expect(fixtureFile.schema_version).toBe(2);
+    for (const [index, fixture] of fixtureFile.cases.entries()) {
+      it(String(index), () => executeMarkdownCase(fixture, ffm));
     }
   });
 }
 
-describe('language-neutral Markdown fixtures', () => {
-  expect(fixtures.schema_version).toBe(1);
-});
+executeMarkdownSuite('standard Markdown fixtures', standardFixtures, false);
+executeMarkdownSuite('FFM fixtures', ffmFixtures, true);
 
-executeSuite('unit');
-executeSuite('ffm');
-executeSuite('safety');
+describe('safety fixtures', () => {
+  expect(safetyFixtures.schema_version).toBe(1);
+  for (const fixture of safetyFixtures.links)
+    it(`link: ${fixture.input}`, () =>
+      expect(isSafeLinkUrl(fixture.input)).toBe(fixture.valid));
+  for (const fixture of safetyFixtures.colors)
+    it(`color: ${fixture.input}`, () =>
+      expect(isSafeColorValue(fixture.input)).toBe(fixture.valid));
+});

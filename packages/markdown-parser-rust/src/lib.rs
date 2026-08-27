@@ -44,24 +44,25 @@ mod cross_language_fixtures {
     #[derive(Deserialize)]
     struct MarkdownFixtureFile {
         schema_version: u32,
-        cases: Vec<MarkdownFixture>,
+        cases: Vec<MarkdownCase>,
     }
 
     #[derive(Deserialize)]
-    struct MarkdownFixture {
-        id: String,
-        parser: String,
-        operation: Option<String>,
-        source: Option<String>,
-        value: Option<String>,
-        expected: Option<bool>,
-        expected_html: Option<String>,
-        output_normalization: Option<String>,
-        expected_error: Option<String>,
-        expect_no_throw: Option<bool>,
-        options: Option<FixtureOptions>,
+    struct MarkdownCase {
+        input: Option<String>,
+        html: Option<String>,
         #[serde(default)]
-        assertions: Vec<FixtureAssertion>,
+        assert: Vec<MarkdownAssertion>,
+        error: Option<String>,
+        no_throw: Option<bool>,
+        options: Option<FixtureOptions>,
+    }
+
+    #[derive(Deserialize)]
+    struct MarkdownAssertion {
+        path: String,
+        value: Option<Value>,
+        length: Option<usize>,
     }
 
     #[derive(Deserialize)]
@@ -70,23 +71,28 @@ mod cross_language_fixtures {
     }
 
     #[derive(Deserialize)]
-    struct FixtureAssertion {
-        path: String,
-        equals: Option<Value>,
-        length: Option<usize>,
+    struct SafetyFixtureFile {
+        schema_version: u32,
+        links: Vec<SafetyCase>,
+        colors: Vec<SafetyCase>,
+    }
+
+    #[derive(Deserialize)]
+    struct SafetyCase {
+        input: String,
+        valid: bool,
     }
 
     #[derive(Deserialize)]
     struct LinkifyFixtureFile {
         schema_version: u32,
-        cases: Vec<LinkifyFixture>,
+        cases: Vec<LinkifyCase>,
     }
 
     #[derive(Deserialize)]
-    struct LinkifyFixture {
-        id: String,
-        source: String,
-        expected: Vec<ExpectedLink>,
+    struct LinkifyCase {
+        input: String,
+        links: Vec<ExpectedLink>,
     }
 
     #[derive(Deserialize)]
@@ -95,18 +101,11 @@ mod cross_language_fixtures {
         url: String,
     }
 
-    // Load the shared Markdown fixture from the repository root.
-    fn markdown_fixtures() -> MarkdownFixtureFile {
-        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../fixtures/markdown.json");
-        serde_json::from_str(&std::fs::read_to_string(path).expect("markdown fixture must exist"))
-            .expect("markdown fixture must be valid JSON")
-    }
-
-    // Load the shared linkify fixture from the repository root.
-    fn linkify_fixtures() -> LinkifyFixtureFile {
-        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../fixtures/linkify.json");
-        serde_json::from_str(&std::fs::read_to_string(path).expect("linkify fixture must exist"))
-            .expect("linkify fixture must be valid JSON")
+    // Load a shared JSON fixture from the repository root.
+    fn read_fixture<T: for<'de> Deserialize<'de>>(name: &str) -> T {
+        let path = format!("{}/../../fixtures/{name}", env!("CARGO_MANIFEST_DIR"));
+        serde_json::from_str(&std::fs::read_to_string(path).expect("fixture must exist"))
+            .expect("fixture must be valid JSON")
     }
 
     // Convert the Rust AST into the TypeScript-compatible wire projection.
@@ -177,9 +176,9 @@ mod cross_language_fixtures {
     }
 
     // Translate fixture options into the Rust parser API.
-    fn parser_options(fixture: &MarkdownFixture) -> ParserOptions {
+    fn parser_options(case: &MarkdownCase) -> ParserOptions {
         ParserOptions {
-            max_nesting_depth: fixture
+            max_nesting_depth: case
                 .options
                 .as_ref()
                 .and_then(|options| options.max_nesting_depth)
@@ -188,120 +187,75 @@ mod cross_language_fixtures {
         }
     }
 
-    // Execute one canonical Markdown fixture against the Rust implementation.
-    fn execute_markdown_fixture(fixture: &MarkdownFixture) {
-        let options = parser_options(fixture);
-        match fixture.operation.as_deref() {
-            Some("safe_link") => {
-                assert_eq!(
-                    is_safe_link_url(fixture.value.as_deref().unwrap_or("")),
-                    fixture.expected.expect("safe_link fixture expected value"),
-                    "fixture: {}",
-                    fixture.id
-                );
-                return;
-            }
-            Some("safe_color") => {
-                assert_eq!(
-                    is_safe_color_value(fixture.value.as_deref().unwrap_or("")),
-                    fixture.expected.expect("safe_color fixture expected value"),
-                    "fixture: {}",
-                    fixture.id
-                );
-                return;
-            }
-            Some("construct") => {
-                assert!(
-                    MarkdownParser::try_new(options).is_err(),
-                    "fixture: {}",
-                    fixture.id
-                );
-                assert_eq!(
-                    fixture.expected_error.as_deref(),
-                    Some("invalid_nesting_depth"),
-                    "fixture: {}",
-                    fixture.id
-                );
-                return;
-            }
-            Some("parse") | None => {}
-            Some(operation) => panic!("unknown Markdown fixture operation: {operation}"),
+    // Execute one standard or FFM Markdown case against the Rust parser.
+    fn execute_markdown_case(case: &MarkdownCase, ffm: bool) {
+        let options = parser_options(case);
+        if case.error.as_deref() == Some("invalid_nesting_depth") {
+            assert!(MarkdownParser::try_new(options).is_err());
+            return;
         }
-
-        let parser = if fixture.parser == "ffm" {
+        let parser = if ffm {
             create_fuyeor_markdown_parser(options)
         } else {
             create_markdown_parser(options)
         };
-        let ast = parser.parse(fixture.source.as_deref().unwrap_or(""));
-        if let Some(expected_html) = &fixture.expected_html {
-            let actual_html = render(&ast);
-            let actual_html = if fixture.output_normalization.as_deref() == Some("trim") {
-                actual_html.trim().to_owned()
-            } else {
-                actual_html
-            };
-            assert_eq!(actual_html, *expected_html, "fixture: {}", fixture.id);
+        let ast = parser.parse(case.input.as_deref().unwrap_or(""));
+        if let Some(expected_html) = &case.html {
+            assert_eq!(render(&ast).trim(), expected_html, "Markdown fixture");
         }
         let normalized = Value::Array(ast.iter().map(normalize_node).collect());
-        for assertion in &fixture.assertions {
-            let actual = read_json_pointer(&normalized, &assertion.path).unwrap_or_else(|| {
-                panic!(
-                    "missing AST path {} in fixture {}",
-                    assertion.path, fixture.id
-                )
-            });
+        for assertion in &case.assert {
+            let actual = read_json_pointer(&normalized, &assertion.path)
+                .unwrap_or_else(|| panic!("missing AST path {}", assertion.path));
             if let Some(length) = assertion.length {
-                assert_eq!(
-                    actual.as_array().map(Vec::len),
-                    Some(length),
-                    "fixture: {}",
-                    fixture.id
-                );
+                assert_eq!(actual.as_array().map(Vec::len), Some(length));
             } else {
-                assert_eq!(
-                    Some(actual),
-                    assertion.equals.as_ref(),
-                    "fixture: {}",
-                    fixture.id
-                );
+                assert_eq!(Some(actual), assertion.value.as_ref());
             }
         }
-        if fixture.expect_no_throw == Some(true) {
-            assert!(normalized.is_array(), "fixture: {}", fixture.id);
+        if case.no_throw == Some(true) {
+            assert!(normalized.is_array());
         }
     }
 
     #[test]
-    fn executes_all_shared_markdown_fixtures() {
-        let fixtures = markdown_fixtures();
-        assert_eq!(fixtures.schema_version, 1);
-        for fixture in &fixtures.cases {
-            execute_markdown_fixture(fixture);
+    fn executes_shared_markdown_fixtures() {
+        let standard = read_fixture::<MarkdownFixtureFile>("markdown.json");
+        assert_eq!(standard.schema_version, 2);
+        for case in &standard.cases {
+            execute_markdown_case(case, false);
+        }
+        let ffm = read_fixture::<MarkdownFixtureFile>("ffm.json");
+        assert_eq!(ffm.schema_version, 2);
+        for case in &ffm.cases {
+            execute_markdown_case(case, true);
         }
     }
 
     #[test]
-    fn executes_all_shared_linkify_fixtures() {
-        let fixtures = linkify_fixtures();
-        assert_eq!(fixtures.schema_version, 1);
-        for fixture in fixtures.cases {
-            let actual = linkify(&fixture.source)
-                .into_iter()
-                .map(|matched| ExpectedLink {
-                    text: matched.text,
-                    url: matched.url,
-                })
-                .collect::<Vec<_>>();
+    fn executes_shared_safety_and_linkify_fixtures() {
+        let safety = read_fixture::<SafetyFixtureFile>("safety.json");
+        assert_eq!(safety.schema_version, 1);
+        for case in safety.links {
+            assert_eq!(is_safe_link_url(&case.input), case.valid);
+        }
+        for case in safety.colors {
+            assert_eq!(is_safe_color_value(&case.input), case.valid);
+        }
+
+        let linkify_cases = read_fixture::<LinkifyFixtureFile>("linkify.json");
+        assert_eq!(linkify_cases.schema_version, 1);
+        for case in linkify_cases.cases {
+            let actual = linkify(&case.input);
             assert_eq!(
                 actual.len(),
-                fixture.expected.len(),
-                "fixture: {}",
-                fixture.id
+                case.links.len(),
+                "linkify input: {}",
+                case.input
             );
-            for (actual, expected) in actual.iter().zip(fixture.expected.iter()) {
-                assert_eq!(actual.text, expected.text, "fixture: {}", fixture.id);
-                assert_eq!(actual.url, expected.url, "fixture: {}", fixture.id);
+            for (actual, expected) in actual.iter().zip(case.links.iter()) {
+                assert_eq!(actual.text, expected.text);
+                assert_eq!(actual.url, expected.url);
             }
         }
     }

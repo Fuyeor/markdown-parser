@@ -1,0 +1,192 @@
+{
+  "schema_version": 2,
+  "description": "Language-neutral FFM parser fixtures.",
+  "cases": [
+    {
+      "input": "| 属性 | 类型 | 说明 |\n| :--- | :---: | ---: |\n| name | string | 用户名 |",
+      "html": "<table>\n<thead>\n<tr>\n<th align=\"left\">属性</th>\n<th align=\"center\">类型</th>\n<th align=\"right\">说明</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"left\">name</td>\n<td align=\"center\">string</td>\n<td align=\"right\">用户名</td>\n</tr>\n</tbody>\n</table>"
+    },
+    {
+      "input": "| :--- | ---: |\n| Ray ID | a2c5ac427b7aa727 |\n| IP 地址 | 172.214.47.18 |",
+      "html": "<table>\n<tbody>\n<tr>\n<td align=\"left\">Ray ID</td>\n<td align=\"right\">a2c5ac427b7aa727</td>\n</tr>\n<tr>\n<td align=\"left\">IP 地址</td>\n<td align=\"right\">172.214.47.18</td>\n</tr>\n</tbody>\n</table>"
+    },
+    {
+      "input": "[x](javascript:alert(1))",
+      "html": "<p>[x](javascript:alert(1))</p>"
+    },
+    {
+      "input": "--Fuyeor--",
+      "html": "<p><del>Fuyeor</del></p>"
+    },
+    {
+      "input": "__Fuyeor__",
+      "html": "<p><u>Fuyeor</u></p>"
+    },
+    {
+      "input": "`#ff0000`",
+      "html": "<p><code class=\"ffm-color-code\"><span class=\"ffm-color-swatch\" style=\"display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:#ff0000;vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;\"></span>#ff0000</code></p>"
+    },
+    {
+      "input": "```quote\n## Title\n```",
+      "html": "<blockquote>\n<h2>Title</h2>\n</blockquote>"
+    },
+    {
+      "input": "```accordion\n**One**\nContent\n```",
+      "html": "<div class=\"ffm-accordion\"><details name=\"acc-0\"><summary>One</summary><div class=\"accordion-content\"><p>Content</p>\n</div></details></div>"
+    },
+    {
+      "input": "```chain\n**[x] Done**\nBody\n```",
+      "html": "<div class=\"chain-container\"><div class=\"chain-item is-completed\"><div class=\"chain-marker\"></div><div class=\"chain-content-wrapper\"><div class=\"chain-title\">Done</div><div class=\"chain-body\"><p>Body</p>\n</div></div></div></div>"
+    },
+    {
+      "input": "```slide\nFirst\n\n---\n\nSecond\n```",
+      "html": "<div class=\"slide-container-wrapper\"><div class=\"slide-container\"><div class=\"slide-item\"><p>First</p>\n</div><div class=\"slide-item\"><p>Second</p>\n</div></div></div>"
+    },
+    {
+      "input": "[x](data:text/html,<script>alert(1)</script>)",
+      "html": "<p>[x](data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;)</p>"
+    },
+    {
+      "input": "[x](file:///etc/passwd)",
+      "html": "<p>[x](file:///etc/passwd)</p>"
+    },
+    {
+      "input": "Visit fuyeor.xn--p1ai",
+      "html": "<p>Visit <a href=\"https://fuyeor.рф\">fuyeor.рф</a></p>",
+      "assert": [
+        {
+          "path": "/0/children/1/type",
+          "value": "link"
+        },
+        {
+          "path": "/0/children/1/url",
+          "value": "https://fuyeor.рф"
+        },
+        {
+          "path": "/0/children/1/children/0/content",
+          "value": "fuyeor.рф"
+        }
+      ]
+    },
+    {
+      "input": "1. example\n  - example",
+      "assert": [
+        {
+          "path": "/0/type",
+          "value": "list"
+        },
+        {
+          "path": "/0/children/0/children/1/type",
+          "value": "list"
+        }
+      ]
+    },
+    {
+      "input": "1. example\n   - example",
+      "assert": [
+        {
+          "path": "/0/type",
+          "value": "list"
+        },
+        {
+          "path": "/0/children/0/children/1/type",
+          "value": "list"
+        }
+      ]
+    },
+    {
+      "input": "1. root\n   - level 1\n    - level 2",
+      "assert": [
+        {
+          "path": "/0/type",
+          "value": "list"
+        },
+        {
+          "path": "/0/children/0/children/1/children/0/children/1/type",
+          "value": "list"
+        }
+      ]
+    },
+    {
+      "input": ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> value",
+      "options": {
+        "max_nesting_depth": 8
+      },
+      "no_throw": true
+    },
+    {
+      "options": {
+        "max_nesting_depth": 0
+      },
+      "error": "invalid_nesting_depth"
+    },
+    {
+      "input": "__under__ and --strike--\n\n```quote\n## nested\n```",
+      "assert": [
+        {
+          "path": "/0/children/0/type",
+          "value": "underline"
+        },
+        {
+          "path": "/0/children/2/type",
+          "value": "strike"
+        },
+        {
+          "path": "/1/type",
+          "value": "blockquote"
+        },
+        {
+          "path": "/1/children/0/type",
+          "value": "heading"
+        }
+      ]
+    },
+    {
+      "input": "```slide\nFirst\n\n  ---  \n\nSecond\n```",
+      "assert": [
+        {
+          "path": "/0/type",
+          "value": "slide"
+        },
+        {
+          "path": "/0/children",
+          "length": 2
+        }
+      ]
+    },
+    {
+      "input": "```accordion\n**First**\nBody\n\n**Second**\nMore\n```",
+      "assert": [
+        {
+          "path": "/0/type",
+          "value": "accordion"
+        },
+        {
+          "path": "/0/children",
+          "length": 2
+        },
+        {
+          "path": "/0/children/0/name",
+          "value": "acc-0"
+        }
+      ]
+    },
+    {
+      "input": "```chain\n**[x] Done**\nBody\n```",
+      "assert": [
+        {
+          "path": "/0/type",
+          "value": "chain"
+        },
+        {
+          "path": "/0/children/0/isCompleted",
+          "value": true
+        },
+        {
+          "path": "/0/children/0/hasCheckbox",
+          "value": true
+        }
+      ]
+    }
+  ]
+}
