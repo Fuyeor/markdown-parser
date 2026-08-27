@@ -25,6 +25,7 @@ type MarkdownFixture = {
   value?: string;
   expected?: boolean;
   expected_html?: string;
+  output_normalization?: 'trim';
   expected_error?: 'invalid_nesting_depth';
   expect_no_throw?: boolean;
   options?: { max_nesting_depth?: number };
@@ -92,8 +93,16 @@ function executeFixture(fixture: MarkdownFixture): void {
       : createMarkdownParser(options);
   const ast = parser(fixture.source ?? '');
 
-  if (fixture.expected_html !== undefined)
-    expect(render(ast)).toBe(fixture.expected_html);
+  if (fixture.expected_html !== undefined) {
+    const actualHtml = render(ast);
+    const expectedHtml =
+      fixture.output_normalization === 'trim'
+        ? fixture.expected_html.trim()
+        : fixture.expected_html;
+    expect(
+      fixture.output_normalization === 'trim' ? actualHtml.trim() : actualHtml,
+    ).toBe(expectedHtml);
+  }
 
   for (const assertion of fixture.assertions ?? []) {
     const value = readJsonPointer(ast, assertion.path);

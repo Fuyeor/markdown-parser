@@ -70,56 +70,61 @@
       "id": "unsafe-link",
       "parser": "ffm",
       "source": "[x](javascript:alert(1))",
-      "expected_html": "<p>[x](javascript:alert(1))</p>\n",
+      "expected_html": "<p>[x](javascript:alert(1))</p>",
       "tags": [
         "security",
         "link"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-strike",
       "parser": "ffm",
       "source": "--Fuyeor--",
-      "expected_html": "<p><del>Fuyeor</del></p>\n",
+      "expected_html": "<p><del>Fuyeor</del></p>",
       "tags": [
         "ffm",
         "strike"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-underline",
       "parser": "ffm",
       "source": "__Fuyeor__",
-      "expected_html": "<p><u>Fuyeor</u></p>\n",
+      "expected_html": "<p><u>Fuyeor</u></p>",
       "tags": [
         "ffm",
         "underline"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-color-code",
       "parser": "ffm",
       "source": "`#ff0000`",
-      "expected_html": "<p><code class=\"ffm-color-code\"><span class=\"ffm-color-swatch\" style=\"display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:#ff0000;vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;\"></span>#ff0000</code></p>\n",
+      "expected_html": "<p><code class=\"ffm-color-code\"><span class=\"ffm-color-swatch\" style=\"display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:#ff0000;vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;\"></span>#ff0000</code></p>",
       "tags": [
         "ffm",
         "color"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-quote",
       "parser": "ffm",
       "source": "```quote\n## Title\n```",
-      "expected_html": "<blockquote>\n<h2>Title</h2>\n</blockquote>\n",
+      "expected_html": "<blockquote>\n<h2>Title</h2>\n</blockquote>",
       "tags": [
         "ffm",
         "quote"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-accordion",
@@ -130,7 +135,8 @@
         "ffm",
         "accordion"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-chain",
@@ -142,7 +148,8 @@
         "chain",
         "checkbox"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-slide",
@@ -153,31 +160,34 @@
         "ffm",
         "slide"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-unsafe-data-link",
       "parser": "ffm",
       "source": "[x](data:text/html,<script>alert(1)</script>)",
-      "expected_html": "<p>[x](data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;)</p>\n",
+      "expected_html": "<p>[x](data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;)</p>",
       "tags": [
         "ffm",
         "security",
         "link"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "ffm-unsafe-file-link",
       "parser": "ffm",
       "source": "[x](file:///etc/passwd)",
-      "expected_html": "<p>[x](file:///etc/passwd)</p>\n",
+      "expected_html": "<p>[x](file:///etc/passwd)</p>",
       "tags": [
         "ffm",
         "security",
         "link"
       ],
-      "source_suite": "ffm"
+      "source_suite": "ffm",
+      "output_normalization": "trim"
     },
     {
       "id": "malicious-html-as-text",

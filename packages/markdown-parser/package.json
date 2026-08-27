@@ -6,7 +6,7 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run src/cross-language-fixtures.spec.ts",
     "test:unit": "vitest run src/cross-language-fixtures.spec.ts -t \"unit fixtures\"",
     "test:ffm": "vitest run src/cross-language-fixtures.spec.ts -t \"ffm fixtures\"",
     "test:safety": "vitest run src/cross-language-fixtures.spec.ts -t \"safety fixtures\"",

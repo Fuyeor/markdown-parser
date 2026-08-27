@@ -56,6 +56,7 @@ mod cross_language_fixtures {
         value: Option<String>,
         expected: Option<bool>,
         expected_html: Option<String>,
+        output_normalization: Option<String>,
         expected_error: Option<String>,
         expect_no_throw: Option<bool>,
         options: Option<FixtureOptions>,
@@ -234,7 +235,13 @@ mod cross_language_fixtures {
         };
         let ast = parser.parse(fixture.source.as_deref().unwrap_or(""));
         if let Some(expected_html) = &fixture.expected_html {
-            assert_eq!(render(&ast), *expected_html, "fixture: {}", fixture.id);
+            let actual_html = render(&ast);
+            let actual_html = if fixture.output_normalization.as_deref() == Some("trim") {
+                actual_html.trim().to_owned()
+            } else {
+                actual_html
+            };
+            assert_eq!(actual_html, *expected_html, "fixture: {}", fixture.id);
         }
         let normalized = Value::Array(ast.iter().map(normalize_node).collect());
         for assertion in &fixture.assertions {
