@@ -4,51 +4,63 @@
   "cases": [
     {
       "input": "| 属性 | 类型 | 说明 |\n| :--- | :---: | ---: |\n| name | string | 用户名 |",
-      "html": "<table>\n<thead>\n<tr>\n<th align=\"left\">属性</th>\n<th align=\"center\">类型</th>\n<th align=\"right\">说明</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"left\">name</td>\n<td align=\"center\">string</td>\n<td align=\"right\">用户名</td>\n</tr>\n</tbody>\n</table>"
+      "html": "<table>\n<thead>\n<tr>\n<th align=\"left\">属性</th>\n<th align=\"center\">类型</th>\n<th align=\"right\">说明</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"left\">name</td>\n<td align=\"center\">string</td>\n<td align=\"right\">用户名</td>\n</tr>\n</tbody>\n</table>",
+      "plain_text": "属性\n类型\n说明\nname\nstring\n用户名"
     },
     {
       "input": "| :--- | ---: |\n| Ray ID | a2c5ac427b7aa727 |\n| IP 地址 | 172.214.47.18 |",
-      "html": "<table>\n<tbody>\n<tr>\n<td align=\"left\">Ray ID</td>\n<td align=\"right\">a2c5ac427b7aa727</td>\n</tr>\n<tr>\n<td align=\"left\">IP 地址</td>\n<td align=\"right\">172.214.47.18</td>\n</tr>\n</tbody>\n</table>"
+      "html": "<table>\n<tbody>\n<tr>\n<td align=\"left\">Ray ID</td>\n<td align=\"right\">a2c5ac427b7aa727</td>\n</tr>\n<tr>\n<td align=\"left\">IP 地址</td>\n<td align=\"right\">172.214.47.18</td>\n</tr>\n</tbody>\n</table>",
+      "plain_text": "Ray ID\na2c5ac427b7aa727\nIP 地址\n172.214.47.18"
     },
     {
       "input": "[x](javascript:alert(1))",
-      "html": "<p>[x](javascript:alert(1))</p>"
+      "html": "<p>[x](javascript:alert(1))</p>",
+      "plain_text": "[x](javascript:alert(1))"
     },
     {
       "input": "--Fuyeor--",
-      "html": "<p><del>Fuyeor</del></p>"
+      "html": "<p><del>Fuyeor</del></p>",
+      "plain_text": "Fuyeor"
     },
     {
       "input": "__Fuyeor__",
-      "html": "<p><u>Fuyeor</u></p>"
+      "html": "<p><u>Fuyeor</u></p>",
+      "plain_text": "Fuyeor"
     },
     {
       "input": "`#ff0000`",
-      "html": "<p><code class=\"ffm-color-code\"><span class=\"ffm-color-swatch\" style=\"display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:#ff0000;vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;\"></span>#ff0000</code></p>"
+      "html": "<p><code class=\"ffm-color-code\"><span class=\"ffm-color-swatch\" style=\"display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:#ff0000;vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;\"></span>#ff0000</code></p>",
+      "plain_text": "#ff0000"
     },
     {
       "input": "```quote\n## Title\n```",
-      "html": "<blockquote>\n<h2>Title</h2>\n</blockquote>"
+      "html": "<blockquote>\n<h2>Title</h2>\n</blockquote>",
+      "plain_text": "Title"
     },
     {
       "input": "```accordion\n**One**\nContent\n```",
-      "html": "<div class=\"ffm-accordion\"><details name=\"acc-0\"><summary>One</summary><div class=\"accordion-content\"><p>Content</p>\n</div></details></div>"
+      "html": "<div class=\"ffm-accordion\"><details name=\"acc-0\"><summary>One</summary><div class=\"accordion-content\"><p>Content</p>\n</div></details></div>",
+      "plain_text": "One\nContent"
     },
     {
       "input": "```chain\n**[x] Done**\nBody\n```",
-      "html": "<div class=\"chain-container\"><div class=\"chain-item is-completed\"><div class=\"chain-marker\"></div><div class=\"chain-content-wrapper\"><div class=\"chain-title\">Done</div><div class=\"chain-body\"><p>Body</p>\n</div></div></div></div>"
+      "html": "<div class=\"chain-container\"><div class=\"chain-item is-completed\"><div class=\"chain-marker\"></div><div class=\"chain-content-wrapper\"><div class=\"chain-title\">Done</div><div class=\"chain-body\"><p>Body</p>\n</div></div></div></div>",
+      "plain_text": "Done\nBody"
     },
     {
       "input": "```slide\nFirst\n\n---\n\nSecond\n```",
-      "html": "<div class=\"slide-container-wrapper\"><div class=\"slide-container\"><div class=\"slide-item\"><p>First</p>\n</div><div class=\"slide-item\"><p>Second</p>\n</div></div></div>"
+      "html": "<div class=\"slide-container-wrapper\"><div class=\"slide-container\"><div class=\"slide-item\"><p>First</p>\n</div><div class=\"slide-item\"><p>Second</p>\n</div></div></div>",
+      "plain_text": "First\nSecond"
     },
     {
       "input": "[x](data:text/html,<script>alert(1)</script>)",
-      "html": "<p>[x](data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;)</p>"
+      "html": "<p>[x](data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;)</p>",
+      "plain_text": "[x](data:text/html,<script>alert(1)</script>)"
     },
     {
       "input": "[x](file:///etc/passwd)",
-      "html": "<p>[x](file:///etc/passwd)</p>"
+      "html": "<p>[x](file:///etc/passwd)</p>",
+      "plain_text": "[x](file:///etc/passwd)"
     },
     {
       "input": "Visit fuyeor.xn--p1ai",
@@ -66,7 +78,8 @@
           "path": "/0/children/1/children/0/content",
           "value": "fuyeor.рф"
         }
-      ]
+      ],
+      "plain_text": "Visit fuyeor.рф"
     },
     {
       "input": "1. example\n  - example",
@@ -79,7 +92,8 @@
           "path": "/0/children/0/children/1/type",
           "value": "list"
         }
-      ]
+      ],
+      "plain_text": "example\nexample"
     },
     {
       "input": "1. example\n   - example",
@@ -92,7 +106,8 @@
           "path": "/0/children/0/children/1/type",
           "value": "list"
         }
-      ]
+      ],
+      "plain_text": "example\nexample"
     },
     {
       "input": "1. root\n   - level 1\n    - level 2",
@@ -105,14 +120,16 @@
           "path": "/0/children/0/children/1/children/0/children/1/type",
           "value": "list"
         }
-      ]
+      ],
+      "plain_text": "root\nlevel 1\nlevel 2"
     },
     {
       "input": ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> value",
       "options": {
         "max_nesting_depth": 8
       },
-      "no_throw": true
+      "no_throw": true,
+      "plain_text": ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> value"
     },
     {
       "options": {
@@ -139,7 +156,8 @@
           "path": "/1/children/0/type",
           "value": "heading"
         }
-      ]
+      ],
+      "plain_text": "under and strike\nnested"
     },
     {
       "input": "```slide\nFirst\n\n  ---  \n\nSecond\n```",
@@ -152,7 +170,8 @@
           "path": "/0/children",
           "length": 2
         }
-      ]
+      ],
+      "plain_text": "First\nSecond"
     },
     {
       "input": "```accordion\n**First**\nBody\n\n**Second**\nMore\n```",
@@ -169,7 +188,8 @@
           "path": "/0/children/0/name",
           "value": "acc-0"
         }
-      ]
+      ],
+      "plain_text": "First\nBody\nSecond\nMore"
     },
     {
       "input": "```chain\n**[x] Done**\nBody\n```",
@@ -186,7 +206,8 @@
           "path": "/0/children/0/hasCheckbox",
           "value": true
         }
-      ]
+      ],
+      "plain_text": "Done\nBody"
     }
   ]
 }

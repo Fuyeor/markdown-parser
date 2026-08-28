@@ -6,6 +6,7 @@ import { isSafeColorValue } from './core/color';
 import { MarkdownParser } from './core/parser';
 import { isSafeLinkUrl } from './core/url';
 import { render } from './core/render';
+import { toPlainText } from './core/plain-text';
 import { createFuyeorMarkdownParser, createMarkdownParser } from './default';
 
 type MarkdownAssertion = {
@@ -17,6 +18,7 @@ type MarkdownAssertion = {
 type MarkdownCase = {
   input?: string;
   html?: string;
+  plain_text?: string;
   assert?: MarkdownAssertion[];
   error?: 'invalid_nesting_depth';
   no_throw?: boolean;
@@ -84,6 +86,8 @@ function executeMarkdownCase(fixture: MarkdownCase, ffm: boolean): void {
     : createMarkdownParser(options);
   const ast = parser(fixture.input ?? '');
   if (fixture.html !== undefined) expect(render(ast).trim()).toBe(fixture.html);
+  if (fixture.plain_text !== undefined)
+    expect(toPlainText(ast)).toBe(fixture.plain_text);
 
   for (const assertion of fixture.assert ?? []) {
     const value = readJsonPointer(ast, assertion.path);
