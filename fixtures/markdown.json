@@ -4,19 +4,23 @@
   "cases": [
     {
       "input": "## Hello **World**",
-      "html": "<h2>Hello <strong>World</strong></h2>"
+      "html": "<h2>Hello <strong>World</strong></h2>",
+      "plain_text": "Hello World"
     },
     {
       "input": "```ts\nconst a = 1;\n```",
-      "html": "<div class=\"code-block-wrapper\"><div class=\"code-lang\">ts</div><pre><code class=\"language-ts\">const a = 1;\n</code></pre></div>"
+      "html": "<div class=\"code-block-wrapper\"><div class=\"code-lang\">ts</div><pre><code class=\"language-ts\">const a = 1;\n</code></pre></div>",
+      "plain_text": "const a = 1;"
     },
     {
       "input": "visit www.fuyeor.com or [click here](https://fuyeor.com)",
-      "html": "<p>visit <a href=\"https://www.fuyeor.com\">www.fuyeor.com</a> or <a href=\"https://fuyeor.com\">click here</a></p>"
+      "html": "<p>visit <a href=\"https://www.fuyeor.com\">www.fuyeor.com</a> or <a href=\"https://fuyeor.com\">click here</a></p>",
+      "plain_text": "visit www.fuyeor.com or click here"
     },
     {
       "input": "line\\\nbreak",
-      "html": "<p>line<br />\nbreak</p>"
+      "html": "<p>line<br />\nbreak</p>",
+      "plain_text": "line\nbreak"
     },
     {
       "input": "text <script>alert(1)</script>",
@@ -30,7 +34,8 @@
           "path": "/0/children/0/content",
           "value": "text <script>alert(1)</script>"
         }
-      ]
+      ],
+      "plain_text": "text <script>alert(1)</script>"
     },
     {
       "input": "\n| title 1 | title 2 |\n|---|---|\n| content 1 | content 2 |\n",
@@ -51,7 +56,13 @@
           "path": "/0/children/0/type",
           "value": "table_row"
         }
-      ]
+      ],
+      "plain_text": "title 1\ntitle 2\ncontent 1\ncontent 2"
+    },
+    {
+      "input": "<style>.x { color: red; }</style>",
+      "html": "<p>&lt;style&gt;.x { color: red; }&lt;/style&gt;</p>",
+      "plain_text": "<style>.x { color: red; }</style>"
     }
   ]
 }

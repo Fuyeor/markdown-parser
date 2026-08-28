@@ -1,6 +1,7 @@
 // @fuyeor/markdown-parser/src/index.ts
 export { MarkdownParser } from './core/parser';
 export { render } from './core/render';
+export { toPlainText } from './core/plain-text';
 export { isSafeColorValue } from './core/color';
 export { isSafeLinkUrl } from './core/url';
 export {

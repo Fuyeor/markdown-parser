@@ -9,6 +9,7 @@
 mod ast;
 mod linkify;
 mod parser;
+mod plain_text;
 mod render;
 mod rules;
 mod safety;
@@ -17,6 +18,7 @@ mod state;
 pub use ast::{Alignment, AstNode, NodeType};
 pub use linkify::{LinkMatch, linkify};
 pub use parser::{Linkifier, MarkdownParser, ParserContext, ParserError, ParserOptions};
+pub use plain_text::to_plain_text;
 pub use render::{render, render_optional};
 pub use safety::{is_safe_color_value, is_safe_link_url};
 pub use state::{BlockState, InlineState};
@@ -39,6 +41,7 @@ mod cross_language_fixtures {
     use super::{
         AstNode, MarkdownParser, ParserOptions, create_fuyeor_markdown_parser,
         create_markdown_parser, is_safe_color_value, is_safe_link_url, linkify, render,
+        to_plain_text,
     };
 
     #[derive(Deserialize)]
@@ -51,6 +54,7 @@ mod cross_language_fixtures {
     struct MarkdownCase {
         input: Option<String>,
         html: Option<String>,
+        plain_text: Option<String>,
         #[serde(default)]
         assert: Vec<MarkdownAssertion>,
         error: Option<String>,
@@ -202,6 +206,13 @@ mod cross_language_fixtures {
         let ast = parser.parse(case.input.as_deref().unwrap_or(""));
         if let Some(expected_html) = &case.html {
             assert_eq!(render(&ast).trim(), expected_html, "Markdown fixture");
+        }
+        if let Some(expected_plain_text) = &case.plain_text {
+            assert_eq!(
+                to_plain_text(&ast),
+                *expected_plain_text,
+                "Markdown fixture"
+            );
         }
         let normalized = Value::Array(ast.iter().map(normalize_node).collect());
         for assertion in &case.assert {
