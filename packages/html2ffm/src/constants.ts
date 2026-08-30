@@ -1,7 +1,7 @@
 // @fuyeor/html2ffm/src/constants.ts
 import type { Marks } from './types';
 
-export const BLOCK_TAGS = new Set([
+export const blockElements = new Set([
   'article',
   'aside',
   'blockquote',
@@ -24,27 +24,27 @@ export const BLOCK_TAGS = new Set([
   'ul',
 ]);
 
-export const DROPPED_TAGS = new Set([
+export const droppedElements = new Set([
   'math',
   'script',
   'style',
   'svg',
   'template',
 ]);
-export const HEADING_PATTERN = /^h([1-6])$/u;
-export const CSS_LENGTH_PATTERN =
+export const headingPattern = /^h([1-6])$/u;
+export const cssLengthPattern =
   /^[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:px|rem|em|%|pt|pc|in|cm|mm|q|ch|ex|cap|ic|lh|rlh|vw|vh|vmin|vmax|svw|svh|lvw|lvh|dvw|dvh|vi|vb)$/iu;
-export const SAFE_SCHEME_PATTERN = /^(?:https?:|mailto:|tel:|ftp:)/iu;
-export const DANGEROUS_URL_PATTERN = /^(?:javascript:|data:|vbscript:|file:)/iu;
+export const safeSchemePattern = /^(?:https?:|mailto:|tel:|ftp:)/iu;
+export const unsafeSchemePattern = /^(?:javascript:|data:|vbscript:|file:)/iu;
 
-export const EMPTY_MARKS: Marks = {
+export const emptyMarks: Marks = {
   bold: false,
   italic: false,
   underline: false,
   strike: false,
 };
 
-export const CSS_NAMED_COLORS: Readonly<Record<string, string>> = {
+export const cssNamedColors: Readonly<Record<string, string>> = {
   aliceblue: '#f0f8ff',
   antiquewhite: '#faebd7',
   aqua: '#00ffff',

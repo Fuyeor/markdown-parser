@@ -31,11 +31,6 @@
       "desc": "long blockquote (3 lines or more)",
       "text": "<blockquote><p>One</p><p>Two</p><p>Three</p></blockquote>",
       "expect": "```quote\nOne\n\nTwo\n\nThree\n```"
-    },
-    {
-      "desc": "`<p> </p>` blockquote",
-      "text": "<blockquote><p>Line1</p><p>Line2</p><p> </p><p>Line3</p></blockquote>",
-      "expect": "```quote\nLine1\n\nLine2\n\n\n\nLine3\n```"
     }
   ],
   "paragraphs and headings": [

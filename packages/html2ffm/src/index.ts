@@ -2,7 +2,7 @@
 import { format } from '@fuyeor/markdown-formatter';
 import { parseDocument } from 'htmlparser2';
 import { renderFlow } from './render';
-import type { ParsedDocument } from './types';
+import type { ParsedDocument, ToFFMOptions } from './types';
 
 export * from './color';
 export * from './constants';
@@ -11,7 +11,7 @@ export * from './style';
 export * from './types';
 
 /** Convert an HTML fragment into formatted Fuyeor Flavored Markdown. */
-export function toFFM(input: string): string {
+export function toFFM(input: string, options?: ToFFMOptions): string {
   if (typeof input !== 'string') throw new TypeError('Input must be a string');
 
   let document: ParsedDocument;
@@ -26,6 +26,6 @@ export function toFFM(input: string): string {
   }
 
   const rendered = renderFlow(document.children, {});
-  const formatted = format(rendered);
+  const formatted = format(rendered, options);
   return formatted.replace(/^\n+|\n+$/gu, '');
 }

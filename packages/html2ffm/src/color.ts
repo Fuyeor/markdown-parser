@@ -1,5 +1,5 @@
 // @fuyeor/html2ffm/src/color.ts
-import { CSS_NAMED_COLORS } from './constants';
+import { cssNamedColors } from './constants';
 import type { Rgba } from './types';
 
 // Convert one clamped color channel to a two-digit lowercase hexadecimal value.
@@ -143,7 +143,7 @@ export function parseColor(value: string): string | null {
   const normalized = value.trim().toLowerCase();
   if (!normalized || normalized.includes('var(')) return null;
 
-  const named = CSS_NAMED_COLORS[normalized];
+  const named = cssNamedColors[normalized];
   if (named) return named;
   if (normalized === 'transparent') return null;
 

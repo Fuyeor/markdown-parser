@@ -1,11 +1,11 @@
 // @fuyeor/html2ffm/src/render.ts
 import {
-  BLOCK_TAGS,
-  DANGEROUS_URL_PATTERN,
-  DROPPED_TAGS,
-  EMPTY_MARKS,
-  HEADING_PATTERN,
-  SAFE_SCHEME_PATTERN,
+  blockElements,
+  unsafeSchemePattern,
+  droppedElements,
+  emptyMarks,
+  headingPattern,
+  safeSchemePattern,
 } from './constants';
 import {
   cloneMarks,
@@ -35,11 +35,11 @@ export function isTextNode(node: ChildNode): node is TextNode {
 }
 
 export function isDroppedElement(element: ElementNode): boolean {
-  return DROPPED_TAGS.has(element.name);
+  return droppedElements.has(element.name);
 }
 
 export function isBlockElement(element: ElementNode): boolean {
-  if (BLOCK_TAGS.has(element.name)) return true;
+  if (blockElements.has(element.name)) return true;
   return element.children.some(
     (child) => isElement(child) && isBlockElement(child),
   );
@@ -195,13 +195,7 @@ export function renderInlineNode(
       {
         content: `${fence}${code}${fence}`,
         style: cloneStyle(nextStyle),
-        marks: {
-          ...nextMarks,
-          bold: false,
-          italic: false,
-          underline: false,
-          strike: false,
-        },
+        marks: { ...nextMarks },
       },
     ];
   }
@@ -224,8 +218,8 @@ export function renderInlineNode(
     const isSafeUrl =
       normalizedHref !== undefined &&
       normalizedHref !== '' &&
-      !DANGEROUS_URL_PATTERN.test(normalizedHref) &&
-      (!hasScheme || SAFE_SCHEME_PATTERN.test(normalizedHref));
+      !unsafeSchemePattern.test(normalizedHref) &&
+      (!hasScheme || safeSchemePattern.test(normalizedHref));
     if (isSafeUrl) nextMarks = cloneMarks(nextMarks, { link: href });
   }
 
@@ -365,16 +359,13 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
     return renderList(element, nextStyle, 0);
   if (element.name === 'table') return renderTable(element, nextStyle);
   if (element.name === 'blockquote') {
-    // ✨ 规范化空行（保留最多双换行段落结构）
     const rawContent = stripBoundaryNewlines(
       renderFlow(element.children, nextStyle),
-    )
-      .replace(/\n{3,}/gu, '\n\n')
-      .trim();
+    ).trim();
     if (!rawContent) return '';
     const textLines = rawContent.split(/\n+/u);
     if (textLines.length >= 3) {
-      return `\`\`\`quote\n${rawContent}\n\`\`\`\n\n`; // ✨ 完整保留段落原本的换行结构
+      return `\`\`\`quote\n${rawContent}\n\`\`\`\n\n`;
     }
     const quoted = rawContent
       .split('\n')
@@ -383,12 +374,12 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
     return `${quoted}\n\n`;
   }
 
-  const headingMatch = element.name.match(HEADING_PATTERN);
+  const headingMatch = element.name.match(headingPattern);
   if (headingMatch) {
     const content = renderInlineContent(
       element.children,
       nextStyle,
-      EMPTY_MARKS,
+      emptyMarks,
     ).trim();
     return content
       ? `${'#'.repeat(Number(headingMatch[1]))} ${content}\n\n`
@@ -398,6 +389,11 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
   const content = stripBoundaryNewlines(
     renderFlow(element.children, nextStyle),
   ).trim();
+
+  // When encountering empty paragraphs (such as <p></p> or only newline spaces)
+  // preserve the blank lines and hand them over to the downstream formatter for scheduling
+  if (element.name === 'p' && !content) return '\n\n';
+
   return content ? `${content}\n\n` : '';
 }
 
@@ -413,7 +409,7 @@ export function renderFlow(nodes: readonly ChildNode[], style: Style): string {
   for (const node of nodes) {
     if (isTextNode(node)) {
       if (/^\s+$/u.test(node.data) && node.data.includes('\n')) continue;
-      inlinePieces.push(...renderInlineNode(node, style, EMPTY_MARKS));
+      inlinePieces.push(...renderInlineNode(node, style, emptyMarks));
       continue;
     }
     if (!isElement(node) || isDroppedElement(node)) continue;
@@ -421,7 +417,7 @@ export function renderFlow(nodes: readonly ChildNode[], style: Style): string {
       flushInline();
       output += renderBlockElement(node, style);
     } else {
-      inlinePieces.push(...renderInlineNode(node, style, EMPTY_MARKS));
+      inlinePieces.push(...renderInlineNode(node, style, emptyMarks));
     }
   }
   flushInline();

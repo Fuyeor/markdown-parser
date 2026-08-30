@@ -1,11 +1,11 @@
 // @fuyeor/html2ffm/src/style.ts
 import { isTransparentColor, parseColor } from './color';
-import { CSS_LENGTH_PATTERN } from './constants';
+import { cssLengthPattern } from './constants';
 import type { Marks, Style } from './types';
 
 export function parseFontSize(value: string): string | null {
   const normalized = value.trim().replace(/\s*!important\s*$/iu, '');
-  return CSS_LENGTH_PATTERN.test(normalized) ? normalized : null;
+  return cssLengthPattern.test(normalized) ? normalized : null;
 }
 
 // Parse supported inline declarations while preserving CSS last-valid semantics.

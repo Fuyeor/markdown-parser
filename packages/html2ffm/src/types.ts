@@ -1,4 +1,5 @@
 // @fuyeor/html2ffm/src/types.ts
+import type { FormatOptions } from '@fuyeor/markdown-formatter';
 import type { parseDocument } from 'htmlparser2';
 
 export type ParsedDocument = ReturnType<typeof parseDocument>;
@@ -45,3 +46,6 @@ export type TableRow = {
   cells: ElementNode[];
   isHeader: boolean;
 };
+
+/** Options for HTML to FFM conversion. */
+export type ToFFMOptions = FormatOptions;
