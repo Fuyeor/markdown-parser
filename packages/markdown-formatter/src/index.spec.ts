@@ -1,15 +1,8 @@
 // @fuyeor/markdown-formatter/src/index.spec.ts
+// pnpm --filter @fuyeor/markdown-formatter test
 import { describe, expect, it } from 'vitest';
-import fixtureData from './fixtures/format.json';
 import { format } from './index';
-
-type FormatFixture = {
-  origin: string;
-  formatted: string;
-  section: string;
-};
-
-const fixtures = fixtureData as FormatFixture[];
+import fixtures from './fixtures/format.json' with { type: 'json' };
 
 describe('format fixtures', () => {
   for (const fixture of fixtures) {
