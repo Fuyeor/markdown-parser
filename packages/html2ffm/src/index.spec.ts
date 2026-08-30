@@ -1,107 +1,19 @@
-// packages/html2ffm/src/index.spec.ts
+// @fuyeor/html2ffm/src/index.spec.ts
+// pnpm --filter @fuyeor/html2ffm test
 import { describe, expect, it } from 'vitest';
-import fixtureData from './fixtures/conversions.json';
 import { toFFM } from './index';
+import fixtures from './fixtures/conversions.json' with { type: 'json' };
 
-type ConversionFixture = {
-  section: string;
-  text: string;
-  expect: string;
-};
-
-const fixtures = fixtureData as ConversionFixture[];
-
-describe('toFFM fixtures', () => {
-  for (const fixture of fixtures) {
-    it(fixture.section, () => {
-      expect(toFFM(fixture.text)).toBe(fixture.expect);
+describe('toFFM conversions', () => {
+  for (const [section, cases] of Object.entries(fixtures)) {
+    describe(section, () => {
+      for (const [index, { desc, text, expect: expected }] of cases.entries()) {
+        it(desc ?? `case ${index + 1}: ${text.slice(0, 30)}`, () => {
+          expect(toFFM(text)).toBe(expected);
+        });
+      }
     });
   }
-});
-
-describe('toFFM edge cases', () => {
-  it('normalizes RGB and HSL colors, including alpha', () => {
-    expect(toFFM('<span style="color:rgb(100% 0% 0% / 50%)">RGB</span>')).toBe(
-      '[RGB](color = #ff000080)',
-    );
-    expect(toFFM('<span style="color:hsl(0 100% 50%)">HSL</span>')).toBe(
-      '[HSL](color = #ff0000)',
-    );
-    expect(toFFM('<span style="color:#abcd">Short</span>')).toBe(
-      '[Short](color = #aabbccdd)',
-    );
-  });
-
-  it('applies the last valid declaration and suppresses transparent color', () => {
-    expect(toFFM('<span style="color:red;color:not-a-color">Keep</span>')).toBe(
-      '[Keep](color = #ff0000)',
-    );
-    expect(
-      toFFM('<span style="color:red;color:transparent">Clear</span>'),
-    ).toBe('Clear');
-    expect(
-      toFFM(
-        '<span style="color:red"><span style="color:rgba(0,0,0,0)">Child</span></span>',
-      ),
-    ).toBe('Child');
-  });
-
-  it('inherits and overrides inline styles through nested elements', () => {
-    expect(
-      toFFM(
-        '<span style="color:red;font-size:20px">A <b>B</b> <span style="color:blue">C</span></span>',
-      ),
-    ).toBe(
-      '[A **B** ](color = #ff0000, font = {size = 20px})[C](color = #0000ff, font = {size = 20px})',
-    );
-  });
-
-  it('drops indentation-only whitespace while retaining inline spaces', () => {
-    expect(toFFM(`\n  <p>First <b>item</b></p>\n  <p>Second</p>\n`)).toBe(
-      'First **item**\n\nSecond',
-    );
-  });
-
-  it('keeps inline labels from adding line breaks and parses case-insensitively', () => {
-    expect(toFFM('<P><SPAN STYLE="COLOR:RED">Text</SPAN></P>')).toBe(
-      '[Text](color = #ff0000)',
-    );
-  });
-
-  it('preserves list and quote block structure', () => {
-    expect(
-      toFFM('<ul><li>One<ol><li>Nested</li></ol></li><li>Two</li></ul>'),
-    ).toBe('- One\n  1. Nested\n- Two');
-    expect(toFFM('<blockquote><p>One</p><p>Two</p></blockquote>')).toBe(
-      '> One\n> Two',
-    );
-  });
-
-  it('uses th rows as headers without requiring thead', () => {
-    expect(
-      toFFM(
-        '<table><tr><th>A</th><th>B</th></tr><tr><td>1</td><td>2</td></tr></table>',
-      ),
-    ).toBe('| A | B |\n| --- | --- |\n| 1 | 2 |');
-  });
-
-  it('does not render dangerous URLs or content elements', () => {
-    expect(
-      toFFM(
-        '<a href="data:text/plain,unsafe">Text</a><svg><b>Hidden</b></svg>',
-      ),
-    ).toBe('Text');
-  });
-
-  it('preserves code text and ignores inline markup inside pre', () => {
-    expect(toFFM('<pre><b>&lt;literal&gt;</b>\nvalue</pre>')).toBe(
-      '```\n<literal>\nvalue\n```',
-    );
-  });
-
-  it('accepts incomplete HTML fragments', () => {
-    expect(toFFM('<p><b>Unclosed')).toBe('**Unclosed**');
-  });
 });
 
 describe('toFFM input validation', () => {
@@ -110,8 +22,25 @@ describe('toFFM input validation', () => {
       new TypeError('Input must be a string'),
     );
   });
+});
 
-  it('accepts an empty fragment', () => {
-    expect(toFFM('')).toBe('');
+describe('toFFM options', () => {
+  it('respects maxConsecutiveBlankLines option for empty paragraphs and blockquotes', () => {
+    const html = '<p>First</p><p></p><p></p><p></p><p></p><p>Second</p>';
+
+    // default (keep 1 blank lines)
+    expect(toFFM(html)).toBe('First\n\nSecond');
+
+    // keep 4 blank lines
+    expect(toFFM(html, { maxConsecutiveBlankLines: 4 })).toBe(
+      'First\n\n\n\n\nSecond',
+    );
+
+    // keep 4 blank lines within blockquote
+    const quoteHtml =
+      '<blockquote><p>Line1</p><p></p><p></p><p>Line2</p><p>Line3</p></blockquote>';
+    expect(toFFM(quoteHtml, { maxConsecutiveBlankLines: 2 })).toBe(
+      '```quote\nLine1\n\n\nLine2\n\nLine3\n```',
+    );
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@fuyeor/html2ffm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Convert HTML fragments to Fuyeor Flavored Markdown.",
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",

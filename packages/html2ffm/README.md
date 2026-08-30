@@ -21,6 +21,11 @@ console.log(output);
 // # Hello
 //
 // **World**
+
+// keep blank lines:
+const html = '<p>First</p><p></p><p></p><p></p><p></p><p>Second</p>';
+const result = toFFM(html, { maxConsecutiveBlankLines: 4 });
+// First\n\n\n\n\nSecond
 ```
 
 `toFFM` accepts an HTML fragment and returns a formatted string. It does not fetch external resources, execute scripts, or read stylesheets.
