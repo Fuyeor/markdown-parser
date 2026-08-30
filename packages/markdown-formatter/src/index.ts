@@ -9,7 +9,8 @@ import {
   normalizeLineEndings,
   trimDocumentBoundary,
 } from './blocks';
-import type { Fence, ListIndentContext } from './types';
+import { defaultFormatOptions } from './constants';
+import type { Fence, FormatOptions, ListIndentContext } from './types';
 
 export * from './blocks';
 export * from './constants';
@@ -17,9 +18,19 @@ export * from './text';
 export * from './types';
 
 /** Format a complete FFM document according to the editor's canonical style. */
-export function format(content: string): string {
+export function format(content: string, options?: FormatOptions): string {
   if (typeof content !== 'string')
     throw new TypeError('content must be a string');
+
+  const maxBlank =
+    options?.maxConsecutiveBlankLines ??
+    defaultFormatOptions.maxConsecutiveBlankLines;
+
+  if (!Number.isInteger(maxBlank) || maxBlank < 0)
+    throw new TypeError(
+      'maxConsecutiveBlankLines must be a non-negative integer',
+    );
+
   const lines = normalizeLineEndings(content).split('\n');
   const formatted: string[] = [];
   const listContext: ListIndentContext = { levels: [0] };
@@ -35,7 +46,16 @@ export function format(content: string): string {
     }
 
     if (line.trim() === '') {
-      if (formatted.at(-1) !== '') formatted.push('');
+      let trailingEmpty = 0;
+      for (
+        let cursor = formatted.length - 1;
+        cursor >= 0 && formatted[cursor] === '';
+        cursor--
+      ) {
+        trailingEmpty++;
+      }
+      // Whether to retain blank lines depends on the maximum allowed number of blank lines.
+      if (trailingEmpty < maxBlank) formatted.push('');
       index++;
       continue;
     }
@@ -47,6 +67,7 @@ export function format(content: string): string {
         index,
         openingFence,
         format,
+        options,
       );
       if (semanticFence) {
         formatted.push(...semanticFence.lines);

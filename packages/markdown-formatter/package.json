@@ -1,6 +1,6 @@
 {
   "name": "@fuyeor/markdown-formatter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Formatter for Fuyeor Flavored Markdown documents.",
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",

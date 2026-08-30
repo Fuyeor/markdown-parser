@@ -1,7 +1,12 @@
 // @fuyeor/markdown-formatter/src/blocks.ts
 import { semanticFenceLanguages } from './constants';
 import { formatText } from './text';
-import type { Fence, ListIndentContext, QuoteLine } from './types';
+import type {
+  Fence,
+  FormatOptions,
+  ListIndentContext,
+  QuoteLine,
+} from './types';
 
 /** Normalize line endings before applying deterministic line-based formatting. */
 export function normalizeLineEndings(content: string): string {
@@ -191,7 +196,8 @@ export function formatSemanticFence(
   lines: readonly string[],
   start: number,
   fence: Fence,
-  formatFn: (content: string) => string,
+  formatFn: (content: string, options?: FormatOptions) => string,
+  options?: FormatOptions,
 ): { lines: string[]; next: number } | null {
   if (!fence.language || !semanticFenceLanguages.has(fence.language)) {
     return null;
@@ -204,7 +210,10 @@ export function formatSemanticFence(
   }
   if (closingIndex >= lines.length) return null;
 
-  const inner = formatFn(lines.slice(start + 1, closingIndex).join('\n'));
+  const inner = formatFn(
+    lines.slice(start + 1, closingIndex).join('\n'),
+    options,
+  );
   return {
     lines: [
       lines[start]!,
