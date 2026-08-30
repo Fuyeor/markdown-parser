@@ -13,7 +13,7 @@ import {
   formatStyle,
   marksKey,
   mergeStyle,
-  parseInlineStyle,
+  parseStyleAttribute,
   styleKey,
 } from './style';
 import type {
@@ -43,6 +43,13 @@ export function isBlockElement(element: ElementNode): boolean {
   return element.children.some(
     (child) => isElement(child) && isBlockElement(child),
   );
+}
+
+export function escapeMarkdownText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/[*_]/gu, '\\$&')
+    .replace(/^(#{1,6}\s+|>\s*|[-+*]\s+|\d+\.\s+)/gmu, '\\$1');
 }
 
 function getTextContent(nodes: readonly ChildNode[]): string {
@@ -148,18 +155,24 @@ export function renderInlineNode(
 ): InlinePiece[] {
   if (isTextNode(node)) {
     if (!node.data) return [];
+    // escape text node
+    const escaped = escapeMarkdownText(node.data);
     return [
-      { content: node.data, style: cloneStyle(style), marks: { ...marks } },
+      { content: escaped, style: cloneStyle(style), marks: { ...marks } },
     ];
   }
   if (!isElement(node) || isDroppedElement(node)) return [];
 
-  const ownStyle = parseInlineStyle(node.attribs.style);
+  const { style: ownStyle, marks: ownMarks } = parseStyleAttribute(
+    node.attribs.style,
+  );
   const nextStyle = mergeStyle(style, ownStyle);
+  let nextMarks = cloneMarks(marks, ownMarks);
+
   const name = node.name;
   if (name === 'br') {
     return [
-      { content: '\n', style: cloneStyle(nextStyle), marks: { ...marks } },
+      { content: '\n', style: cloneStyle(nextStyle), marks: { ...nextMarks } },
     ];
   }
   if (name === 'img') {
@@ -170,7 +183,7 @@ export function renderInlineNode(
       {
         content: `![${alt}](${source})`,
         style: cloneStyle(nextStyle),
-        marks: { ...marks },
+        marks: { ...nextMarks },
       },
     ];
   }
@@ -183,7 +196,7 @@ export function renderInlineNode(
         content: `${fence}${code}${fence}`,
         style: cloneStyle(nextStyle),
         marks: {
-          ...marks,
+          ...nextMarks,
           bold: false,
           italic: false,
           underline: false,
@@ -193,7 +206,6 @@ export function renderInlineNode(
     ];
   }
 
-  let nextMarks = marks;
   if (name === 'strong' || name === 'b')
     nextMarks = cloneMarks(nextMarks, { bold: true });
   else if (name === 'em' || name === 'i')
@@ -345,24 +357,26 @@ export function renderPre(element: ElementNode): string {
 
 export function renderBlockElement(element: ElementNode, style: Style): string {
   if (isDroppedElement(element)) return '';
-  const nextStyle = mergeStyle(style, parseInlineStyle(element.attribs.style));
+  const { style: ownStyle } = parseStyleAttribute(element.attribs.style);
+  const nextStyle = mergeStyle(style, ownStyle);
   if (element.name === 'hr') return '\n\n---\n\n';
   if (element.name === 'pre') return renderPre(element);
   if (element.name === 'ul' || element.name === 'ol')
     return renderList(element, nextStyle, 0);
   if (element.name === 'table') return renderTable(element, nextStyle);
   if (element.name === 'blockquote') {
-    const content = stripBoundaryNewlines(
+    // ✨ 规范化空行（保留最多双换行段落结构）
+    const rawContent = stripBoundaryNewlines(
       renderFlow(element.children, nextStyle),
     )
-      .replace(/\n{2,}/gu, '\n')
+      .replace(/\n{3,}/gu, '\n\n')
       .trim();
-    if (!content) return '';
-    const newlineCount = (content.match(/\n/gu) ?? []).length;
-    if (newlineCount >= 2) {
-      return `\`\`\`quote\n${content}\n\`\`\`\n\n`;
+    if (!rawContent) return '';
+    const textLines = rawContent.split(/\n+/u);
+    if (textLines.length >= 3) {
+      return `\`\`\`quote\n${rawContent}\n\`\`\`\n\n`; // ✨ 完整保留段落原本的换行结构
     }
-    const quoted = content
+    const quoted = rawContent
       .split('\n')
       .map((line) => (line ? `> ${line}` : '>'))
       .join('\n');

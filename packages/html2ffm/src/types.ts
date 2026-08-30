@@ -16,6 +16,7 @@ export type TextNode = ChildNode & {
 
 export type Style = {
   color?: string | null;
+  background?: string | null;
   fontSize?: string;
 };
 

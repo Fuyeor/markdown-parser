@@ -9,28 +9,33 @@
       "desc": "inline formatting",
       "text": "<b>Bold</b> <strong>Strong</strong> <i>Italic</i> <em>Emphasis</em> <u>Underline</u> <ins>Insert</ins> <del>Delete</del> <code>code</code>",
       "expect": "**Bold** **Strong** *Italic* *Emphasis* __Underline__ __Insert__ --Delete-- `code`"
-    },
-    {
-      "desc": "alpha colors",
-      "text": "<span style=\"color:rgba(255, 0, 0, 0.5)\">Half</span> <span style=\"color:transparent\">Clear</span>",
-      "expect": "[Half](color = #ff000080) Clear"
     }
   ],
   "blockquote": [
     {
+      "desc": "text within blockquote",
+      "text": "<blockquote><p><strong>Text</strong></p><p>Text</p></blockquote>",
+      "expect": "> **Text**\n>\n> Text"
+    },
+    {
+      "desc": "bold text before blockquote",
+      "text": "<p><strong>Text</strong><p><blockquote><p><strong>Text</strong></p><p>Text</p></blockquote>",
+      "expect": "**Text**\n\n> **Text**\n>\n> Text"
+    },
+    {
       "desc": "short blockquote (under 3 lines)",
       "text": "<blockquote><p>One</p><p>Two</p></blockquote>",
-      "expect": "> One\n> Two"
+      "expect": "> One\n>\n> Two"
     },
     {
       "desc": "long blockquote (3 lines or more)",
       "text": "<blockquote><p>One</p><p>Two</p><p>Three</p></blockquote>",
-      "expect": "```quote\nOne\nTwo\nThree\n```"
+      "expect": "```quote\nOne\n\nTwo\n\nThree\n```"
     },
     {
-      "desc": "blockquote",
-      "text": "<blockquote><p>One</p><p>Two</p><p>Three</p></blockquote>",
-      "expect": "```quote\nOne\nTwo\nThree\n```"
+      "desc": "`<p> </p>` blockquote",
+      "text": "<blockquote><p>Line1</p><p>Line2</p><p> </p><p>Line3</p></blockquote>",
+      "expect": "```quote\nLine1\n\nLine2\n\n\n\nLine3\n```"
     }
   ],
   "paragraphs and headings": [
@@ -49,14 +54,34 @@
   ],
   "color and styles": [
     {
-      "desc": "color normalization - rgb with alpha",
+      "desc": "alpha color",
+      "text": "<span style=\"color:rgba(255, 0, 0, 0.5)\">Half</span>",
+      "expect": "[Half](color = #ff000080)"
+    },
+    {
+      "desc": "rgb with alpha",
       "text": "<span style=\"color:rgb(100% 0% 0% / 50%)\">RGB</span>",
       "expect": "[RGB](color = #ff000080)"
     },
     {
-      "desc": "color",
+      "desc": "transparent color",
+      "text": "<span style=\"color:transparent\">Text</span>",
+      "expect": "Text"
+    },
+    {
+      "desc": "named color",
       "text": "<span style=\"color:red\">Red</span>",
       "expect": "[Red](color = #ff0000)"
+    },
+    {
+      "desc": "background",
+      "text": "<span style=\"background-color: #ffff99\">Text</span>",
+      "expect": "[Text](background = #ffff99)"
+    },
+    {
+      "desc": "underline",
+      "text": "<span style=\"text-decoration: underline\">Text</span>",
+      "expect": "__Text__"
     },
     {
       "desc": "font-size",
@@ -67,11 +92,6 @@
       "desc": "color and font-size",
       "text": "<span style=\"color:#ABC;font-size:20px\">Both</span>",
       "expect": "[Both](color = #aabbcc, font = {size = 20px})"
-    },
-    {
-      "desc": "background",
-      "text": "<span style=\"background-color: #ffff99\">Text</span>",
-      "expect": "[Text](background = #ffff99)"
     },
     {
       "desc": "nested style and underline",
@@ -87,6 +107,11 @@
     }
   ],
   "links and images": [
+    {
+      "desc": "multiple lines links",
+      "text": "<p><a href=\"https://fuyeor.com\">Link1</a></p><p><a href=\"https://fuyeor.com\">Link2</a></p>",
+      "expect": "[Link1](https://fuyeor.com)\n\n[Link2](https://fuyeor.com)"
+    },
     {
       "desc": "links and images",
       "text": "<a href=\"/docs?a=1&amp;b=2\">Docs</a> <a href=\"javascript:alert(1)\">Unsafe</a> <img src=\"cat.jpg\" alt=\"Cat &amp; friend\"> <img src=\"missing-alt.jpg\">",
@@ -119,18 +144,38 @@
       "expect": "````\nconst value = ```text```;\n````"
     }
   ],
-  "missing image source": [
+  "remove unnecessary elements": [
+    {
+      "desc": "remove div",
+      "text": "<div><div><div><div>Text</div></div></div></div>",
+      "expect": "Text"
+    },
     {
       "desc": "missing image source",
       "text": "<img alt=\"No source\"><p>After</p>",
       "expect": "After"
     }
   ],
-  "remove unnecessary elements": [
+  "escape markdown special symbols": [
     {
-      "desc": "div",
-      "text": "<div><div><div><div>Text</div></div></div></div>",
-      "expect": "Text"
+      "desc": "escape first `*`",
+      "text": "<ul><li>* Text</li></ul>",
+      "expect": "- \\* Text"
+    },
+    {
+      "desc": "escape inline asterisks and underscores in paragraph",
+      "text": "<p>hello_world and *italic* should be escaped</p>",
+      "expect": "hello\\_world and \\*italic\\* should be escaped"
+    },
+    {
+      "desc": "escape leading block symbols to avoid syntax ambiguity",
+      "text": "<p># Not heading</p><p>> Not quote</p><p>- Not list</p>",
+      "expect": "\\# Not heading\n\n\\> Not quote\n\n\\- Not list"
+    },
+    {
+      "desc": "do not escape inside pre or code blocks",
+      "text": "<pre><code># Heading\n* List\nfoo_bar</code></pre>",
+      "expect": "```\n# Heading\n* List\nfoo_bar\n```"
     }
   ]
 }
