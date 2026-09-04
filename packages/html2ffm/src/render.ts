@@ -49,7 +49,7 @@ export function escapeMarkdownText(text: string): string {
   if (!text) return '';
   return text
     .replace(/[*_]/gu, '\\$&')
-    .replace(/^(#{1,6}\s+|>\s*|[-+*]\s+|\d+\.\s+)/gmu, '\\$1');
+    .replace(/^(#{1,6}\s+|>\s*|[-+]\s+)/gmu, '\\$1');
 }
 
 function getTextContent(nodes: readonly ChildNode[]): string {
@@ -386,9 +386,11 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
       : '';
   }
 
-  const content = stripBoundaryNewlines(
-    renderFlow(element.children, nextStyle),
-  ).trim();
+  // // Remove simple line breaks at the beginning and end
+  // retaining the line breaks intentionally left by the author within the paragraph
+  const content = renderFlow(element.children, nextStyle)
+    .replace(/^\n+/u, '')
+    .replace(/[ \t]+$/u, '');
 
   // When encountering empty paragraphs (such as <p></p> or only newline spaces)
   // preserve the blank lines and hand them over to the downstream formatter for scheduling
@@ -415,6 +417,11 @@ export function renderFlow(nodes: readonly ChildNode[], style: Style): string {
     if (!isElement(node) || isDroppedElement(node)) continue;
     if (isBlockElement(node)) {
       flushInline();
+      // Ensure a standard block-level line break (\n\n)
+      // between inline elements and subsequent block-level elements
+      if (output && !output.endsWith('\n\n')) {
+        output += output.endsWith('\n') ? '\n' : '\n\n';
+      }
       output += renderBlockElement(node, style);
     } else {
       inlinePieces.push(...renderInlineNode(node, style, emptyMarks));

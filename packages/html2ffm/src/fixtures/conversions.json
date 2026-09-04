@@ -1,11 +1,6 @@
 {
   "inline formatting": [
     {
-      "desc": "bold",
-      "text": "<b>Bold</b> ...",
-      "expect": "**Bold** ..."
-    },
-    {
       "desc": "inline formatting",
       "text": "<b>Bold</b> <strong>Strong</strong> <i>Italic</i> <em>Emphasis</em> <u>Underline</u> <ins>Insert</ins> <del>Delete</del> <code>code</code>",
       "expect": "**Bold** **Strong** *Italic* *Emphasis* __Underline__ __Insert__ --Delete-- `code`"
@@ -42,9 +37,24 @@
   ],
   "line breaks and horizontal rules": [
     {
-      "desc": "line breaks and horizontal rules",
+      "desc": "inline line breaks and horizontal rule",
       "text": "<p>Before<br>After<br><br>End</p><hr>",
       "expect": "Before\nAfter\n\nEnd\n\n---"
+    },
+    {
+      "desc": "ignore single trailing br placeholder at paragraph end",
+      "text": "<p>Text<br></p><p>Next</p>",
+      "expect": "Text\n\nNext"
+    },
+    {
+      "desc": "ignore blank lines at paragraph end",
+      "text": "<p>Text<br></p><p></p>",
+      "expect": "Text"
+    },
+    {
+      "desc": "normalize trailing br with nbsp under default max 1 blank line",
+      "text": "<p>Text<br>&nbsp;</p><p>Next</p>",
+      "expect": "Text\n\nNext"
     }
   ],
   "color and styles": [
@@ -118,6 +128,26 @@
       "desc": "nested ordered and unordered lists",
       "text": "<ol start=\"3\"><li>Three<ul><li><b>Child</b></li><li>Child two</li></ul></li><li>Four</li></ol>",
       "expect": "3. Three\n  - **Child**\n  - Child two\n4. Four"
+    },
+    {
+      "desc": "plain text like ordered list in unordered list",
+      "text": "<ul><li>1. Text</li></ul>",
+      "expect": "- 1. Text"
+    },
+    {
+      "desc": "plain text like ordered list",
+      "text": "<p>1. Text</p>",
+      "expect": "1. Text"
+    },
+    {
+      "desc": "bold text within list",
+      "text": "<ul><li><strong>Text</strong></li></ul>",
+      "expect": "- **Text**"
+    },
+    {
+      "desc": "list after image",
+      "text": "<img src=\"https://fuyeor.com/example.webp\" /><ul><li><strong>Text</strong></li></ul>",
+      "expect": "![](https://fuyeor.com/example.webp)\n\n- **Text**"
     }
   ],
   "tables": [
@@ -146,14 +176,14 @@
       "expect": "Text"
     },
     {
-      "desc": "missing image source",
+      "desc": "remove invalid image",
       "text": "<img alt=\"No source\"><p>After</p>",
       "expect": "After"
     }
   ],
   "escape markdown special symbols": [
     {
-      "desc": "escape first `*`",
+      "desc": "escape first `*` within plain text",
       "text": "<ul><li>* Text</li></ul>",
       "expect": "- \\* Text"
     },
