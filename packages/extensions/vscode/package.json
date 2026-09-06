@@ -2,14 +2,14 @@
   "name": "ffm",
   "displayName": "Fuyeor Flavored Markdown",
   "description": "Syntax highlighting for Fuyeor Flavored Markdown in Visual Studio Code.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "Fuyeor",
   "license": "MIT",
-  "icon": "extension/icon.png",
+  "icon": "./extension/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/Fuyeor/markdown-parser.git",
-    "directory": "packages/vscode-extension"
+    "directory": "packages/extensions/vscode"
   },
   "engines": {
     "vscode": "^1.80.0"
@@ -23,10 +23,10 @@
     "languages": [
       {
         "id": "ffm",
-        "aliases": [
-          "ffm",
-          "fuyeor-flavored-markdown"
-        ],
+        "icon": {
+          "light": "./extension/icon.png",
+          "dark": "./extension/icon.png"
+        },
         "extensions": [
           ".ffm"
         ],
