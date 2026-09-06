@@ -60,47 +60,47 @@
   "color and styles": [
     {
       "desc": "alpha color",
-      "text": "<span style=\"color:rgba(255, 0, 0, 0.5)\">Half</span>",
+      "text": "<span style='color:rgba(255, 0, 0, 0.5)'>Half</span>",
       "expect": "[Half](color = #ff000080)"
     },
     {
       "desc": "rgb with alpha",
-      "text": "<span style=\"color:rgb(100% 0% 0% / 50%)\">RGB</span>",
+      "text": "<span style='color:rgb(100% 0% 0% / 50%)'>RGB</span>",
       "expect": "[RGB](color = #ff000080)"
     },
     {
       "desc": "transparent color",
-      "text": "<span style=\"color:transparent\">Text</span>",
+      "text": "<span style='color:transparent'>Text</span>",
       "expect": "Text"
     },
     {
       "desc": "named color",
-      "text": "<span style=\"color:red\">Red</span>",
+      "text": "<span style='color:red'>Red</span>",
       "expect": "[Red](color = #ff0000)"
     },
     {
       "desc": "background",
-      "text": "<span style=\"background-color: #ffff99\">Text</span>",
+      "text": "<span style='background-color: #ffff99'>Text</span>",
       "expect": "[Text](background = #ffff99)"
     },
     {
       "desc": "underline",
-      "text": "<span style=\"text-decoration: underline\">Text</span>",
+      "text": "<span style='text-decoration: underline'>Text</span>",
       "expect": "__Text__"
     },
     {
       "desc": "font-size",
-      "text": "<span style=\"font-size:20px\">Large</span>",
+      "text": "<span style='font-size:20px'>Large</span>",
       "expect": "[Large](font = {size = 20px})"
     },
     {
       "desc": "color and font-size",
-      "text": "<span style=\"color:#ABC;font-size:20px\">Both</span>",
+      "text": "<span style='color:#ABC;font-size:20px'>Both</span>",
       "expect": "[Both](color = #aabbcc, font = {size = 20px})"
     },
     {
       "desc": "nested style and underline",
-      "text": "<span style=\"color: rgb(255, 0, 0); font-size: 1.25rem\"><u>Text</u></span>",
+      "text": "<span style='color: rgb(255, 0, 0); font-size: 1.25rem'><u>Text</u></span>",
       "expect": "[__Text__](color = #ff0000, font = {size = 1.25rem})"
     }
   ],
@@ -114,19 +114,19 @@
   "links and images": [
     {
       "desc": "multiple lines links",
-      "text": "<p><a href=\"https://fuyeor.com\">Link1</a></p><p><a href=\"https://fuyeor.com\">Link2</a></p>",
+      "text": "<p><a href='https://fuyeor.com'>Link1</a></p><p><a href='https://fuyeor.com'>Link2</a></p>",
       "expect": "[Link1](https://fuyeor.com)\n\n[Link2](https://fuyeor.com)"
     },
     {
       "desc": "links and images",
-      "text": "<a href=\"/docs?a=1&amp;b=2\">Docs</a> <a href=\"javascript:alert(1)\">Unsafe</a> <img src=\"cat.jpg\" alt=\"Cat &amp; friend\"> <img src=\"missing-alt.jpg\">",
+      "text": "<a href='/docs?a=1&amp;b=2'>Docs</a> <a href='javascript:alert(1)'>Unsafe</a> <img src='cat.jpg' alt='Cat &amp; friend'> <img src='missing-alt.jpg'>",
       "expect": "[Docs](/docs?a=1&b=2) Unsafe ![Cat & friend](cat.jpg) ![](missing-alt.jpg)"
     }
   ],
   "nested ordered and unordered lists": [
     {
       "desc": "nested ordered and unordered lists",
-      "text": "<ol start=\"3\"><li>Three<ul><li><b>Child</b></li><li>Child two</li></ul></li><li>Four</li></ol>",
+      "text": "<ol start='3'><li>Three<ul><li><b>Child</b></li><li>Child two</li></ul></li><li>Four</li></ol>",
       "expect": "3. Three\n  - **Child**\n  - Child two\n4. Four"
     },
     {
@@ -146,8 +146,23 @@
     },
     {
       "desc": "list after image",
-      "text": "<img src=\"https://fuyeor.com/example.webp\" /><ul><li><strong>Text</strong></li></ul>",
+      "text": "<img src='https://fuyeor.com/example.webp' /><ul><li><strong>Text</strong></li></ul>",
       "expect": "![](https://fuyeor.com/example.webp)\n\n- **Text**"
+    },
+    {
+      "desc": "multiline list item with 2-space canonical indentation",
+      "text": "<ol><li><strong>Title 1</strong><div></div>Description</li><li><strong>Title 2</strong><div></div>Description 2</li></ol>",
+      "expect": "1. **Title 1**\n  Description\n2. **Title 2**\n  Description 2"
+    },
+    {
+      "desc": "multiline list item with br line break",
+      "text": "<ul><li><strong>Header</strong><br>Body content line</li></ul>",
+      "expect": "- **Header**\n  Body content line"
+    },
+    {
+      "desc": "multiline list item with nested sub-list",
+      "text": "<ol><li><strong>Point 1</strong><br>Details of point 1<ul><li>Sub item A</li><li>Sub item B</li></ul></li><li>Point 2</li></ol>",
+      "expect": "1. **Point 1**\n  Details of point 1\n  - Sub item A\n  - Sub item B\n2. Point 2"
     }
   ],
   "tables": [
@@ -171,14 +186,24 @@
   ],
   "remove unnecessary elements": [
     {
-      "desc": "remove div",
-      "text": "<div><div><div><div>Text</div></div></div></div>",
-      "expect": "Text"
+      "desc": "remove deep nested wrappers and trailing redundant newlines",
+      "text": "<div><div><div><div><h2>Title</h2></div></div></div></div><div><div><div>Text</div></div></div>",
+      "expect": "## Title\n\nText"
+    },
+    {
+      "desc": "remove empty div inside list items without breaking list structure",
+      "text": "<ol><li><strong>Item 1</strong><div></div>Description 1</li><li><strong>Item 2</strong><div></div>Description 2</li></ol>",
+      "expect": "1. **Item 1**\n  Description 1\n2. **Item 2**\n  Description 2"
     },
     {
       "desc": "remove invalid image",
-      "text": "<img alt=\"No source\"><p>After</p>",
+      "text": "<img alt='No source'><p>After</p>",
       "expect": "After"
+    },
+    {
+      "desc": "remove wordpress comments",
+      "text": "<!-- wp:quote -->\n<blockquote class='wp-block-quote'><p>Text</p></blockquote>\n<!-- /wp:quote -->",
+      "expect": "> Text"
     }
   ],
   "escape markdown special symbols": [
@@ -201,6 +226,38 @@
       "desc": "do not escape inside pre or code blocks",
       "text": "<pre><code># Heading\n* List\nfoo_bar</code></pre>",
       "expect": "```\n# Heading\n* List\nfoo_bar\n```"
+    }
+  ],
+  "CMS raw database fragments": [
+    {
+      "desc": "title",
+      "text": "Text<h2>Title</h2>\nText",
+      "expect": "Text\n\n## Title\n\nText"
+    },
+    {
+      "desc": "horizontal rule",
+      "text": "Text\n\n\n<hr />\n\n\nText",
+      "expect": "Text\n\n---\n\nText"
+    },
+    {
+      "desc": "paragraph after list",
+      "text": "Text\n<ul><li>Item 1</li><li>Item 2</li></ul>\nText",
+      "expect": "Text\n\n- Item 1\n- Item 2\n\nText"
+    },
+    {
+      "desc": "raw double newlines between bold titles and images without p wrappers",
+      "text": "<strong>Text</strong>\n\n<img src='https://fuyeor.com/example.webp' width='600' />\n\n<strong>Text</strong>",
+      "expect": "**Text**\n\n![](https://fuyeor.com/example.webp)\n\n**Text**"
+    },
+    {
+      "desc": "raw paragraphs separated by newlines mixed with links and lists",
+      "text": "First\n\nSecond with <a href='https://fuyeor.com'>Link</a>\n\n<ul><li>Item 1</li><li>Item 2</li></ul>",
+      "expect": "First\n\nSecond with [Link](https://fuyeor.com)\n\n- Item 1\n- Item 2"
+    },
+    {
+      "desc": "complex wordpress hybrid article structure with mixed tags",
+      "text": "<strong>Bold Text</strong>\n\n<img src='https://fuyeor.com/example.webp' />\n\nParagraph Text<ul><li><strong>Item 1:</strong>description</li></ul><img src='https://fuyeor.com/example.webp' />",
+      "expect": "**Bold Text**\n\n![](https://fuyeor.com/example.webp)\n\nParagraph Text\n\n- **Item 1:**description\n\n![](https://fuyeor.com/example.webp)"
     }
   ]
 }

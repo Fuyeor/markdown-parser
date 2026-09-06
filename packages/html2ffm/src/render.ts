@@ -31,7 +31,11 @@ export function isElement(node: ChildNode): node is ElementNode {
 }
 
 export function isTextNode(node: ChildNode): node is TextNode {
-  return 'data' in node && !('name' in node);
+  return (
+    'data' in node &&
+    !('name' in node) &&
+    (!('type' in node) || node.type === 'text')
+  );
 }
 
 export function isDroppedElement(element: ElementNode): boolean {
@@ -247,6 +251,7 @@ export function renderInlineContent(
   return serializePieces(pieces);
 }
 
+// Render ordered and unordered lists with canonical two-space nesting.
 export function renderList(
   element: ElementNode,
   style: Style,
@@ -256,10 +261,12 @@ export function renderList(
   const parsedStart = Number.parseInt(element.attribs.start ?? '', 10);
   let number = Number.isInteger(parsedStart) ? parsedStart : 1;
   const lines: string[] = [];
+
   for (const child of element.children) {
     if (!isElement(child) || child.name !== 'li') continue;
     const inlineChildren: ChildNode[] = [];
     const nestedLists: ElementNode[] = [];
+
     for (const itemChild of child.children) {
       if (
         isElement(itemChild) &&
@@ -268,14 +275,36 @@ export function renderList(
         nestedLists.push(itemChild);
       else inlineChildren.push(itemChild);
     }
-    const itemContent = renderFlow(inlineChildren, style)
-      .replace(/\n+/gu, ' ')
-      .trim();
+
+    // Extract the list item content
+    // split it into multiple lines based on line breaks
+    // and add 2 spaces of FFM standard indentation
+    const rawContent = stripBoundaryNewlines(
+      renderFlow(inlineChildren, style),
+    ).trim();
+
     const marker = ordered ? `${number}.` : '-';
     number++;
-    lines.push(
-      `${'  '.repeat(depth)}${marker}${itemContent ? ` ${itemContent}` : ''}`,
-    );
+    const currentIndent = '  '.repeat(depth);
+    const subIndent = '  '.repeat(depth + 1);
+
+    if (rawContent) {
+      const contentLines = rawContent
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      if (contentLines.length > 0) {
+        const firstLine = `${currentIndent}${marker} ${contentLines[0]}`;
+        const restLines = contentLines
+          .slice(1)
+          .map((line) => `${subIndent}${line}`);
+        lines.push([firstLine, ...restLines].join('\n'));
+      }
+    } else {
+      lines.push(`${currentIndent}${marker}`);
+    }
+
     for (const nestedList of nestedLists) {
       const nested = renderList(nestedList, style, depth + 1).replace(
         /\n+$/u,
@@ -284,6 +313,7 @@ export function renderList(
       if (nested) lines.push(nested);
     }
   }
+
   return lines.length > 0 ? `${lines.join('\n')}\n\n` : '';
 }
 
@@ -353,7 +383,7 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
   if (isDroppedElement(element)) return '';
   const { style: ownStyle } = parseStyleAttribute(element.attribs.style);
   const nextStyle = mergeStyle(style, ownStyle);
-  if (element.name === 'hr') return '\n\n---\n\n';
+  if (element.name === 'hr') return '---\n\n';
   if (element.name === 'pre') return renderPre(element);
   if (element.name === 'ul' || element.name === 'ol')
     return renderList(element, nextStyle, 0);
@@ -386,17 +416,22 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
       : '';
   }
 
-  // // Remove simple line breaks at the beginning and end
+  // Remove simple line breaks at the beginning and end
   // retaining the line breaks intentionally left by the author within the paragraph
   const content = renderFlow(element.children, nextStyle)
     .replace(/^\n+/u, '')
     .replace(/[ \t]+$/u, '');
 
-  // When encountering empty paragraphs (such as <p></p> or only newline spaces)
-  // preserve the blank lines and hand them over to the downstream formatter for scheduling
-  if (element.name === 'p' && !content) return '\n\n';
+  // Empty `<p></p>` paragraphs retain line breaks and whitespace;
+  // empty `<div></div>` containers are ignored
+  if (!content.trim()) {
+    return element.name === 'p' ? '\n\n' : '';
+  }
 
-  return content ? `${content}\n\n` : '';
+  // If the content itself already has block delimiters (ending with \n\n), do not append again;
+  // otherwise, normalize and pad to \n\n  if (content.endsWith('\n\n')) return content;
+  if (content.endsWith('\n')) return `${content}\n`;
+  return `${content}\n\n`;
 }
 
 export function renderFlow(nodes: readonly ChildNode[], style: Style): string {
@@ -410,10 +445,37 @@ export function renderFlow(nodes: readonly ChildNode[], style: Style): string {
 
   for (const node of nodes) {
     if (isTextNode(node)) {
+      // If the text node contains consecutive line breaks (\n\n)
+      // Then preserving the line breaks
+      if (/^\s*?\n\s*?\n\s*?$/u.test(node.data)) {
+        flushInline();
+        if (output && !output.endsWith('\n\n')) {
+          output += output.endsWith('\n') ? '\n' : '\n\n';
+        }
+        continue;
+      }
+      // Filter single line breaks and indentation for dirty data
       if (/^\s+$/u.test(node.data) && node.data.includes('\n')) continue;
-      inlinePieces.push(...renderInlineNode(node, style, emptyMarks));
+
+      // If a block-level \n\n delimiter already exists
+      // truncate all newline characters (\n+) at the beginning of the current text
+      let textData = node.data;
+      if (inlinePieces.length === 0 && (!output || output.endsWith('\n\n'))) {
+        textData = textData.replace(/^\n+/u, '');
+      }
+
+      if (!textData) continue;
+
+      inlinePieces.push(
+        ...renderInlineNode(
+          { ...node, data: textData } as TextNode,
+          style,
+          emptyMarks,
+        ),
+      );
       continue;
     }
+
     if (!isElement(node) || isDroppedElement(node)) continue;
     if (isBlockElement(node)) {
       flushInline();

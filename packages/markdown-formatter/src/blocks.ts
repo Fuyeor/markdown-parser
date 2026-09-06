@@ -102,17 +102,40 @@ export function formatListLine(
   if (!match) return null;
 
   const rawIndentation = match[1]!.replace(/\t/gu, '  ').length;
-  while (context.levels.length > 1 && rawIndentation < context.levels.at(-1)!) {
-    context.levels.pop();
-  }
-  if (rawIndentation > context.levels.at(-1)!) {
-    context.levels.push(rawIndentation);
+  if (context.levels.length === 0) {
+    context.levels = [rawIndentation];
+  } else {
+    while (
+      context.levels.length > 1 &&
+      rawIndentation < context.levels.at(-1)!
+    ) {
+      context.levels.pop();
+    }
+    if (rawIndentation > context.levels.at(-1)!) {
+      context.levels.push(rawIndentation);
+    }
   }
 
   const markerEnd = match[1]!.length + match[2]!.length;
   const rest = formatText(line.slice(markerEnd).trimStart());
   const indentation = ' '.repeat((context.levels.length - 1) * 2);
   return `${indentation}${match[2]} ${rest}`;
+}
+
+// Supports multi-line, 2-space indented content within list items.
+export function formatListContinuationLine(
+  line: string,
+  context: ListIndentContext,
+): string | null {
+  if (context.levels.length === 0) return null;
+  const match = line.match(/^([ \t]+)(\S.*)$/u);
+  if (!match) return null;
+  const rawIndentation = match[1]!.replace(/\t/gu, '  ').length;
+  if (rawIndentation < 2) return null;
+
+  const rest = formatText(match[2]!);
+  const indentation = ' '.repeat(context.levels.length * 2);
+  return `${indentation}${rest}`;
 }
 
 /** Normalize one Markdown blockquote marker and its content spacing. */
@@ -129,10 +152,26 @@ export function formatOrdinaryLine(
   context: ListIndentContext,
 ): string {
   const quoteLine = formatQuoteLine(line);
+  if (quoteLine !== null) {
+    context.levels = [];
+    return quoteLine.replace(/[ \t]+$/u, '');
+  }
+
   const listLine = formatListLine(line, context);
-  const formatted = quoteLine ?? listLine ?? formatText(line).trimStart();
-  if (!listLine) context.levels = [0];
-  return formatted.replace(/[ \t]+$/u, '');
+  if (listLine !== null) {
+    return listLine.replace(/[ \t]+$/u, '');
+  }
+
+  // Preserve and standardize 2-space indentation for multi-line list items
+  const continuationLine = formatListContinuationLine(line, context);
+  if (continuationLine !== null) {
+    return continuationLine.replace(/[ \t]+$/u, '');
+  }
+
+  context.levels = [];
+  return formatText(line)
+    .trimStart()
+    .replace(/[ \t]+$/u, '');
 }
 
 /** Parse a single line from a contiguous Markdown blockquote. */
