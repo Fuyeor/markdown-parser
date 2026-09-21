@@ -3,4 +3,4 @@
 **/out
 **/test.failed.json
 **/target
-package/playground/public/assets/locale/*
+playground/public/assets/locale/*

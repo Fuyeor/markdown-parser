@@ -143,17 +143,33 @@ importers:
         specifier: ^4.1.0
         version: 4.1.4(@types/node@25.6.0)(@vitest/coverage-v8@4.1.4)(jsdom@29.0.2)(vite@8.0.9(@types/node@25.6.0)(esbuild@0.27.7)(terser@5.50.0)(tsx@4.21.0))
 
-  package/playground:
+  package/vue-renderer:
     dependencies:
-      '@ffm/formatter':
-        specifier: workspace:*
-        version: link:../formatter
       '@ffm/parser':
         specifier: workspace:*
         version: link:../parser
+    devDependencies:
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vue:
+        specifier: ^3.5.30
+        version: 3.5.41(typescript@6.0.3)
+
+  playground:
+    dependencies:
+      '@ffm/formatter':
+        specifier: workspace:*
+        version: link:../package/formatter
+      '@ffm/parser':
+        specifier: workspace:*
+        version: link:../package/parser
       '@ffm/vue-renderer':
         specifier: workspace:*
-        version: link:../vue-renderer
+        version: link:../package/vue-renderer
       '@fuyeor/commons':
         specifier: ^0.1.2
         version: 0.1.2(vue@3.5.41(typescript@7.0.2))
@@ -194,22 +210,6 @@ importers:
       vite:
         specifier: 8.0.1
         version: 8.0.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@26.2.0)(esbuild@0.27.7)(terser@5.50.0)(tsx@4.21.0)
-
-  package/vue-renderer:
-    dependencies:
-      '@ffm/parser':
-        specifier: workspace:*
-        version: link:../parser
-    devDependencies:
-      '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
-      typescript:
-        specifier: ^6.0.3
-        version: 6.0.3
-      vue:
-        specifier: ^3.5.30
-        version: 3.5.41(typescript@6.0.3)
 
 packages:
 

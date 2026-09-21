@@ -1,7 +1,8 @@
 # /pnpm-workspace.yaml
 packages:
-  - 'package/*'
   - 'extension/vscode'
+  - 'package/*'
+  - 'playground/'
 allowBuilds:
   vue-demi: true
   esbuild: true
