@@ -14,6 +14,7 @@ WORKDIR /app
 # prepare depends
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # copy shared packages
+COPY packages/linkify/package.json packages/linkify/
 COPY packages/markdown-parser/package.json packages/markdown-parser/
 COPY packages/markdown-parser-lit/package.json packages/markdown-parser-lit/
 COPY packages/playground/package.json packages/playground/
@@ -23,6 +24,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # copy source code
 COPY . .
 
+# build linkify before parser consumers resolve its package exports
+RUN pnpm --filter @fuyeor/linkify build
 # build parser package before workspace consumers resolve its package exports
 RUN pnpm --filter @fuyeor/markdown-parser build
 

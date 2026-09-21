@@ -1,5 +1,6 @@
 // @fuyeor/markdown-parser/src/types.ts
 
+import type { LinkMatch } from '@fuyeor/linkify';
 import type { MarkdownParser } from './core/parser';
 import type { BlockState, InlineState } from './core/state';
 
@@ -73,8 +74,11 @@ export interface InlineRule {
   ) => { node: ASTNode; consumedChars: number } | null;
 }
 
+export type Linkifier = (text: string) => readonly LinkMatch[];
+
 export interface MarkdownParserOptions {
   maxNestingDepth?: number;
+  linkifier?: Linkifier;
 }
 
 export type MarkdownPlugin = (parser: MarkdownParser) => void;

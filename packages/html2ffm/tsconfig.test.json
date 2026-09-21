@@ -1,0 +1,9 @@
+// packages/html2ffm/tsconfig.test.json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["src/**/*.spec.ts", "src/**/*.json"],
+  "exclude": []
+}

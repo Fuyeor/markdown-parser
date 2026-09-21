@@ -7,10 +7,15 @@ on:
     # Only trigger when relevant code changes to save resources
     paths:
       - '.github/workflows/ci.yml'
+      - 'packages/linkify/**'
       - 'packages/markdown-parser/**'
+      - 'packages/markdown-parser-rust/**'
       - 'packages/markdown-parser-lit/**'
       - 'packages/markdown-parser-vue/**'
       - 'packages/playground/**'
+      - 'fixtures/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'Dockerfile'
@@ -18,10 +23,15 @@ on:
   pull_request:
     paths:
       - '.github/workflows/ci.yml'
+      - 'packages/linkify/**'
       - 'packages/markdown-parser/**'
+      - 'packages/markdown-parser-rust/**'
       - 'packages/markdown-parser-lit/**'
       - 'packages/markdown-parser-vue/**'
       - 'packages/playground/**'
+      - 'fixtures/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'Dockerfile'
@@ -44,8 +54,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          version: 11.20.0
+          toolchain: stable
+          components: rustfmt, clippy
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -53,12 +66,24 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Build linkify package
+        run: pnpm --filter @fuyeor/linkify build
       - name: Typecheck parser package
         run: pnpm --filter @fuyeor/markdown-parser typecheck
       - name: Run parser unit tests
         run: pnpm --filter @fuyeor/markdown-parser test:unit
       - name: Run FFM regression tests
         run: pnpm --filter @fuyeor/markdown-parser test:ffm
+      - name: Run safety fixtures
+        run: pnpm --filter @fuyeor/markdown-parser test:safety
+      - name: Run shared linkify fixtures
+        run: pnpm --filter @fuyeor/linkify exec vitest run src/cross-language-fixtures.spec.ts
+      - name: Check Rust parser
+        run: |
+          cargo fmt --all -- --check
+          cargo check --workspace --all-targets --all-features
+          cargo clippy --workspace --all-targets --all-features -- -D warnings
+          cargo test --workspace --all-targets --all-features
 
   build-markdown-playground:
     needs: test-markdown-parser

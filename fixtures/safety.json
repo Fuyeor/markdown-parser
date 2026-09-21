@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "links": [
+    {
+      "input": "https://fuyeor.com",
+      "valid": true
+    },
+    {
+      "input": "#section",
+      "valid": true
+    },
+    {
+      "input": "../doc",
+      "valid": true
+    },
+    {
+      "input": "javascript:alert(1)",
+      "valid": false
+    },
+    {
+      "input": "data:text/html,alert(1)",
+      "valid": false
+    }
+  ],
+  "colors": [
+    {
+      "input": "#fff",
+      "valid": true
+    },
+    {
+      "input": "rgba(0, 0, 0, 50%)",
+      "valid": true
+    },
+    {
+      "input": "red",
+      "valid": false
+    },
+    {
+      "input": "url(javascript:alert(1))",
+      "valid": false
+    }
+  ],
+  "description": "Language-neutral URL and color safety fixtures."
+}

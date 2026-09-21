@@ -115,6 +115,88 @@ export function extractFencedBlock(state: BlockState): FencedBlock | null {
   return result;
 }
 
+const TABLE_SEPARATOR_PATTERN = /^\s*\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?\s*$/;
+const TABLE_SEPARATOR_CELL_PATTERN = /^:?-+:?$/;
+
+type TableAlignment = 'left' | 'center' | 'right' | undefined;
+
+// Split table rows while treating escaped pipes as cell content.
+const extractTableCells = (row: string) => {
+  if (!row.includes('\\')) {
+    const cells = row.split('|');
+    if (cells[0]?.trim() === '') cells.shift();
+    if (cells.at(-1)?.trim() === '') cells.pop();
+    return cells.map((value) => value.trim());
+  }
+
+  const cells: string[] = [];
+  let cell = '';
+  let escaped = false;
+
+  for (const char of row) {
+    if (escaped) {
+      cell += char === '|' || char === '\\' ? char : `\\${char}`;
+      escaped = false;
+    } else if (char === '\\') {
+      escaped = true;
+    } else if (char === '|') {
+      cells.push(cell);
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+
+  if (escaped) cell += '\\';
+  cells.push(cell);
+
+  if (cells[0]?.trim() === '') cells.shift();
+  if (cells.at(-1)?.trim() === '') cells.pop();
+  return cells.map((value) => value.trim());
+};
+
+// Convert separator cells into the alignment metadata used by table cells.
+const parseTableAlignments = (line: string): TableAlignment[] | null => {
+  if (!TABLE_SEPARATOR_PATTERN.test(line)) return null;
+
+  const separators = extractTableCells(line);
+  if (
+    separators.length === 0 ||
+    separators.some((cell) => !TABLE_SEPARATOR_CELL_PATTERN.test(cell))
+  )
+    return null;
+
+  return separators.map((separator) => {
+    const startsWithColon = separator.startsWith(':');
+    const endsWithColon = separator.endsWith(':');
+    if (startsWithColon && endsWithColon) return 'center';
+    if (startsWithColon) return 'left';
+    if (endsWithColon) return 'right';
+    return undefined;
+  });
+};
+
+// Normalize rows to the separator-defined column count.
+const normalizeTableCells = (cells: string[], columnCount: number) => {
+  if (cells.length === columnCount) return cells;
+  if (cells.length > columnCount) return cells.slice(0, columnCount);
+  return cells.concat(Array(columnCount - cells.length).fill(''));
+};
+
+// Create table cells without allocating an alignment property for left-default columns.
+const createTableCell = (
+  content: string,
+  alignment: TableAlignment,
+  parseInline: (content: string) => ASTNode[],
+): ASTNode => {
+  const cell: ASTNode = {
+    type: 'table_cell',
+    children: parseInline(content),
+  };
+  if (alignment) cell.align = alignment;
+  return cell;
+};
+
 /**
  * parse table |...| syntax
  */
@@ -125,36 +207,43 @@ export const tableRule: BlockRule = {
     const line = state.currentLine;
     if (!line || !line.includes('|')) return null;
 
-    // check if the second line is a line separator |---|---|
-    if (state.lineIndex + 1 >= state.lineCount) return null;
-    const nextLine = state.lines[state.lineIndex + 1];
-    if (!/^\s*\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?\s*$/.test(nextLine))
-      return null;
+    const currentAlignments = parseTableAlignments(line);
+    let alignments: TableAlignment[] | null = currentAlignments;
+    let headerCells: string[] | undefined;
+    let consumedLines = currentAlignments ? 1 : 0;
 
-    let consumedLines = 2;
-    // split header
-    const extractCells = (row: string) => {
-      const parts = row.split('|');
-      if (parts[0] !== undefined && parts[0].trim() === '') parts.shift();
-      if (parts.length > 0 && parts[parts.length - 1].trim() === '')
-        parts.pop();
-      return parts.map((s) => s.trim());
-    };
+    if (!currentAlignments) {
+      // A separator on the second line identifies a standard headed table.
+      if (state.lineIndex + 1 >= state.lineCount) return null;
+      const nextLine = state.lines[state.lineIndex + 1];
+      alignments = parseTableAlignments(nextLine);
+      if (!alignments) return null;
 
-    const headers = extractCells(line);
+      headerCells = extractTableCells(line);
+      consumedLines = 2;
+      if (headerCells.length !== alignments.length) return null;
+    }
+
+    if (!alignments) return null;
+    const columnCount = alignments.length;
+    const headers = headerCells
+      ? normalizeTableCells(headerCells, columnCount)
+      : undefined;
     const rows = [];
 
-    // scan subsequent lines
+    // Scan subsequent rows until a line without a pipe is encountered.
     while (state.lineIndex + consumedLines < state.lineCount) {
       const rowLine = state.lines[state.lineIndex + consumedLines];
-      // the table ends when a row without a | is encountered
       if (!rowLine.includes('|')) break;
+
       rows.push({
         type: 'table_row',
-        children: extractCells(rowLine).map((cell) => ({
-          type: 'table_cell',
-          children: ctx.parseInline(cell),
-        })),
+        children: normalizeTableCells(
+          extractTableCells(rowLine),
+          columnCount,
+        ).map((cell, index) =>
+          createTableCell(cell, alignments[index], ctx.parseInline),
+        ),
       });
       consumedLines++;
     }
@@ -162,10 +251,13 @@ export const tableRule: BlockRule = {
     return {
       node: {
         type: 'table',
-        headers: headers.map((h) => ({
-          type: 'table_cell',
-          children: ctx.parseInline(h),
-        })),
+        ...(headers
+          ? {
+              headers: headers.map((header, index) =>
+                createTableCell(header, alignments[index], ctx.parseInline),
+              ),
+            }
+          : {}),
         children: rows,
       },
       consumedLines,
@@ -234,6 +326,9 @@ export const blockquoteRule: BlockRule = {
   },
 };
 
+const LIST_ITEM_PATTERN = /^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)/;
+const LIST_INDENT_STEP = 2;
+
 /**
  * parse list syntax (- xxx)
  */
@@ -245,7 +340,7 @@ export const listRule: BlockRule = {
     if (!line) return null;
 
     // match list header: supports -, *, + and 1., 99)
-    const match = line.match(/^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)/);
+    const match = line.match(LIST_ITEM_PATTERN);
     if (!match) return null;
 
     const baseIndent = match[1].length;
@@ -258,7 +353,7 @@ export const listRule: BlockRule = {
 
     while (state.lineIndex + consumedLines < state.lineCount) {
       const currentLine = state.lines[state.lineIndex + consumedLines];
-      const itemMatch = currentLine.match(/^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)/);
+      const itemMatch = currentLine.match(LIST_ITEM_PATTERN);
 
       // to determine if an item is a new list item:
       // the indentation must be consistent with the baseline
@@ -269,6 +364,8 @@ export const listRule: BlockRule = {
         // detect subsequent lines belonging to this item
         // (lines with indentation deeper than the marker).
         const markerTotalWidth = baseIndent + marker.length + 1;
+        // Normalize nested list markers to two-space logical levels, tolerating odd legacy indentation.
+        const nestedListIndent = baseIndent + LIST_INDENT_STEP;
 
         while (
           state.lineIndex + consumedLines + itemConsumedLines <
@@ -283,7 +380,28 @@ export const listRule: BlockRule = {
           }
 
           const nextIndent = nextLine.match(/^(\s*)/)![1].length;
-          if (nextIndent >= markerTotalWidth) {
+          const firstContentChar = nextLine[nextIndent];
+          const isListMarkerCandidate =
+            firstContentChar === '-' ||
+            firstContentChar === '*' ||
+            firstContentChar === '+' ||
+            (firstContentChar >= '0' && firstContentChar <= '9');
+          let normalizedContentStart = markerTotalWidth;
+
+          if (nextIndent >= nestedListIndent && isListMarkerCandidate) {
+            const relativeIndent = nextIndent - baseIndent;
+            const nestingLevel = Math.floor(relativeIndent / LIST_INDENT_STEP);
+            const contentIndent = (nestingLevel - 1) * LIST_INDENT_STEP;
+            normalizedContentStart = nextIndent - contentIndent;
+          }
+
+          if (
+            normalizedContentStart !== markerTotalWidth &&
+            LIST_ITEM_PATTERN.test(nextLine)
+          ) {
+            itemLines.push(nextLine.slice(normalizedContentStart));
+            itemConsumedLines++;
+          } else if (nextIndent >= markerTotalWidth) {
             // remove the indentation corresponding to the width
             itemLines.push(nextLine.slice(markerTotalWidth));
             itemConsumedLines++;

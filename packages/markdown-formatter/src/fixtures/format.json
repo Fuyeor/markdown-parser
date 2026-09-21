@@ -5,6 +5,16 @@
     "section": "cjk-spacing"
   },
   {
+    "origin": "#               title",
+    "formatted": "# title",
+    "section": "repeated-heading-spacing"
+  },
+  {
+    "origin": "this is                an apple",
+    "formatted": "this is an apple",
+    "section": "repeated-text-spacing"
+  },
+  {
     "origin": "展示**Fuyeor Flavored Markdown**的文章",
     "formatted": "展示 **Fuyeor Flavored Markdown** 的文章",
     "section": "inline-markup-spacing"
