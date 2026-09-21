@@ -1,45 +1,25 @@
-// @fuyeor/markdown-parser-playground/src/main.ts
-import { LitElement, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import {
-  createFuyeorMarkdownParser,
-  render as renderMarkdown,
-} from '@fuyeor/markdown-parser-lit';
-import { styles as mainStyles } from './main.styles';
-import { styles as markdownStyles } from './markdown.styles';
+// @/main.ts
+// pnpm playground
+import App from './App.vue';
+import router from './router';
 
-@customElement('markdown-playground')
-export class MarkdownPlayground extends LitElement {
-  static styles = [mainStyles, markdownStyles];
+import { createApp } from 'vue';
+import { initializeLocale, createHead } from '@fuyeor/commons';
+import { vRipple, vTooltip } from '@fuyeor/interactify';
 
-  #parser = createFuyeorMarkdownParser();
+async function bootstrap() {
+  const app = createApp(App);
+  const head = createHead();
 
-  @state()
-  private _source =
-    '# Welcome to Markdown Playground\n\nTry writing some **markdown** here!';
+  app.use(router);
+  app.use(head);
 
-  render() {
-    const ast = this.#parser(this._source);
+  await initializeLocale({ app });
 
-    return html`
-      <div class="pane">
-        <div class="header">Editor (Markdown)</div>
-        <textarea @input=${this.#onInput}>${this._source}</textarea>
-      </div>
+  app.directive('ripple', vRipple);
+  app.directive('tooltip', vTooltip);
 
-      <div class="pane">
-        <div class="header">Preview (DOM)</div>
-        <div id="preview" class="markdown-rendered">${renderMarkdown(ast)}</div>
-      </div>
-
-      <div class="pane" id="ast">
-        <div class="header">Abstract Syntax Tree (JSON)</div>
-        <pre>${JSON.stringify(ast, null, 2)}</pre>
-      </div>
-    `;
-  }
-
-  #onInput(e: Event) {
-    this._source = (e.target as HTMLTextAreaElement).value;
-  }
+  app.mount('#app');
 }
+
+bootstrap();

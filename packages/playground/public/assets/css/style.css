@@ -1,0 +1,162 @@
+:root {
+  --width-body: 100%;
+  --width-main: 1000px;
+  --width-left-sidebar: 350px;
+  --width-right-sidebar: 0;
+}
+
+:root {
+  --punctuation: #a0aec0;
+  --heading: #d73a49;
+  --quote: #718096;
+  --list: #718096;
+  --bold: #718096;
+  --italic: #188038;
+  --strike: #e36209;
+  --code: #d53f8c;
+  --code-fence: #d53f8c;
+}
+:root[data-theme='dark'],
+:root[data-theme='black'] {
+  --punctuation: #718096;
+  --heading: #aa9bf5;
+  --quote: #718096;
+  --list: #718096;
+  --bold: #718096;
+  --italic: #188038;
+  --strike: #e36209;
+  --code: #bf616a;
+  --code-fence: #bf616a;
+}
+
+::highlight(md-punctuation) {
+  color: var(--punctuation);
+}
+::highlight(md-heading) {
+  color: var(--heading);
+}
+::highlight(md-quote) {
+  color: var(--quote);
+}
+::highlight(md-list) {
+  color: var(--list);
+}
+::highlight(md-bold) {
+  color: var(--bold);
+}
+::highlight(md-italic) {
+  color: var(--italic);
+}
+::highlight(md-strike) {
+  color: var(--strike);
+}
+::highlight(md-code) {
+  color: var(--code);
+}
+::highlight(md-code-fence) {
+  color: var(--code-fence);
+}
+
+html {
+  /* remove scroll bar */
+  scrollbar-gutter: unset;
+}
+
+body {
+  overflow: hidden;
+}
+
+.left-sidebar {
+  min-width: var(--width-left-sidebar);
+}
+
+@media (width >= 1000px) {
+  main {
+    width: 100%;
+  }
+
+  .header {
+    border: none;
+  }
+}
+
+h3::after {
+  display: none;
+}
+
+.markdown-rendered {
+  ol,
+  ul {
+    margin: 0 0 20px 20px;
+    padding: 0;
+  }
+
+  li {
+    margin: 10px 0 10px 0;
+  }
+
+  code,
+  pre,
+  pre * {
+    font-size: 0.9rem;
+  }
+}
+
+/* FFM Ambassador Theme Tokens */
+:root {
+  --ink: #24354b;
+  --ink-soft: #64707d;
+  --paper: #fbfaf7;
+  --paper-deep: #f1efe8;
+  --lilac: #aea4e4;
+  --lilac-deep: #8275ce;
+  --lilac-pale: #eeebfb;
+  --sage: #8ba493;
+  --line: rgba(36, 53, 75, 0.12);
+  --card: rgba(255, 255, 255, 0.86);
+  --radius: 16px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--lilac-deep);
+  --primary-foreground: #fff;
+  --secondary: var(--lilac-pale);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--lilac-pale);
+  --accent-foreground: var(--ink);
+  --destructive: #c84c4a;
+  --destructive-foreground: #fff;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--lilac);
+}
+
+.night {
+  --ink: #f0eff5;
+  --ink-soft: #b7b6c4;
+  --paper: #11101c;
+  --paper-deep: #191827;
+  --lilac-pale: #292743;
+  --line: rgba(239, 238, 247, 0.12);
+  --card: rgba(30, 29, 44, 0.9);
+}
+
+body.home-page {
+  overflow: auto;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.home-page .paper-grain {
+  mix-blend-mode: multiply;
+}
+
+.night .paper-grain {
+  mix-blend-mode: screen;
+  opacity: 0.13;
+}

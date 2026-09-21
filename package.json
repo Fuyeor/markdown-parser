@@ -6,9 +6,11 @@
   "scripts": {
     "format": "prettier --write \"**/*.ts\"",
     "test": "pnpm -F @fuyeor/markdown-parser test",
-    "playground": "pnpm -F @fuyeor/markdown-playground dev"
+    "playground": "pnpm -F @fuyeor/markdown-playground dev",
+    "locale": "locale-cli"
   },
   "devDependencies": {
+    "@fuyeor/locale-cli": "^0.1.1",
     "@types/node": "^25.6.0",
     "jsdom": "^29.0.1",
     "prettier": "^3.8.3",
