@@ -1,4 +1,4 @@
-// @fuyeor/markdown-parser-playground/vite.config.ts
+// @/vite.config.ts
 import { defineConfig } from 'vite';
 import { createViteConfig } from '@fuyeor/config/vite.config.js';
 

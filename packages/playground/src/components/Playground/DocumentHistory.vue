@@ -2,7 +2,7 @@
 <template>
   <!-- only shows when user created example doc -->
   <Foldable
-    v-if="filteredDocuments.length !== 0"
+    v-if="documents.length !== 0"
     :title="t('documents')"
     :model-value="true"
     :icon-url="getIconUrl('learn')"
@@ -19,12 +19,11 @@
 
       <button
         type="button"
-        class="clear-documents-button"
-        :aria-label="t('documents.clear')"
-        :title="t('documents.clear')"
+        class="remove-btn"
+        v-tooltip="t('documents.clear')"
         @click="isClearDocumentsModalOpen = true"
       >
-        <img class="document-icon" :src="getIconUrl('close')" alt="" />
+        ✕
       </button>
     </div>
 
@@ -32,21 +31,19 @@
       <template #header>
         <h3>{{ t('documents.clear') }}</h3>
       </template>
-      <div class="clear-documents-content">
-        <p>{{ t('documents.clearConfirm') }}</p>
-      </div>
+      {{ t('documents.clearConfirm') }}
       <template #footer>
-        <div class="clear-documents-actions">
+        <div class="confirm-dialog-actions">
           <button
             type="button"
-            class="clear-documents-cancel"
+            class="action-btn secondary"
             @click="isClearDocumentsModalOpen = false"
           >
             {{ t('cancel') }}
           </button>
           <button
             type="button"
-            class="clear-documents-confirm"
+            class="action-btn danger"
             @click="handleClearDocuments"
           >
             {{ t('confirm') }}
@@ -56,39 +53,36 @@
     </Modal>
 
     <div class="document-list">
-      <template v-for="document in filteredDocuments" :key="document.id">
-        <router-link
-          :to="{
-            name: 'Playground',
-            params: { ...route.params, id: document.id },
-          }"
-          class="document-item"
-          :class="{ active: currentDocumentId === document.id }"
-        >
-          <span class="document-info">
-            <span class="document-title">{{
-              document.title || t('documents.untitled')
-            }}</span>
-            <span class="document-time">
-              {{ formatTime(document.updated_at) }}
-              <span
-                v-if="document.word_count !== undefined"
-                class="document-word-count"
-              >
-                {{
-                  t('documents.stats.words', {
-                    count: document.word_count,
-                  })
-                }}
-              </span>
-              <DropdownMenu
-                :aria-label="`${t('delete')}: ${document.title}`"
-                :items="documentMenuItems(document)"
-              />
+      <router-link
+        v-for="document in filteredDocuments"
+        :key="document.id"
+        :to="{
+          name: 'Playground',
+          params: { ...route.params, id: document.id },
+        }"
+        class="document-item"
+        :class="{ active: currentDocumentId === document.id }"
+      >
+        <span class="document-info">
+          <span class="document-title">{{
+            document.title || t('documents.untitled')
+          }}</span>
+          <span class="document-time">
+            {{ formatTime(document.updated_at) }}
+            <span
+              v-if="document.word_count !== undefined"
+              class="document-word-count"
+            >
+              {{ t('documents.stats.words', { count: document.word_count }) }}
             </span>
+            <DropdownMenu
+              :aria-label="`${t('delete')}: ${document.title}`"
+              :items="documentMenuItems(document)"
+              @click.stop.prevent
+            />
           </span>
-        </router-link>
-      </template>
+        </span>
+      </router-link>
     </div>
   </Foldable>
 </template>
@@ -221,73 +215,19 @@ const formatTime = (timestamp: number): string => {
   background: var(--surface-raised);
   font-size: 0.85rem;
   outline: none;
+
+  &:focus {
+    box-shadow: var(--input-border-shadow);
+  }
 }
 
-.document-search-input:focus {
-  border: var(--input-border-focus);
-}
-
-.clear-documents-button {
-  display: grid;
-  width: 32px;
-  height: 32px;
+.remove-btn {
   flex: 0 0 32px;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: transparent;
-  cursor: pointer;
-}
 
-.clear-documents-button:hover,
-.clear-documents-button:focus-visible {
-  background: var(--surface-raised);
-}
-
-.clear-documents-button .document-icon {
-  width: 18px;
-  height: 18px;
-  opacity: 0.65;
-}
-
-.clear-documents-button:hover .document-icon,
-.clear-documents-button:focus-visible .document-icon {
-  opacity: 1;
-}
-
-.clear-documents-content p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.clear-documents-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.clear-documents-actions button {
-  padding: 8px 14px;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-}
-
-.clear-documents-cancel {
-  border: var(--border-subtle);
-  color: var(--text-secondary);
-  background: var(--surface-raised);
-}
-
-.clear-documents-confirm {
-  border: 1px solid var(--color-danger, #c84c4a);
-  color: #ffffff;
-  background: var(--color-danger, #c84c4a);
-}
-
-.clear-documents-confirm:hover {
-  filter: brightness(0.92);
+  &:hover,
+  &:focus-visible {
+    color: var(--color-danger);
+  }
 }
 
 .document-list {
@@ -364,8 +304,9 @@ const formatTime = (timestamp: number): string => {
   margin-left: 2px;
 }
 
-.document-item-wrapper:hover .document-menu,
-.document-item-wrapper:focus-within .document-menu {
-  opacity: 1;
+@media (width <= 900px) {
+  .document-item {
+    padding: 10px 0;
+  }
 }
 </style>

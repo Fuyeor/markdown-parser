@@ -1,6 +1,6 @@
 <!-- @/views/Home.vue -->
 <template>
-  <div class="site-shell" :class="{ night: isDark }">
+  <div class="site-shell">
     <div class="paper-grain" aria-hidden="true" />
     <div class="page-spine" aria-hidden="true">
       <span class="spine-dot" />
@@ -8,31 +8,22 @@
       <span class="spine-flower">✦</span>
     </div>
 
-    <HomeHeader :is-dark="isDark" @toggle-theme="toggleTheme" />
-
-    <main id="top">
-      <HomeHero />
-      <HomeIntro />
-      <HomeStatement />
-      <HomeFeatures />
-      <HomeCampaign />
-    </main>
-
-    <HomeFooter />
+    <HomeHero />
+    <HomeIntro />
+    <HomeStatement />
+    <HomeFeatures />
+    <HomeCampaign />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue';
 import HomeCampaign from '@/components/Home/HomeCampaign.vue';
 import HomeFeatures from '@/components/Home/HomeFeatures.vue';
-import HomeFooter from '@/components/Home/HomeFooter.vue';
-import HomeHeader from '@/components/Home/HomeHeader.vue';
 import HomeHero from '@/components/Home/HomeHero.vue';
 import HomeIntro from '@/components/Home/HomeIntro.vue';
 import HomeStatement from '@/components/Home/HomeStatement.vue';
 
-const isDark = ref(false);
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 // Scope page-level scrolling to Home while preserving the Playground layout.
 onMounted(() => {
@@ -42,11 +33,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.body.classList.remove('home-page');
 });
-
-// Toggle only the Home presentation theme; the existing Playground stays unchanged.
-const toggleTheme = () => {
-  isDark.value = !isDark.value;
-};
 </script>
 
 <style scoped>

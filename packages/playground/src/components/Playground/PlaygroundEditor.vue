@@ -17,43 +17,35 @@
     </MarkdownToolbar>
     <div
       class="editor-scroll-container"
-      @scroll="syncScroll"
       ref="scrollContainer"
+      @scroll="syncScroll"
     >
-      <div class="editor-line-numbers" aria-hidden="true">
-        <div v-for="n in lineNumbers" :key="n" class="line-number">{{ n }}</div>
-      </div>
-      <div
-        class="editor-content-wrapper"
-        :style="{ minHeight: `calc(${lineNumbers.length} * 1.6em + 32px)` }"
-      >
-        <div
-          v-if="!supportsCustomHighlight"
-          class="editor-highlight-layer"
-          aria-hidden="true"
-        >
+      <div class="editor-grid" ref="highlightTarget">
+        <div class="editor-gutter-bg" aria-hidden="true" />
+        <template v-for="(line, i) in lines" :key="i">
           <div
-            v-for="(html, i) in highlightedLines"
-            :key="i"
-            class="highlight-line"
-            v-html="html"
+            aria-hidden="true"
+            class="line-number"
+            :style="{ gridRow: `${i + 1}` }"
+          >
+            {{ i + 1 }}
+          </div>
+          <div
+            aria-hidden="true"
+            class="highlight-line custom-highlight-target"
+            v-text="line || ' '"
+            :style="{ gridRow: `${i + 1}` }"
           ></div>
-        </div>
-        <div
-          v-else
-          ref="highlightTarget"
-          class="editor-highlight-layer custom-highlight-target"
-          aria-hidden="true"
-        >
-          {{ source + (source.endsWith('\n') ? ' ' : '') }}
-        </div>
+        </template>
+
         <textarea
           ref="editor"
-          v-model="source"
           spellcheck="false"
           class="editor-textarea"
-          @input="recordInput"
-          @scroll="syncTextareaScroll"
+          :value="source"
+          @input="handleInput"
+          @compositionstart="handleCompositionStart"
+          @compositionend="handleCompositionEnd"
         />
       </div>
     </div>
@@ -85,7 +77,6 @@ const { source } = usePlaygroundSource();
 const editor = ref<HTMLTextAreaElement | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
 const highlightTarget = ref<HTMLElement | null>(null);
-const supportsCustomHighlight = 'highlights' in window.CSS;
 
 const {
   canUndo,
@@ -98,11 +89,7 @@ const {
   redo,
 } = useMarkdownEditor(source, editor);
 
-const { lineNumbers, highlightedLines } = useMarkdownHighlighter(
-  source,
-  highlightTarget,
-  supportsCustomHighlight,
-);
+const { lines } = useMarkdownHighlighter(source, highlightTarget);
 const { stats } = useDocumentStats(source);
 
 // The outer container owns scrolling so line numbers and the mirrored text stay aligned.
@@ -112,17 +99,34 @@ const emit = defineEmits<{
   (e: 'copy-html'): void;
 }>();
 
+// 输入法组合状态锁
+const isComposing = ref(false);
+
+const handleCompositionStart = () => {
+  isComposing.value = true;
+};
+
+const handleCompositionEnd = (event: Event) => {
+  isComposing.value = false;
+  source.value = (event.target as HTMLTextAreaElement).value;
+  // 选词完成时，立即将最终确定的中文写入撤销栈
+  recordInput();
+};
+
+const handleInput = (event: Event) => {
+  source.value = (event.target as HTMLTextAreaElement).value;
+  // 拼音组合中只更新显示，绝不污染撤销历史栈
+  if (!isComposing.value) {
+    recordInput();
+  }
+};
+
 // The outer container owns scrolling so line numbers and the mirrored text stay aligned.
 const syncScroll = (event: Event) => {
   const target = event.target as HTMLElement;
   const maxScroll = target.scrollHeight - target.clientHeight;
   const percentage = maxScroll > 0 ? target.scrollTop / maxScroll : 0;
   emit('scroll', percentage);
-};
-
-const syncTextareaScroll = (event: Event) => {
-  const target = event.target as HTMLElement;
-  if (scrollContainer.value) scrollContainer.value.scrollTop = target.scrollTop;
 };
 
 const scrollToPercentage = (percentage: number) => {
@@ -145,119 +149,116 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
   flex-direction: column;
 }
 
+.editor {
+  border-right: var(--border-subtle);
+
+  textarea:hover,
+  textarea:focus {
+    box-shadow: none;
+  }
+}
+
 .tab-container {
   height: 3rem;
   border-bottom: var(--border-subtle);
 }
 
 .editor-scroll-container {
-  display: flex;
   min-height: 0;
   flex: 1;
-  overflow: auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  overflow-x: hidden;
+  overflow-y: auto;
   font-size: 1rem;
   line-height: 1.6;
 }
 
-.editor-line-numbers {
-  padding: 16px 12px;
-  text-align: right;
-  color: #a0aec0;
-  user-select: none;
-  border-right: var(--border-default);
+.editor-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  /* 强制所有行靠顶紧凑排列，剩余空间留在底部 */
+  align-content: start;
+  min-height: 100%;
+  padding: 16px 0;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Line number background */
+.editor-gutter-bg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  grid-column: 1;
   background: var(--surface-top);
+  border-right: var(--border-default);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .line-number {
+  grid-column: 1;
+  padding: 0 12px;
+  text-align: right;
+  color: #a0aec0;
+  user-select: none;
+  align-self: start;
+  line-height: inherit;
+  z-index: 2;
+}
+
+/* Rendering layer
+ * Adapts to the height of the current line
+ * and expands the line size naturally when encountering line breaks
+ */
+.highlight-line {
+  grid-column: 2;
+  padding: 0 16px;
+  margin: 0;
+  box-sizing: border-box;
+  word-spacing: inherit;
+  tab-size: 4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  pointer-events: none;
+  z-index: 2;
   min-height: 1.6em;
 }
 
-.editor-content-wrapper {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-}
-
-.editor-highlight-layer,
 .editor-textarea {
   position: absolute;
-  top: 0;
+  grid-column: 2;
+  top: 16px;
   left: 0;
   width: 100%;
-  height: 100%;
-  padding: 16px;
+  height: calc(100% - 32px);
+  padding: 0 16px;
   margin: 0;
   border: 0;
   box-sizing: border-box;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  tab-size: 4;
   white-space: pre-wrap;
-  word-wrap: break-word;
+  word-break: break-word;
   overflow-wrap: break-word;
-}
-
-.editor-highlight-layer {
-  pointer-events: none;
-  z-index: 1;
-  color: #1a202c;
-}
-
-.highlight-line {
-  min-height: 1.6em;
-}
-
-.editor-textarea {
   color: transparent;
   background: transparent;
   caret-color: #2b6cb0;
   resize: none;
   outline: none;
   overflow: hidden;
-  z-index: 2;
+  z-index: 3;
 }
 
 /* Make selection visible on the transparent textarea */
 .editor-textarea::selection {
   background: rgba(43, 108, 176, 0.25);
   color: transparent;
-}
-
-/* Fallback Highlighting tokens */
-.hl-punctuation {
-  color: #a0aec0;
-}
-.hl-heading {
-  color: #553c9a;
-  font-weight: 600;
-}
-.hl-quote {
-  color: #718096;
-  font-style: italic;
-}
-.hl-list {
-  color: #2d3748;
-}
-.hl-bold {
-  font-weight: 700;
-  color: #1a202c;
-}
-.hl-italic {
-  font-style: italic;
-  color: #1a202c;
-}
-.hl-code {
-  color: #d53f8c;
-  background: #faf5ff;
-  border-radius: 3px;
-  padding: 0 2px;
-}
-.hl-strike {
-  text-decoration: line-through;
-  color: #a0aec0;
-}
-.hl-code-fence {
-  color: #805ad5;
 }
 </style>

@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 import { useLocale } from '@fuyeor/locale';
-import type { MarkdownTool } from '../../composables/useMarkdownEditor';
+import type { MarkdownTool } from '@/composables/useMarkdownEditor';
 
 const { t } = useLocale();
 

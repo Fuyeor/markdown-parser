@@ -1,7 +1,7 @@
 <!-- @/views/Playground.vue -->
 <template>
-  <div class="playground-wrapper">
-    <section class="playground-layout">
+  <div class="playground-layout">
+    <section class="playground">
       <PlaygroundEditor
         ref="editorComponent"
         :created-at="currentDocument?.created_at"
@@ -14,10 +14,7 @@
           <PlaygroundShare />
         </template>
       </PlaygroundEditor>
-      <PlaygroundPreview
-        ref="previewComponent"
-        @scroll="handlePreviewScroll"
-      />
+      <PlaygroundPreview ref="previewComponent" @scroll="handlePreviewScroll" />
     </section>
     <DocumentStatsBar
       v-if="editorComponent?.stats"
@@ -38,6 +35,7 @@ import { computed, ref, watch } from 'vue';
 import { useLocale } from '@fuyeor/locale';
 import { useToast } from '@fuyeor/interactify';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
+import { debounce } from '@fuyeor/commons';
 import { fetchExample } from '@/api/examples';
 import { decodeSnippet } from '@/composables/useCompression';
 import { usePlaygroundSource } from '@/composables/usePlaygroundSource';
@@ -57,9 +55,21 @@ const {
   isReady,
   error: storageError,
 } = useIndexedDb();
+
 const editorComponent = ref<InstanceType<typeof PlaygroundEditor> | null>(null);
-const previewComponent = ref<InstanceType<typeof PlaygroundPreview> | null>(null);
+const previewComponent = ref<InstanceType<typeof PlaygroundPreview> | null>(
+  null,
+);
+const isRouteLoading = ref(true);
+
 let synchronizingScroll = false;
+let skipNextSourceChange = false;
+let creatingDocument = false;
+
+const currentDocument = computed(() => {
+  const id = String(route.params.id ?? '');
+  return documents.value.find((document) => document.id === id);
+});
 
 const releaseScrollSync = () => {
   window.requestAnimationFrame(() => {
@@ -97,25 +107,6 @@ const handlePreviewScroll = (percentage: number) => {
   editorComponent.value?.scrollToPercentage(percentage);
   releaseScrollSync();
 };
-const currentDocument = computed(() => {
-  const id = String(route.params.id ?? '');
-  return documents.value.find((document) => document.id === id);
-});
-const isRouteLoading = ref(true);
-let skipNextSourceChange = false;
-let creatingDocument = false;
-let createDocumentTimeout: number | null = null;
-let saveTimeout: number | null = null;
-let pendingSaveId = '';
-let pendingSaveContent = '';
-
-const playgroundParams = (id: string) => ({
-  ...(route.params.locale ? { locale: route.params.locale } : {}),
-  id,
-});
-
-const playgroundPath = () =>
-  `${route.params.locale ? `/${route.params.locale}` : ''}/playground`;
 
 const extractTitle = (content: string, untitled: string): string => {
   for (const line of content.split('\n')) {
@@ -131,48 +122,23 @@ const saveDocumentContent = async (id: string, content: string) => {
   const previous = documents.value.find((document) => document.id === id);
   if (!previous) return;
 
-  const stats = countDocumentStats(content);
   const document: HistoryDocument = {
     ...previous,
     title: extractTitle(content, t('documents.untitled')),
     updated_at: window.Date.now(),
     content,
-    word_count: stats.words,
+    word_count: countDocumentStats(content).words,
   };
   await saveDocument(document);
 };
 
-const clearCreateDocumentTimeout = () => {
-  if (createDocumentTimeout === null) return;
-  window.clearTimeout(createDocumentTimeout);
-  createDocumentTimeout = null;
-};
-
-const clearSaveTimeout = () => {
-  if (saveTimeout === null) return;
-  window.clearTimeout(saveTimeout);
-  saveTimeout = null;
-};
-
-const flushPendingSave = async () => {
-  if (!pendingSaveId) return;
-  const id = pendingSaveId;
-  const content = pendingSaveContent;
-  pendingSaveId = '';
-  pendingSaveContent = '';
-  clearSaveTimeout();
+const debouncedSave = debounce(async (id: string, content: string) => {
   await saveDocumentContent(id, content);
-};
+}, 500);
 
-const scheduleSave = (id: string, content: string) => {
-  pendingSaveId = id;
-  pendingSaveContent = content;
-  clearSaveTimeout();
-  saveTimeout = window.setTimeout(() => {
-    saveTimeout = null;
-    void flushPendingSave().catch(console.error);
-  }, 500);
-};
+const debouncedCreate = debounce(async (content: string) => {
+  await createDocumentFromInput(content);
+}, 300);
 
 const replaceSourceIfChanged = (content: string) => {
   if (source.value === content) return;
@@ -182,6 +148,30 @@ const replaceSourceIfChanged = (content: string) => {
   else source.value = content;
 };
 
+const createDocumentFromInput = async (content: string) => {
+  if (creatingDocument || !content || storageError.value) return;
+  creatingDocument = true;
+
+  try {
+    const now = window.Date.now();
+    const document: HistoryDocument = {
+      id: window.crypto.randomUUID(),
+      title: extractTitle(content, t('documents.untitled')),
+      created_at: now,
+      updated_at: now,
+      content,
+      word_count: countDocumentStats(content).words,
+    };
+    await saveDocument(document);
+    await router.replace({
+      name: 'Playground',
+      params: { ...route.params, id: document.id },
+    });
+  } finally {
+    creatingDocument = false;
+  }
+};
+
 const loadRouteDocument = async () => {
   if (!isReady.value) return;
   if (storageError.value) {
@@ -189,8 +179,9 @@ const loadRouteDocument = async () => {
     return;
   }
 
-  clearCreateDocumentTimeout();
-  await flushPendingSave();
+  debouncedCreate.cancel();
+  debouncedSave.cancel();
+
   const id = String(route.params.id ?? '');
   const document = id
     ? documents.value.find((item) => item.id === id)
@@ -199,7 +190,10 @@ const loadRouteDocument = async () => {
   if (id && !document) {
     replaceSourceIfChanged('');
     isRouteLoading.value = false;
-    await router.replace(playgroundPath());
+    await router.replace({
+      name: 'Playground',
+      params: { ...route.params, id: undefined },
+    });
     return;
   }
 
@@ -235,33 +229,6 @@ const loadRouteDocument = async () => {
   isRouteLoading.value = false;
 };
 
-// Create a local document only after the user starts writing on the blank route.
-const createDocumentFromInput = async (content: string) => {
-  if (creatingDocument || !content || storageError.value) return;
-  creatingDocument = true;
-
-  try {
-    const now = window.Date.now();
-    const stats = countDocumentStats(content);
-    const document: HistoryDocument = {
-      id: window.crypto.randomUUID(),
-      title: extractTitle(content, t('documents.untitled')),
-      created_at: now,
-      updated_at: now,
-      content,
-      word_count: stats.words,
-    };
-    await saveDocument(document);
-    await router.replace({
-      name: 'Playground',
-      params: playgroundParams(document.id),
-    });
-  } finally {
-    creatingDocument = false;
-  }
-};
-
-// Persist edits with a small debounce and retain the native editor history.
 watch(source, (content) => {
   if (!isReady.value || storageError.value || isRouteLoading.value) return;
   if (skipNextSourceChange) {
@@ -271,35 +238,25 @@ watch(source, (content) => {
 
   const id = String(route.params.id ?? '');
   if (!id) {
-    clearCreateDocumentTimeout();
-    createDocumentTimeout = window.setTimeout(() => {
-      createDocumentTimeout = null;
-      void createDocumentFromInput(source.value).catch(console.error);
-    }, 300);
+    debouncedCreate(source.value);
     return;
   }
-  scheduleSave(id, content);
+  debouncedSave(id, content);
 });
 
 watch(
-  isReady,
-  (ready) => {
-    if (ready) void loadRouteDocument().catch(console.error);
+  [isReady, () => route.params.id],
+  ([ready]) => {
+    if (!ready) return;
+    isRouteLoading.value = true;
+    loadRouteDocument().catch(console.error);
   },
   { immediate: true },
-);
-
-watch(
-  () => route.params.id,
-  () => {
-    isRouteLoading.value = true;
-    void loadRouteDocument().catch(console.error);
-  },
 );
 </script>
 
 <style>
-.playground-wrapper {
+.playground-layout {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -307,11 +264,31 @@ watch(
   overflow: hidden;
 }
 
-.playground-layout {
+.playground {
   display: flex;
   flex: 1;
   min-height: 0;
   width: 100%;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (width <= 900px) {
+  .playground-layout {
+    position: absolute;
+    top: var(--height-header);
+    height: calc(100% - var(--height-header));
+  }
+
+  .playground {
+    flex-direction: column-reverse;
+  }
 }
 
 .preview {
@@ -322,13 +299,6 @@ watch(
     .tab-item {
       align-items: stretch;
     }
-  }
-
-  .output-content {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding: 20px;
   }
 
   pre {

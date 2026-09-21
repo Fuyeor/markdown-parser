@@ -1,6 +1,7 @@
 // @/composables/useMarkdownEditor.ts
 import { computed, nextTick, ref, type Ref } from 'vue';
 import { format as formatMarkdown } from '@fuyeor/markdown-formatter';
+import { debounce } from '@fuyeor/commons';
 
 export type MarkdownTool =
   | 'bold'
@@ -34,13 +35,20 @@ export function useMarkdownEditor(
     historyIndex.value = nextHistory.length - 1;
   };
 
+  // 300ms debouncing aggregation during continuous Pinyin typing
+  // to avoid polluting the undo stack with a single Pinyin letter.
+  const debouncedRecordHistory = debounce((value: string) => {
+    recordHistory(value);
+  }, 300);
+
   const replaceSource = (value: string) => {
+    debouncedRecordHistory.cancel();
     source.value = value;
     history.value = [value];
     historyIndex.value = 0;
   };
 
-  const recordInput = () => recordHistory(source.value);
+  const recordInput = () => debouncedRecordHistory(source.value);
 
   const setSource = (
     value: string,
@@ -48,34 +56,18 @@ export function useMarkdownEditor(
     selectionEnd: number,
     scrollTop?: number,
   ) => {
+    debouncedRecordHistory.cancel();
+    source.value = value;
     const element = editor.value;
-    if (element) {
-      element.focus();
-      // 使用 document.execCommand 来触发原生的输入事件，这样可以被 Ctrl+Z 撤销
-      // 由于 execCommand 已经被弃用但依然是所有浏览器支持插入文本且进入撤销栈的唯一标准方式
-      // 我们全选后替换来更新整个值，或只替换选区
-      element.select();
-      const success = document.execCommand('insertText', false, value);
 
-      // 如果 execCommand 失败（某些环境可能禁用），回退到直接赋值
-      if (!success) {
-        source.value = value;
-        element.value = value;
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-    } else {
-      source.value = value;
+    if (element) {
+      element.value = value;
+      element.focus();
+      element.setSelectionRange(selectionStart, selectionEnd);
+      if (scrollTop !== undefined) element.scrollTop = scrollTop;
     }
 
     recordHistory(value);
-    void nextTick(() => {
-      if (!element) return;
-      element.focus();
-      element.setSelectionRange(selectionStart, selectionEnd);
-      if (scrollTop !== undefined) {
-        element.scrollTop = scrollTop;
-      }
-    });
   };
 
   const applyTool = (tool: MarkdownTool) => {
@@ -104,7 +96,7 @@ export function useMarkdownEditor(
 
     if (tool === 'bold') replacement = toggleWrap('**');
     else if (tool === 'italic') replacement = toggleWrap('*');
-    else if (tool === 'strike') replacement = toggleWrap('~~');
+    else if (tool === 'strike') replacement = toggleWrap('--');
     else if (tool === 'code') replacement = toggleWrap('`');
     else if (tool === 'link')
       replacement = `[${fallback}](https://example.com)`;
@@ -112,50 +104,42 @@ export function useMarkdownEditor(
     else if (tool === 'quote')
       replacement = fallback
         .split('\n')
-        .map((line) => `> ${line}`)
+        .map((line) => `\n> ${line}`)
         .join('\n');
     else if (tool === 'unordered-list')
       replacement = fallback
         .split('\n')
-        .map((line) => `- ${line}`)
+        .map((line) => `\n- ${line}`)
         .join('\n');
     else if (tool === 'ordered-list')
       replacement = fallback
         .split('\n')
-        .map((line, index) => `${index + 1}. ${line}`)
+        .map((line, index) => `\n${index + 1}. ${line}`)
         .join('\n');
     else if (tool === 'checklist')
       replacement = fallback
         .split('\n')
-        .map((line) => `- [ ] ${line}`)
+        .map((line) => `\n- [ ] ${line}`)
         .join('\n');
     else if (tool === 'table')
-      replacement = '| Column 1 | Column 2 |\n| --- | --- |\n| Value | Value |';
+      replacement =
+        '\n\n| Column 1 | Column 2 |\n| --- | --- |\n| Value | Value |';
 
     const selectionStart = text ? start : start + replacement.length;
     const selectionEnd = text ? start + replacement.length : selectionStart;
 
     // 如果工具栏触发时不需要替换全部文档，我们可以只选中文本并执行 insertText 替换选区
     // 这样能保留更细粒度的 Ctrl+Z 历史
+    debouncedRecordHistory.cancel();
     element.focus();
-    element.setSelectionRange(start, end);
-    const success = document.execCommand('insertText', false, replacement);
+    element.setRangeText(replacement, start, end, 'end');
+    source.value = element.value;
+    recordHistory(source.value);
 
-    if (!success) {
-      // 降级策略
-      setSource(
-        `${source.value.slice(0, start)}${replacement}${source.value.slice(end)}`,
-        selectionStart,
-        selectionEnd,
-        element.scrollTop,
-      );
-    } else {
-      recordInput();
-      void nextTick(() => {
-        element.focus();
-        element.setSelectionRange(selectionStart, selectionEnd);
-      });
-    }
+    nextTick(() => {
+      element.focus();
+      element.setSelectionRange(selectionStart, selectionEnd);
+    });
   };
 
   const formatDocument = () => {
@@ -177,12 +161,14 @@ export function useMarkdownEditor(
 
   const undo = () => {
     if (!canUndo.value) return;
+    debouncedRecordHistory.cancel();
     historyIndex.value -= 1;
     source.value = history.value[historyIndex.value];
   };
 
   const redo = () => {
     if (!canRedo.value) return;
+    debouncedRecordHistory.cancel();
     historyIndex.value += 1;
     source.value = history.value[historyIndex.value];
   };

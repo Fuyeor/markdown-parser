@@ -48,7 +48,7 @@ const { processedItems: sidebarItems } = useSidebarItems(sidebarItemsRaw, {
 });
 
 const handleLocaleChange = (newLocale: string) => {
-  void router.replace({
+  router.replace({
     name: route.name,
     params: { ...route.params, locale: newLocale },
   });

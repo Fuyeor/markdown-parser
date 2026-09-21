@@ -1,4 +1,4 @@
-// @fuyeor/markdown-parser-playground/src/composables/useIndexedDb.ts
+// @/composables/useIndexedDb.ts
 import { onMounted, ref } from 'vue';
 import { countDocumentStats } from '@/composables/useDocumentStats';
 
@@ -16,7 +16,7 @@ type SyncMessage =
   | { type: 'DELETE'; id: string }
   | { type: 'CLEAR' };
 
-const DB_NAME = 'fuyeor-markdown-playground';
+const DB_NAME = 'ffm-playground';
 const STORE_NAME = 'documents';
 const UPDATED_AT_INDEX = 'updated_at';
 const DB_VERSION = 1;
@@ -28,37 +28,49 @@ let database: IDBDatabase | null = null;
 let initialization: Promise<void> | null = null;
 let broadcastChannel: BroadcastChannel | null = null;
 
+const upsertDocumentState = (document: HistoryDocument) => {
+  const index = documents.value.findIndex((item) => item.id === document.id);
+  if (index >= 0) documents.value[index] = { ...document };
+  else documents.value.push({ ...document });
+  documents.value.sort((a, b) => b.updated_at - a.updated_at);
+};
+
+const removeDocumentState = (id: string) => {
+  documents.value = documents.value.filter((item) => item.id !== id);
+};
+
 const initBroadcastChannel = () => {
   if (broadcastChannel) return;
-  broadcastChannel = new window.BroadcastChannel(
-    'fuyeor_markdown_playground_sync',
-  );
+  broadcastChannel = new window.BroadcastChannel(DB_NAME);
 
   broadcastChannel.onmessage = (event: MessageEvent<SyncMessage>) => {
     const message = event.data;
-    if (message.type === 'SAVE') {
-      const index = documents.value.findIndex(
-        (item) => item.id === message.document.id,
-      );
-      if (index >= 0) documents.value[index] = message.document;
-      else documents.value.push(message.document);
-      documents.value.sort((a, b) => b.updated_at - a.updated_at);
-    } else if (message.type === 'DELETE') {
-      documents.value = documents.value.filter(
-        (item) => item.id !== message.id,
-      );
-    } else if (message.type === 'CLEAR') {
-      documents.value = [];
-    }
+    if (message.type === 'SAVE') upsertDocumentState(message.document);
+    else if (message.type === 'DELETE') removeDocumentState(message.id);
+    else if (message.type === 'CLEAR') documents.value = [];
   };
+};
+
+const executeStore = (
+  mode: IDBTransactionMode,
+  action: (store: IDBObjectStore) => IDBRequest,
+): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!database) return reject(new Error('IndexedDB is not initialized'));
+    const transaction = database.transaction(STORE_NAME, mode);
+    const request = action(transaction.objectStore(STORE_NAME));
+
+    request.onerror = () =>
+      reject(request.error ?? new Error('IndexedDB request failed'));
+    transaction.onabort = () =>
+      reject(transaction.error ?? new Error('IndexedDB transaction aborted'));
+    transaction.oncomplete = () => resolve();
+  });
 };
 
 const loadAllDocuments = (): Promise<void> => {
   return new Promise((resolve, reject) => {
-    if (!database) {
-      reject(new Error('IndexedDB is not initialized'));
-      return;
-    }
+    if (!database) return reject(new Error('IndexedDB is not initialized'));
 
     const transaction = database.transaction(STORE_NAME, 'readwrite');
     const request = transaction
@@ -102,12 +114,7 @@ const loadAllDocuments = (): Promise<void> => {
 const initialize = (): Promise<void> => {
   if (initialization) return initialization;
 
-  initialization = new Promise((resolve, reject) => {
-    if (!window.indexedDB) {
-      reject(new Error('IndexedDB is not supported'));
-      return;
-    }
-
+  initialization = new Promise<void>((resolve, reject) => {
     const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () =>
@@ -151,67 +158,29 @@ const requireDatabase = async (): Promise<IDBDatabase> => {
 
 export function useIndexedDb() {
   const saveDocument = async (document: HistoryDocument): Promise<void> => {
-    const activeDatabase = await requireDatabase();
-
-    await new Promise<void>((resolve, reject) => {
-      const transaction = activeDatabase.transaction(STORE_NAME, 'readwrite');
-      const request = transaction.objectStore(STORE_NAME).put({ ...document });
-
-      request.onerror = () =>
-        reject(request.error ?? new Error('Failed to save document'));
-      transaction.onabort = () =>
-        reject(transaction.error ?? new Error('Failed to save document'));
-      transaction.oncomplete = resolve;
-    });
-
-    const index = documents.value.findIndex((item) => item.id === document.id);
-    if (index >= 0) documents.value[index] = { ...document };
-    else documents.value.push({ ...document });
-    documents.value.sort((a, b) => b.updated_at - a.updated_at);
-
+    await requireDatabase();
+    await executeStore('readwrite', (store) => store.put({ ...document }));
+    upsertDocumentState(document);
     broadcastChannel?.postMessage({ type: 'SAVE', document });
   };
 
   const deleteDocument = async (id: string): Promise<void> => {
-    const activeDatabase = await requireDatabase();
-
-    await new Promise<void>((resolve, reject) => {
-      const transaction = activeDatabase.transaction(STORE_NAME, 'readwrite');
-      const request = transaction.objectStore(STORE_NAME).delete(id);
-
-      request.onerror = () =>
-        reject(request.error ?? new Error('Failed to delete document'));
-      transaction.onabort = () =>
-        reject(transaction.error ?? new Error('Failed to delete document'));
-      transaction.oncomplete = resolve;
-    });
-
-    documents.value = documents.value.filter((item) => item.id !== id);
+    await requireDatabase();
+    await executeStore('readwrite', (store) => store.delete(id));
+    removeDocumentState(id);
     broadcastChannel?.postMessage({ type: 'DELETE', id });
   };
 
-  // Clear every local document in one transaction and update shared state after commit.
   const clearDocuments = async (): Promise<void> => {
-    const activeDatabase = await requireDatabase();
-
-    await new Promise<void>((resolve, reject) => {
-      const transaction = activeDatabase.transaction(STORE_NAME, 'readwrite');
-      const request = transaction.objectStore(STORE_NAME).clear();
-
-      request.onerror = () =>
-        reject(request.error ?? new Error('Failed to clear documents'));
-      transaction.onabort = () =>
-        reject(transaction.error ?? new Error('Failed to clear documents'));
-      transaction.oncomplete = resolve;
-    });
-
+    await requireDatabase();
+    await executeStore('readwrite', (store) => store.clear());
     documents.value = [];
     broadcastChannel?.postMessage({ type: 'CLEAR' });
   };
 
   onMounted(() => {
     initBroadcastChannel();
-    void initialize().catch(() => undefined);
+    initialize().catch(() => undefined);
   });
 
   return {

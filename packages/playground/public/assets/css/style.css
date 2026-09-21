@@ -3,12 +3,71 @@
   --width-main: 1000px;
   --width-left-sidebar: 350px;
   --width-right-sidebar: 0;
+}
 
-  --playground-border: #e2e8f0;
-  --playground-bg-section: #ffffff;
-  --playground-bg-header: #f8fafc;
-  --playground-font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+:root {
+  --punctuation: #a0aec0;
+  --heading: #d73a49;
+  --quote: #718096;
+  --list: #718096;
+  --bold: #718096;
+  --italic: #188038;
+  --strike: #e36209;
+  --code: #d53f8c;
+  --code-fence: #d53f8c;
+}
+:root[data-theme='dark'],
+:root[data-theme='black'] {
+  --punctuation: #718096;
+  --heading: #aa9bf5;
+  --quote: #718096;
+  --list: #718096;
+  --bold: #718096;
+  --italic: #188038;
+  --strike: #e36209;
+  --code: #bf616a;
+  --code-fence: #bf616a;
+}
+
+::highlight(md-punctuation) {
+  color: var(--punctuation);
+}
+::highlight(md-heading) {
+  color: var(--heading);
+}
+::highlight(md-quote) {
+  color: var(--quote);
+}
+::highlight(md-list) {
+  color: var(--list);
+}
+::highlight(md-bold) {
+  color: var(--bold);
+}
+::highlight(md-italic) {
+  color: var(--italic);
+}
+::highlight(md-strike) {
+  color: var(--strike);
+}
+::highlight(md-code) {
+  color: var(--code);
+}
+::highlight(md-code-fence) {
+  color: var(--code-fence);
+}
+
+html {
+  /* remove scroll bar */
+  scrollbar-gutter: unset;
+}
+
+body {
+  overflow: hidden;
+}
+
+.left-sidebar {
+  min-width: var(--width-left-sidebar);
 }
 
 @media (width >= 1000px) {
@@ -40,61 +99,6 @@ h3::after {
   pre,
   pre * {
     font-size: 0.9rem;
-  }
-}
-
-html {
-  /* remove scroll bar */
-  scrollbar-gutter: unset;
-}
-
-body {
-  overflow: hidden;
-}
-
-.playground-layout {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.2fr);
-  height: calc(-110px + 100vh);
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.editor {
-  border-right: var(--border-subtle);
-
-  textarea {
-    flex: 1;
-    resize: none;
-    background: transparent;
-    font: 400 13px / 1.6 var(--playground-font-mono);
-    tab-size: 2;
-    overflow-y: auto;
-  }
-
-  textarea:hover,
-  textarea:focus {
-    box-shadow: none;
-  }
-}
-
-@media (width <= 900px) {
-  .playground-layout {
-    height: auto;
-    grid-template-columns: 1fr;
-    grid-template-rows: 400px 520px;
-    position: absolute;
-    top: var(--height-header);
-  }
-
-  .preview {
-    border-top: var(--border-subtle);
   }
 }
 
