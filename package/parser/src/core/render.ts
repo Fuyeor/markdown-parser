@@ -65,46 +65,46 @@ export function render(nodes?: ASTNode[]): string {
         const level = getHeadingLevel(node.level);
         html +=
           level === null
-            ? `<span>${render(node.children)}</span>`
-            : `<h${level}>${render(node.children)}</h${level}>\n`;
+            ? `<span>${render(node.content)}</span>`
+            : `<h${level}>${render(node.content)}</h${level}>\n`;
         break;
       }
       case 'paragraph':
-        html += `<p>${render(node.children)}</p>\n`;
+        html += `<p>${render(node.content)}</p>\n`;
         break;
       case 'text':
-        html += node.content ? escapeHtml(node.content) : '';
+        html += node.value ? escapeHtml(node.value) : '';
         break;
       case 'emoji': {
-        const emoji = String(node.content ?? '');
+        const emoji = String(node.value ?? '');
         const alt = String(node.alt ?? emoji);
         const src = String(node.src ?? '');
         html += `<img class="emoji" draggable="false" alt="${escapeHtml(alt)}" src="${escapeHtml(src)}"/>`;
         break;
       }
       case 'math_inline':
-        html += `<span class="math-inline">${escapeHtml(String(node.content ?? ''))}</span>`;
+        html += `<span class="math-inline">${escapeHtml(String(node.value ?? ''))}</span>`;
         break;
       case 'math_block':
-        html += `<div class="math-block">${escapeHtml(String(node.content ?? ''))}</div>\n`;
+        html += `<div class="math-block">${escapeHtml(String(node.value ?? ''))}</div>\n`;
         break;
       case 'bold':
-        html += `<strong>${render(node.children)}</strong>`;
+        html += `<strong>${render(node.content)}</strong>`;
         break;
       case 'italic':
-        html += `<em>${render(node.children)}</em>`;
+        html += `<em>${render(node.content)}</em>`;
         break;
       case 'underline':
-        html += `<u>${render(node.children)}</u>`;
+        html += `<u>${render(node.content)}</u>`;
         break;
       case 'strike':
-        html += `<del>${render(node.children)}</del>`;
+        html += `<del>${render(node.content)}</del>`;
         break;
       case 'inline_code':
-        html += `<code>${node.content ? escapeHtml(node.content) : ''}</code>`;
+        html += `<code>${node.value ? escapeHtml(node.value) : ''}</code>`;
         break;
       case 'color_code': {
-        const color = String(node.content ?? '');
+        const color = String(node.value ?? '');
         if (!isSafeColorValue(color)) {
           html += escapeHtml(color);
           break;
@@ -115,8 +115,8 @@ export function render(nodes?: ASTNode[]): string {
       case 'link': {
         const url = String(node.url ?? '').trim();
         html += isSafeLinkUrl(url)
-          ? `<a href="${escapeHtml(url)}">${render(node.children)}</a>`
-          : render(node.children);
+          ? `<a href="${escapeHtml(url)}">${render(node.content)}</a>`
+          : render(node.content);
         break;
       }
       case 'code_block': {
@@ -129,7 +129,7 @@ export function render(nodes?: ASTNode[]): string {
         if (language) {
           html += `<div class="code-lang">${escapeHtml(displayLanguage)}</div>`;
         }
-        html += `<pre ${preAttributes}><code>${escapeHtml(String(node.content ?? ''))}\n</code></pre></div>\n`;
+        html += `<pre ${preAttributes}><code>${escapeHtml(String(node.value ?? ''))}\n</code></pre></div>\n`;
         break;
       }
       case 'list': {
@@ -138,23 +138,23 @@ export function render(nodes?: ASTNode[]): string {
           node.ordered && node.start && node.start !== 1
             ? ` start="${node.start}"`
             : '';
-        html += `<${tag}${start}>\n${render(node.children)}</${tag}>\n`;
+        html += `<${tag}${start}>\n${render(node.content)}</${tag}>\n`;
         break;
       }
       case 'list_item':
-        html += `<li>${render(node.children)}</li>\n`;
+        html += `<li>${render(node.content)}</li>\n`;
         break;
       case 'mermaid':
-        html += `<div class="language-mermaid">${escapeHtml(String(node.content ?? ''))}</div>\n`;
+        html += `<div class="language-mermaid">${escapeHtml(String(node.value ?? ''))}</div>\n`;
         break;
       case 'abc':
-        html += `<div class="language-abc">${escapeHtml(String(node.content ?? ''))}</div>\n`;
+        html += `<div class="language-abc">${escapeHtml(String(node.value ?? ''))}</div>\n`;
         break;
       case 'smiles_inline':
-        html += `<span class="language-smiles smiles-inline" data-smiles="${escapeHtml(String(node.content ?? ''))}"></span>`;
+        html += `<span class="language-smiles smiles-inline" data-smiles="${escapeHtml(String(node.value ?? ''))}"></span>`;
         break;
       case 'smiles_block': {
-        const blocks = String(node.content ?? '')
+        const blocks = String(node.value ?? '')
           .split('\n')
           .filter((line) => line.trim().length > 0)
           .map(
@@ -166,19 +166,19 @@ export function render(nodes?: ASTNode[]): string {
       }
       case 'table': {
         html += '<table>\n';
-        if (node.headers) {
+        if (node.header) {
           html += '<thead>\n<tr>\n';
-          node.headers.forEach((cell) => {
-            html += `<th${getTableAlignment(cell.align)}>${render(cell.children)}</th>\n`;
+          node.header.forEach((cell) => {
+            html += `<th${getTableAlignment(cell.align)}>${render(cell.content)}</th>\n`;
           });
           html += '</tr>\n</thead>\n';
         }
-        if (node.children && node.children.length > 0) {
+        if (node.content && node.content.length > 0) {
           html += '<tbody>\n';
-          node.children.forEach((row) => {
+          node.content.forEach((row) => {
             html += '<tr>\n';
-            row.children?.forEach((cell) => {
-              html += `<td${getTableAlignment(cell.align)}>${render(cell.children)}</td>\n`;
+            row.content?.forEach((cell) => {
+              html += `<td${getTableAlignment(cell.align)}>${render(cell.content)}</td>\n`;
             });
             html += '</tr>\n';
           });
@@ -191,16 +191,16 @@ export function render(nodes?: ASTNode[]): string {
         html += '<hr />\n';
         break;
       case 'blockquote':
-        html += `<blockquote>\n${render(node.children)}</blockquote>\n`;
+        html += `<blockquote>\n${render(node.content)}</blockquote>\n`;
         break;
       case 'accordion':
-        html += `<div class="ffm-accordion">${render(node.children)}</div>`;
+        html += `<div class="ffm-accordion">${render(node.content)}</div>`;
         break;
       case 'accordion_item':
-        html += `<details name="${escapeHtml(String(node.name ?? ''))}"><summary>${render(node.title)}</summary><div class="accordion-content">${render(node.children)}</div></details>`;
+        html += `<details name="${escapeHtml(String(node.name ?? ''))}"><summary>${render(node.title)}</summary><div class="accordion-content">${render(node.content)}</div></details>`;
         break;
       case 'chain':
-        html += `<div class="chain-container">${render(node.children)}</div>`;
+        html += `<div class="chain-container">${render(node.content)}</div>`;
         break;
       case 'chain_item': {
         const statusClass = node.hasCheckbox
@@ -212,20 +212,20 @@ export function render(nodes?: ASTNode[]): string {
           node.title && node.title.length > 0
             ? `<div class="chain-title">${render(node.title)}</div>`
             : '';
-        html += `<div class="chain-item ${statusClass}"><div class="chain-marker"></div><div class="chain-content-wrapper">${title}<div class="chain-body">${render(node.children)}</div></div></div>`;
+        html += `<div class="chain-item ${statusClass}"><div class="chain-marker"></div><div class="chain-content-wrapper">${title}<div class="chain-body">${render(node.content)}</div></div></div>`;
         break;
       }
       case 'slide':
-        html += `<div class="slide-container-wrapper"><div class="slide-container">${render(node.children)}</div></div>`;
+        html += `<div class="slide-container-wrapper"><div class="slide-container">${render(node.content)}</div></div>`;
         break;
       case 'slide_item':
-        html += `<div class="slide-item">${render(node.children)}</div>`;
+        html += `<div class="slide-item">${render(node.content)}</div>`;
         break;
       case 'hardbreak':
         html += '<br />\n';
         break;
       default:
-        html += `<span>${render(node.children)}</span>`;
+        html += `<span>${render(node.content)}</span>`;
         break;
     }
   }

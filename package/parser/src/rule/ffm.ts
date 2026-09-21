@@ -33,7 +33,7 @@ export const ffmBlockRule: BlockRule = {
     // ffm quote: recursively render the internal Markdown
     if (type === 'quote') {
       return {
-        node: { type: 'blockquote', children: ctx.parseBlocks(rawContent) },
+        node: { type: 'blockquote', content: ctx.parseBlocks(rawContent) },
         consumedLines,
       };
     }
@@ -46,10 +46,10 @@ export const ffmBlockRule: BlockRule = {
 
       const slides = slideContents.map((s) => ({
         type: 'slide_item',
-        children: ctx.parseBlocks(s.trim()),
+        content: ctx.parseBlocks(s.trim()),
       }));
 
-      return { node: { type: 'slide', children: slides }, consumedLines };
+      return { node: { type: 'slide', content: slides }, consumedLines };
     }
 
     // ffm chain and accordion
@@ -78,7 +78,7 @@ export const ffmBlockRule: BlockRule = {
               preambleLines = currentLines;
             }
           } else {
-            previousItem.children = ctx.parseBlocks(
+            previousItem.content = ctx.parseBlocks(
               currentLines.join('\n').trim(),
             );
           }
@@ -88,7 +88,7 @@ export const ffmBlockRule: BlockRule = {
             type: type === 'accordion' ? 'accordion_item' : 'chain_item',
             name: accordionName,
             title: ctx.parseInline(titleMatch[2]),
-            children: [],
+            content: [],
             ...(type === 'chain'
               ? {
                   isCompleted: checkboxMark
@@ -108,7 +108,7 @@ export const ffmBlockRule: BlockRule = {
       // archive the last item or go back
       const lastItem = currentItem;
       if (lastItem) {
-        lastItem.children = ctx.parseBlocks(currentLines.join('\n').trim());
+        lastItem.content = ctx.parseBlocks(currentLines.join('\n').trim());
       } else {
         // if no valid title is found from beginning to end
         // revert to displaying regular content
@@ -117,18 +117,18 @@ export const ffmBlockRule: BlockRule = {
         }
       }
 
-      const children: ASTNode[] = [];
+      const content: ASTNode[] = [];
       if (preambleLines.length > 0) {
-        children.push(...ctx.parseBlocks(preambleLines.join('\n').trim()));
+        content.push(...ctx.parseBlocks(preambleLines.join('\n').trim()));
       }
-      children.push(...items);
+      content.push(...items);
 
-      return { node: { type, name: accordionName, children }, consumedLines };
+      return { node: { type, name: accordionName, content }, consumedLines };
     }
 
     // fallback
     return {
-      node: { type: 'code_block', lang: type, content: rawContent },
+      node: { type: 'code_block', lang: type, value: rawContent },
       consumedLines,
     };
   },

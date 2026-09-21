@@ -31,7 +31,7 @@
           "value": "paragraph"
         },
         {
-          "path": "/0/children/0/content",
+          "path": "/0/content/0/value",
           "value": "text <script>alert(1)</script>"
         }
       ],
@@ -45,15 +45,15 @@
           "value": "table"
         },
         {
-          "path": "/0/headers/0/type",
+          "path": "/0/header/0/type",
           "value": "table_cell"
         },
         {
-          "path": "/0/headers/1/type",
+          "path": "/0/header/1/type",
           "value": "table_cell"
         },
         {
-          "path": "/0/children/0/type",
+          "path": "/0/content/0/type",
           "value": "table_row"
         }
       ],

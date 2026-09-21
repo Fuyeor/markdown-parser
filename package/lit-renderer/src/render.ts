@@ -19,46 +19,46 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
           node.level <= 6
             ? node.level
             : null;
-        if (level === null) return html`<span>${render(node.children)}</span>`;
+        if (level === null) return html`<span>${render(node.content)}</span>`;
 
         const tagName = `h${level}`;
         return staticHtml`
           <${unsafeStatic(tagName)}>
-            ${render(node.children)}
+            ${render(node.content)}
           </${unsafeStatic(tagName)}>
         `;
       }
 
       case 'paragraph':
-        return html`<p>${render(node.children)}</p>`;
+        return html`<p>${render(node.content)}</p>`;
 
       case 'text':
-        return node.content || '';
+        return node.value || '';
 
       case 'bold':
-        return html`<strong>${render(node.children)}</strong>`;
+        return html`<strong>${render(node.content)}</strong>`;
 
       case 'italic':
-        return html`<em>${render(node.children)}</em>`;
+        return html`<em>${render(node.content)}</em>`;
 
       case 'underline':
-        return html`<u>${render(node.children)}</u>`;
+        return html`<u>${render(node.content)}</u>`;
 
       case 'strike':
-        return html`<del>${render(node.children)}</del>`;
+        return html`<del>${render(node.content)}</del>`;
 
       case 'link': {
         const url = String(node.url ?? '').trim();
         return isSafeLinkUrl(url)
-          ? html`<a href="${url}">${render(node.children)}</a>`
-          : html`${render(node.children)}`;
+          ? html`<a href="${url}">${render(node.content)}</a>`
+          : html`${render(node.content)}`;
       }
 
       case 'inline_code':
-        return html`<code>${node.content}</code>`;
+        return html`<code>${node.value}</code>`;
 
       case 'color_code': {
-        const color = String(node.content ?? '');
+        const color = String(node.value ?? '');
         if (!isSafeColorValue(color)) return html`${color}`;
         return html`
           <code class="ffm-color-code">
@@ -86,7 +86,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
             ${node.lang ? html`<div class="code-lang">${node.lang}</div>` : ''}
             <pre><code class="${node.lang
               ? `language-${node.lang}`
-              : ''}">${node.content}</code></pre>
+              : ''}">${node.value}</code></pre>
           </div>
         `;
 
@@ -98,16 +98,16 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
             : undefined;
         return staticHtml`
           <${unsafeStatic(tag)} start="${startValue || ''}">
-            ${render(node.children)}
+            ${render(node.content)}
           </${unsafeStatic(tag)}>
         `;
       }
 
       case 'list_item':
-        return html`<li>${render(node.children)}</li>`;
+        return html`<li>${render(node.content)}</li>`;
 
       case 'blockquote':
-        return html`<blockquote>${render(node.children)}</blockquote>`;
+        return html`<blockquote>${render(node.content)}</blockquote>`;
 
       case 'hr':
         return html`<hr />`;
@@ -121,17 +121,17 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
             <table>
               <thead>
                 <tr>
-                  ${(node.headers ?? []).map(
-                    (cell) => html`<th>${render(cell.children)}</th>`,
+                  ${(node.header ?? []).map(
+                    (cell) => html`<th>${render(cell.content)}</th>`,
                   )}
                 </tr>
               </thead>
               <tbody>
-                ${node.children?.map(
+                ${node.content?.map(
                   (row) => html`
                     <tr>
-                      ${(row.children ?? []).map(
-                        (cell) => html`<td>${render(cell.children)}</td>`,
+                      ${(row.content ?? []).map(
+                        (cell) => html`<td>${render(cell.content)}</td>`,
                       )}
                     </tr>
                   `,
@@ -142,13 +142,13 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
         `;
 
       case 'accordion':
-        return html`<div class="ffm-accordion">${render(node.children)}</div>`;
+        return html`<div class="ffm-accordion">${render(node.content)}</div>`;
 
       case 'accordion_item':
         return html`
           <details name="${node.name}">
             <summary>${render(node.title)}</summary>
-            <div class="accordion-content">${render(node.children)}</div>
+            <div class="accordion-content">${render(node.content)}</div>
           </details>
         `;
 
@@ -156,18 +156,16 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
       case 'slide':
         return html`
           <div class="slide-container-wrapper">
-            <div class="slide-container">${render(node.children)}</div>
+            <div class="slide-container">${render(node.content)}</div>
           </div>
         `;
 
       case 'slide_item':
-        return html`<div class="slide-item">${render(node.children)}</div>`;
+        return html`<div class="slide-item">${render(node.content)}</div>`;
 
       // FFM Chain
       case 'chain':
-        return html`<div class="chain-container">
-          ${render(node.children)}
-        </div>`;
+        return html`<div class="chain-container">${render(node.content)}</div>`;
 
       case 'chain_item': {
         const statusClass = node.hasCheckbox
@@ -183,7 +181,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
               ${node.title && node.title.length > 0
                 ? html`<div class="chain-title">${render(node.title)}</div>`
                 : ''}
-              <div class="chain-body">${render(node.children)}</div>
+              <div class="chain-body">${render(node.content)}</div>
             </div>
           </div>
         `;
@@ -191,9 +189,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
 
       default:
         // fallback render
-        return node.children
-          ? html`<span>${render(node.children)}</span>`
-          : null;
+        return node.content ? html`<span>${render(node.content)}</span>` : null;
     }
   });
 }

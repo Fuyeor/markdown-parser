@@ -12,12 +12,12 @@ export const mapAstNodes = (
 
   for (let index = 0; index < nodes.length; index++) {
     const node = nodes[index];
-    const transformedChildren = node.children
-      ? mapAstNodes(node.children, transformNode)
-      : node.children;
+    const transformedChildren = node.content
+      ? mapAstNodes(node.content, transformNode)
+      : node.content;
     const transformedNode =
-      transformedChildren && transformedChildren !== node.children
-        ? { ...node, children: transformedChildren }
+      transformedChildren && transformedChildren !== node.content
+        ? { ...node, content: transformedChildren }
         : node;
     const replacement = transformNode(transformedNode);
     const replacementNodes = Array.isArray(replacement)

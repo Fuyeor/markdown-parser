@@ -32,14 +32,14 @@ export type NodeType =
 
 export interface ASTNode {
   type: NodeType;
-  content?: string;
-  children?: ASTNode[];
+  value?: string;
+  content?: ASTNode[];
   level?: number;
   lang?: string;
   url?: string;
   ordered?: boolean;
   start?: number;
-  headers?: ASTNode[];
+  header?: ASTNode[];
   name?: string;
   title?: ASTNode[];
   isCompleted?: boolean;

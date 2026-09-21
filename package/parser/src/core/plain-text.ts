@@ -12,9 +12,9 @@ function blockText(node: ASTNode): string {
     case 'text':
     case 'inline_code':
     case 'color_code':
-      return node.content ?? '';
+      return node.value ?? '';
     case 'code_block':
-      return node.content ?? '';
+      return node.value ?? '';
     case 'heading':
     case 'paragraph':
     case 'bold':
@@ -23,7 +23,7 @@ function blockText(node: ASTNode): string {
     case 'strike':
     case 'link':
     case 'table_cell':
-      return inlineText(node.children ?? []);
+      return inlineText(node.content ?? []);
     case 'blockquote':
     case 'list':
     case 'list_item':
@@ -32,27 +32,27 @@ function blockText(node: ASTNode): string {
     case 'accordion':
     case 'chain':
     case 'root':
-      return blockTextList(node.children ?? []);
+      return blockTextList(node.content ?? []);
     case 'accordion_item':
-      return joinTitleAndBody(node.title ?? [], node.children ?? []);
+      return joinTitleAndBody(node.title ?? [], node.content ?? []);
     case 'chain_item':
-      return joinTitleAndBody(node.title ?? [], node.children ?? []);
+      return joinTitleAndBody(node.title ?? [], node.content ?? []);
     case 'table': {
       const header =
-        node.headers === undefined ? '' : blockTextList(node.headers);
-      const body = blockTextList(node.children ?? []);
+        node.header === undefined ? '' : blockTextList(node.header);
+      const body = blockTextList(node.content ?? []);
       return header.length > 0 && body.length > 0
         ? `${header}\n${body}`
         : header || body;
     }
     case 'table_row':
-      return joinNodes(node.children ?? []);
+      return joinNodes(node.content ?? []);
     case 'hardbreak':
       return '\n';
     case 'hr':
       return '';
     default:
-      return blockTextList(node.children ?? []);
+      return blockTextList(node.content ?? []);
   }
 }
 

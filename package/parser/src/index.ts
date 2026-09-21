@@ -57,4 +57,4 @@ export type {
   Linkifier,
   MarkdownParserOption,
   MarkdownPlugin,
-} from './types';
+} from './type';

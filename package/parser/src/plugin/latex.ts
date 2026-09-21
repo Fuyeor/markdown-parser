@@ -44,7 +44,7 @@ export const latexInlineRule: InlineRule = {
     return {
       node: {
         type: 'math_inline',
-        content: state.content
+        value: state.content
           .slice(state.pos + MATH_INLINE_MARKER.length, endIndex)
           .trim(),
       },
@@ -86,7 +86,7 @@ export const latexBlockRule: BlockRule = {
     return {
       node: {
         type: 'math_block',
-        content: contentLines.join('\n').trim(),
+        value: contentLines.join('\n').trim(),
       },
       consumedLines,
     };

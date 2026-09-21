@@ -14,25 +14,25 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
             ? node.level
             : null;
         return level === null
-          ? h('span', renderToVue(node.children || []))
-          : h(`h${level}`, renderToVue(node.children || []));
+          ? h('span', renderToVue(node.content || []))
+          : h(`h${level}`, renderToVue(node.content || []));
       }
       case 'paragraph':
-        return h('p', renderToVue(node.children || []));
+        return h('p', renderToVue(node.content || []));
       case 'text':
-        return node.content || ''; // Vue 天然防 XSS，直接返回字符串
+        return node.value || ''; // Vue 天然防 XSS，直接返回字符串
       case 'bold':
-        return h('strong', renderToVue(node.children || []));
+        return h('strong', renderToVue(node.content || []));
       case 'italic':
-        return h('em', renderToVue(node.children || []));
+        return h('em', renderToVue(node.content || []));
       case 'underline':
-        return h('u', renderToVue(node.children || []));
+        return h('u', renderToVue(node.content || []));
       case 'strike':
-        return h('del', renderToVue(node.children || []));
+        return h('del', renderToVue(node.content || []));
       case 'inline_code':
-        return h('code', node.content || '');
+        return h('code', node.value || '');
       case 'color_code': {
-        const color = String(node.content ?? '');
+        const color = String(node.value ?? '');
         if (!isSafeColorValue(color)) return color;
         return h('code', { class: 'ffm-color-code' }, [
           h('span', {
@@ -57,9 +57,9 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
           ? h(
               'a',
               { href: url, target: '_blank', rel: 'noopener noreferrer' },
-              renderToVue(node.children || []),
+              renderToVue(node.content || []),
             )
-          : h('span', renderToVue(node.children || []));
+          : h('span', renderToVue(node.content || []));
       }
       case 'code_block':
         return h('div', { class: 'code-block-wrapper' }, [
@@ -70,7 +70,7 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
             h(
               'code',
               { class: node.lang ? `language-${node.lang}` : '' },
-              node.content || '',
+              node.value || '',
             ),
           ),
         ]);
@@ -80,10 +80,10 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
           node.ordered && node.start && node.start !== 1
             ? { start: node.start }
             : {},
-          renderToVue(node.children || []),
+          renderToVue(node.content || []),
         );
       case 'list_item':
-        return h('li', renderToVue(node.children || []));
+        return h('li', renderToVue(node.content || []));
       case 'table':
         return h('table', null, [
           h(
@@ -92,21 +92,21 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
             h(
               'tr',
               null,
-              (node.headers ?? []).map((cell) =>
-                h('th', renderToVue(cell.children || [])),
+              (node.header ?? []).map((cell) =>
+                h('th', renderToVue(cell.content || [])),
               ),
             ),
           ),
-          node.children && node.children.length > 0
+          node.content && node.content.length > 0
             ? h(
                 'tbody',
                 null,
-                node.children.map((row) =>
+                node.content.map((row) =>
                   h(
                     'tr',
                     null,
-                    (row.children ?? []).map((cell) =>
-                      h('td', renderToVue(cell.children || [])),
+                    (row.content ?? []).map((cell) =>
+                      h('td', renderToVue(cell.content || [])),
                     ),
                   ),
                 ),
@@ -116,14 +116,14 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
       case 'hr':
         return h('hr');
       case 'blockquote':
-        return h('blockquote', renderToVue(node.children || []));
+        return h('blockquote', renderToVue(node.content || []));
       case 'hardbreak':
         return h('br');
       case 'accordion':
         return h(
           'div',
           { class: 'ffm-accordion' },
-          renderToVue(node.children || []),
+          renderToVue(node.content || []),
         );
       case 'accordion_item':
         return h('details', { name: node.name }, [
@@ -131,14 +131,14 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
           h(
             'div',
             { class: 'accordion-content' },
-            renderToVue(node.children || []),
+            renderToVue(node.content || []),
           ),
         ]);
       case 'chain':
         return h(
           'div',
           { class: 'chain-container' },
-          renderToVue(node.children || []),
+          renderToVue(node.content || []),
         );
       case 'chain_item': {
         const statusClass = node.hasCheckbox
@@ -152,7 +152,7 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
             node.title && node.title.length > 0
               ? h('div', { class: 'chain-title' }, renderToVue(node.title))
               : null,
-            h('div', { class: 'chain-body' }, renderToVue(node.children || [])),
+            h('div', { class: 'chain-body' }, renderToVue(node.content || [])),
           ]),
         ]);
       }
@@ -161,17 +161,17 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
           h(
             'div',
             { class: 'slide-container' },
-            renderToVue(node.children || []),
+            renderToVue(node.content || []),
           ),
         ]);
       case 'slide_item':
         return h(
           'div',
           { class: 'slide-item' },
-          renderToVue(node.children || []),
+          renderToVue(node.content || []),
         );
       default:
-        return h('span', renderToVue(node.children || []));
+        return h('span', renderToVue(node.content || []));
     }
   });
 }

@@ -107,10 +107,10 @@ export class MarkdownParser {
       return [
         {
           type: 'paragraph',
-          children: [
+          content: [
             {
               type: 'text',
-              content: state.remainingLines.join('\n'),
+              value: state.remainingLines.join('\n'),
             },
           ],
         },
@@ -223,7 +223,7 @@ export class MarkdownParser {
         if (paragraphLines.length > 0) {
           nodes.push({
             type: 'paragraph',
-            children: this.#parseInline(
+            content: this.#parseInline(
               new InlineState(paragraphLines.join('\n')),
               depth,
             ),
@@ -236,7 +236,7 @@ export class MarkdownParser {
 
   #parseInline(state: InlineState, depth = 0): ASTNode[] {
     if (depth > this.#maxNestingDepth) {
-      return [{ type: 'text', content: state.content.slice(state.pos) }];
+      return [{ type: 'text', value: state.content.slice(state.pos) }];
     }
 
     const context = depth === 0 ? this.#context : this.#createContext(depth);
@@ -256,20 +256,20 @@ export class MarkdownParser {
             if (match.index > lastIdx) {
               nodes.push({
                 type: 'text',
-                content: textBuffer.slice(lastIdx, match.index),
+                value: textBuffer.slice(lastIdx, match.index),
               });
             }
             nodes.push({
               type: 'link',
               url: match.url,
-              children: [{ type: 'text', content: match.text }],
+              content: [{ type: 'text', value: match.text }],
             });
             lastIdx = match.lastIndex;
           }
         }
 
         if (lastIdx < textBuffer.length) {
-          nodes.push({ type: 'text', content: textBuffer.slice(lastIdx) });
+          nodes.push({ type: 'text', value: textBuffer.slice(lastIdx) });
         }
       }
     };

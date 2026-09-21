@@ -30,7 +30,7 @@ export const headingRule: BlockRule = {
       node: {
         type: 'heading',
         level: match[1].length,
-        children: match[2] ? ctx.parseInline(match[2].trim()) : [],
+        content: match[2] ? ctx.parseInline(match[2].trim()) : [],
       },
       consumedLines: 1,
     };
@@ -48,7 +48,7 @@ export const codeBlockRule: BlockRule = {
     if (!block) return null;
 
     return {
-      node: { type: 'code_block', lang: block.lang, content: block.content },
+      node: { type: 'code_block', lang: block.lang, value: block.content },
       consumedLines: block.consumedLines,
     };
   },
@@ -191,7 +191,7 @@ const createTableCell = (
 ): ASTNode => {
   const cell: ASTNode = {
     type: 'table_cell',
-    children: parseInline(content),
+    content: parseInline(content),
   };
   if (alignment) cell.align = alignment;
   return cell;
@@ -238,7 +238,7 @@ export const tableRule: BlockRule = {
 
       rows.push({
         type: 'table_row',
-        children: normalizeTableCells(
+        content: normalizeTableCells(
           extractTableCells(rowLine),
           columnCount,
         ).map((cell, index) =>
@@ -253,12 +253,12 @@ export const tableRule: BlockRule = {
         type: 'table',
         ...(headers
           ? {
-              headers: headers.map((header, index) =>
+              header: headers.map((header, index) =>
                 createTableCell(header, alignments[index], ctx.parseInline),
               ),
             }
           : {}),
-        children: rows,
+        content: rows,
       },
       consumedLines,
     };
@@ -319,7 +319,7 @@ export const blockquoteRule: BlockRule = {
     return {
       node: {
         type: 'blockquote',
-        children: ctx.parseBlocks(contentLines.join('\n')),
+        content: ctx.parseBlocks(contentLines.join('\n')),
       },
       consumedLines,
     };
@@ -418,7 +418,7 @@ export const listRule: BlockRule = {
 
         items.push({
           type: 'list_item',
-          children: ctx.parseBlocks(itemLines.join('\n')),
+          content: ctx.parseBlocks(itemLines.join('\n')),
         });
         consumedLines += itemConsumedLines;
       } else {
@@ -431,7 +431,7 @@ export const listRule: BlockRule = {
         type: 'list',
         ordered: isOrdered,
         start: startNumber,
-        children: items,
+        content: items,
       },
       consumedLines,
     };

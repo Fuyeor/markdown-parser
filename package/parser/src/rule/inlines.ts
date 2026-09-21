@@ -40,7 +40,7 @@ export const boldRule: InlineRule = {
       node: {
         type: 'bold',
         // supports nested parsing
-        children: ctx.parseInline(innerContent),
+        content: ctx.parseInline(innerContent),
       },
       // +2 is because the followed `**` was consumed
       consumedChars: endIdx - state.pos + 2,
@@ -68,7 +68,7 @@ export const italicRule: InlineRule = {
       return {
         node: {
           type: 'italic',
-          children: ctx.parseInline(state.content.slice(state.pos + 1, endIdx)),
+          content: ctx.parseInline(state.content.slice(state.pos + 1, endIdx)),
         },
         consumedChars: endIdx - state.pos + 1,
       };
@@ -111,7 +111,7 @@ export const inlineCodeRule: InlineRule = {
 
     if (endIdx === -1) {
       return {
-        node: { type: 'text', content: marker },
+        node: { type: 'text', value: marker },
         consumedChars: markerLength,
       };
     }
@@ -132,7 +132,7 @@ export const inlineCodeRule: InlineRule = {
     return {
       node: {
         type: isColor ? 'color_code' : 'inline_code',
-        content: rawContent,
+        value: rawContent,
       },
       consumedChars: endIdx + markerLength - state.pos,
     };
@@ -168,7 +168,7 @@ export const linkRule: InlineRule = {
       node: {
         type: 'link',
         url,
-        children: ctx.parseInline(innerText),
+        content: ctx.parseInline(innerText),
       },
       consumedChars: urlEnd - state.pos + 1,
     };
@@ -190,7 +190,7 @@ export const underlineRule: InlineRule = {
     return {
       node: {
         type: 'underline',
-        children: ctx.parseInline(state.content.slice(state.pos + 2, endIdx)),
+        content: ctx.parseInline(state.content.slice(state.pos + 2, endIdx)),
       },
       consumedChars: endIdx - state.pos + 2,
     };
@@ -212,7 +212,7 @@ export const strikeRule: InlineRule = {
     return {
       node: {
         type: 'strike',
-        children: ctx.parseInline(state.content.slice(state.pos + 2, endIdx)),
+        content: ctx.parseInline(state.content.slice(state.pos + 2, endIdx)),
       },
       consumedChars: endIdx - state.pos + 2,
     };

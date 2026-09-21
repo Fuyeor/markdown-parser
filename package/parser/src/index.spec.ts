@@ -123,6 +123,44 @@ function executeMarkdownSuite(
 executeMarkdownSuite('standard Markdown fixtures', standardFixtures, false);
 executeMarkdownSuite('FFM fixtures', ffmFixtures, true);
 
+// Verify the public AST shape uses the modern scalar and structural field names.
+describe('AST field names', () => {
+  it('uses value, content, and header fields', () => {
+    const ast = createMarkdownParser()('# Title\n\nhello');
+    expect(ast).toEqual([
+      {
+        type: 'heading',
+        level: 1,
+        content: [{ type: 'text', value: 'Title' }],
+      },
+      {
+        type: 'paragraph',
+        content: [{ type: 'text', value: 'hello' }],
+      },
+    ]);
+
+    const table = createMarkdownParser()(
+      '\n| A | B |\n|---|---|\n| C | D |',
+    );
+    expect(table[0]).toMatchObject({
+      type: 'table',
+      header: [
+        { type: 'table_cell', content: [{ type: 'text', value: 'A' }] },
+        { type: 'table_cell', content: [{ type: 'text', value: 'B' }] },
+      ],
+      content: [
+        {
+          type: 'table_row',
+          content: [
+            { type: 'table_cell', content: [{ type: 'text', value: 'C' }] },
+            { type: 'table_cell', content: [{ type: 'text', value: 'D' }] },
+          ],
+        },
+      ],
+    });
+  });
+});
+
 describe('safety fixtures', () => {
   expect(safetyFixtures.schema_version).toBe(1);
   for (const fixture of safetyFixtures.links)

@@ -18,7 +18,7 @@ export const getTwemojiUrl = (emoji: string): string => {
 
 // Split text nodes into plain text and emoji image nodes without touching code.
 export const transformTwemojiNode = (node: ASTNode): ASTNode[] => {
-  const content = node.content;
+  const content = node.value;
   if (typeof content !== 'string' || content.length === 0) return [node];
 
   emojiRegex.lastIndex = 0;
@@ -35,12 +35,12 @@ export const transformTwemojiNode = (node: ASTNode): ASTNode[] => {
     if (matchIndex > lastIndex) {
       nodes.push({
         type: 'text',
-        content: content.slice(lastIndex, matchIndex),
+        value: content.slice(lastIndex, matchIndex),
       });
     }
     nodes.push({
       type: 'emoji',
-      content: emoji,
+      value: emoji,
       alt: emoji,
       src: getTwemojiUrl(emoji),
     });
@@ -48,7 +48,7 @@ export const transformTwemojiNode = (node: ASTNode): ASTNode[] => {
   }
 
   if (lastIndex < content.length) {
-    nodes.push({ type: 'text', content: content.slice(lastIndex) });
+    nodes.push({ type: 'text', value: content.slice(lastIndex) });
   }
   return nodes;
 };

@@ -18,7 +18,7 @@ export const smilesInlineRule: InlineRule = {
     if (!match) return null;
 
     return {
-      node: { type: 'smiles_inline', content: match[1].trim() },
+      node: { type: 'smiles_inline', value: match[1].trim() },
       consumedChars: match[0].length,
     };
   },
@@ -36,7 +36,7 @@ export const transformSpecialBlockNode = (
 
   return {
     type: language === 'smiles' ? 'smiles_block' : language,
-    content: String(node.content ?? ''),
+    value: String(node.value ?? ''),
   } satisfies ASTNode;
 };
 
