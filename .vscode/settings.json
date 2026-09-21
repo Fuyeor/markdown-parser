@@ -15,9 +15,14 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.formatOnType": false
+  },
   "search.exclude": {
     "**/node_modules": true,
     "**/dist": true,
-    "**/build": true
+    "**/build": true,
+    "**/target": true
   }
 }

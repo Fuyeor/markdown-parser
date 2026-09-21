@@ -8,7 +8,7 @@ export default defineConfig({
     alias: {
       vscode: resolve(
         import.meta.dirname,
-        'packages/vscode-extension/src/vscode.mock.ts',
+        'extension/vscode/src/vscode.mock.ts',
       ),
     },
   },

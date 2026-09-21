@@ -1,6 +1,6 @@
 **/node_modules
 **/dist
 **/out
-**/tests.failed.json
-packages/playground/public/assets/locale/*
+**/test.failed.json
 **/target
+package/playground/public/assets/locale/*

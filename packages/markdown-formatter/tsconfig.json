@@ -1,9 +1,0 @@
-{
-  "extends": "../markdown-parser/tsconfig.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "noEmit": true
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": []
-}
