@@ -11,7 +11,7 @@ export {
   listRule,
   hrRule,
   blockquoteRule,
-} from './rule/blocks';
+} from './rule/block';
 export {
   hardBreakRule,
   inlineCodeRule,
@@ -19,7 +19,7 @@ export {
   linkRule,
   underlineRule,
   strikeRule,
-} from './rule/inlines';
+} from './rule/inline';
 export { latexPlugin, latexInlineRule, latexBlockRule } from './plugin/latex';
 export {
   twemojiPlugin,

@@ -22,7 +22,7 @@ type MarkdownCase = {
   assert?: MarkdownAssertion[];
   error?: 'invalid_nesting_depth';
   no_throw?: boolean;
-  options?: { max_nesting_depth?: number };
+  option?: { max_nesting_depth?: number };
 };
 
 type MarkdownFixtureFile = {
@@ -47,8 +47,8 @@ const loadJson = <T>(name: string): T =>
     ),
   ) as T;
 
-const standardFixtures = loadJson<MarkdownFixtureFile>('markdown.json');
-const ffmFixtures = loadJson<MarkdownFixtureFile>('ffm.json');
+const cfmFixture = loadJson<MarkdownFixtureFile>('markdown.json');
+const ffmFixture = loadJson<MarkdownFixtureFile>('ffm.json');
 const safetyFixtures = loadJson<SafetyFixtureFile>('safety.json');
 
 // Read a portable JSON Pointer path from a TypeScript AST value.
@@ -69,24 +69,24 @@ function readJsonPointer(root: unknown, pointer: string): unknown {
   return value;
 }
 
-// Map the wire-level snake_case options to the TypeScript API.
-function parserOptions(fixture: MarkdownCase) {
-  return fixture.options === undefined
+// Map the wire-level snake_case option to the TypeScript API.
+function parserOption(fixture: MarkdownCase) {
+  return fixture.option === undefined
     ? undefined
-    : { maxNestingDepth: fixture.options.max_nesting_depth };
+    : { maxNestingDepth: fixture.option.max_nesting_depth };
 }
 
 // Execute one canonical Markdown case against a selected parser dialect.
 function executeMarkdownCase(fixture: MarkdownCase, ffm: boolean): void {
-  const options = parserOptions(fixture);
+  const option = parserOption(fixture);
   if (fixture.error === 'invalid_nesting_depth') {
-    expect(() => new MarkdownParser(options)).toThrow(RangeError);
+    expect(() => new MarkdownParser(option)).toThrow(RangeError);
     return;
   }
 
   const parser = ffm
-    ? createFuyeorMarkdownParser(options)
-    : createMarkdownParser(options);
+    ? createFuyeorMarkdownParser(option)
+    : createMarkdownParser(option);
   const ast = parser(fixture.input ?? '');
   if (fixture.html !== undefined) expect(render(ast).trim()).toBe(fixture.html);
   if (fixture.plain_text !== undefined)
@@ -120,8 +120,8 @@ function executeMarkdownSuite(
   });
 }
 
-executeMarkdownSuite('standard Markdown fixtures', standardFixtures, false);
-executeMarkdownSuite('FFM fixtures', ffmFixtures, true);
+executeMarkdownSuite('cfm fixture', cfmFixture, false);
+executeMarkdownSuite('ffm fixture', ffmFixture, true);
 
 // Verify the public AST shape uses the modern scalar and structural field names.
 describe('AST field names', () => {
@@ -139,9 +139,7 @@ describe('AST field names', () => {
       },
     ]);
 
-    const table = createMarkdownParser()(
-      '\n| A | B |\n|---|---|\n| C | D |',
-    );
+    const table = createMarkdownParser()('\n| A | B |\n|---|---|\n| C | D |');
     expect(table[0]).toMatchObject({
       type: 'table',
       header: [
@@ -161,7 +159,7 @@ describe('AST field names', () => {
   });
 });
 
-describe('safety fixtures', () => {
+describe('safety fixture', () => {
   expect(safetyFixtures.schema_version).toBe(1);
   for (const fixture of safetyFixtures.links)
     it(`link: ${fixture.input}`, () =>

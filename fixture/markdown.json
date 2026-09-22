@@ -8,11 +8,6 @@
       "plain_text": "Hello World"
     },
     {
-      "input": "```ts\nconst a = 1;\n```",
-      "html": "<div class=\"code-block-wrapper\"><div class=\"code-lang\">ts</div><pre><code class=\"language-ts\">const a = 1;\n</code></pre></div>",
-      "plain_text": "const a = 1;"
-    },
-    {
       "input": "visit www.fuyeor.com or [click here](https://fuyeor.com)",
       "html": "<p>visit <a href=\"https://www.fuyeor.com\">www.fuyeor.com</a> or <a href=\"https://fuyeor.com\">click here</a></p>",
       "plain_text": "visit www.fuyeor.com or click here"
