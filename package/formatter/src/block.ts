@@ -1,5 +1,5 @@
 // @ffm/formatter/src/block.ts
-import { semanticFenceLanguages } from './constant';
+import { semanticFence } from './constant';
 import { formatText } from './text';
 import type { Fence, FormatOption, ListIndentContext, QuoteLine } from './type';
 
@@ -24,6 +24,18 @@ export function isFenceClose(line: string, fence: Fence): boolean {
   const marker = fence.character === '`' ? '`' : '~';
   const expression = new RegExp(`^\\s*${marker}{${fence.length},}\\s*$`, 'u');
   return expression.test(line);
+}
+
+/** Normalize heading marker and format heading text with heading typography context. */
+export function formatHeadingLine(
+  line: string,
+  option?: FormatOption,
+): string | null {
+  const match = line.match(/^(\s*)(#{1,6})\s+(.*)$/u);
+  if (!match) return null;
+  const prefix = match[2]!;
+  const rest = formatText(match[3]!.trim(), option, 'heading');
+  return `${prefix} ${rest}`;
 }
 
 /** Split a table row without treating escaped or inline-code pipes as separators. */
@@ -73,32 +85,38 @@ export function getTableDelimiterCells(line: string): string[] | null {
 }
 
 /** Reduce table padding and delimiter runs to the canonical FFM representation. */
-export function formatTableRow(cells: readonly string[]): string {
-  return `| ${cells.map(formatText).join(' | ')} |`;
+export function formatTableRow(
+  cells: readonly string[],
+  option?: FormatOption,
+): string {
+  return `| ${cells.map((c) => formatText(c, option, 'sentence')).join(' | ')} |`;
 }
 
 /** Preserve alignment markers while removing redundant delimiter hyphens. */
 export function formatTableDelimiter(cells: readonly string[]): string {
-  return formatTableRow(
-    cells.map((cell) => {
-      const leftAligned = cell.startsWith(':');
-      const rightAligned = cell.endsWith(':');
-      return `${leftAligned ? ':' : ''}---${rightAligned ? ':' : ''}`;
-    }),
-  );
+  const formatted = cells.map((cell) => {
+    const leftAligned = cell.startsWith(':');
+    const rightAligned = cell.endsWith(':');
+    return `${leftAligned ? ':' : ''}---${rightAligned ? ':' : ''}`;
+  });
+  return `| ${formatted.join(' | ')} |`;
 }
 
 /** Normalize one list level to two spaces while preserving nested list depth. */
 export function formatListLine(
   line: string,
   context: ListIndentContext,
+  option?: FormatOption,
 ): string | null {
   const match = line.match(/^(\s*)([-*]|\d+[.)])(?=\s+)/u);
   if (!match) return null;
 
   const rawIndentation = match[1]!.replace(/\t/gu, '  ').length;
+
+  // When a list item is encountered for the first time
+  // hierarchy stack is precisely initialized based on the presence of leading indentation.
   if (context.levels.length === 0) {
-    context.levels = [rawIndentation];
+    context.levels = rawIndentation > 0 ? [0, rawIndentation] : [0];
   } else {
     while (
       context.levels.length > 1 &&
@@ -112,32 +130,41 @@ export function formatListLine(
   }
 
   const markerEnd = match[1]!.length + match[2]!.length;
-  const rest = formatText(line.slice(markerEnd).trimStart());
+  const rest = formatText(
+    line.slice(markerEnd).trimStart(),
+    option,
+    'sentence',
+  );
   const indentation = ' '.repeat((context.levels.length - 1) * 2);
   return `${indentation}${match[2]} ${rest}`;
 }
 
-// Supports multi-line, 2-space indented content within list items.
+/** Normalize one list continuation line with canonical two-space indentation. */
 export function formatListContinuationLine(
   line: string,
   context: ListIndentContext,
+  option?: FormatOption,
 ): string | null {
+  // Skip directly if the list is not currently active
   if (context.levels.length === 0) return null;
   const match = line.match(/^([ \t]+)(\S.*)$/u);
   if (!match) return null;
   const rawIndentation = match[1]!.replace(/\t/gu, '  ').length;
   if (rawIndentation < 2) return null;
 
-  const rest = formatText(match[2]!);
+  const rest = formatText(match[2]!, option, 'sentence');
   const indentation = ' '.repeat(context.levels.length * 2);
   return `${indentation}${rest}`;
 }
 
 /** Normalize one Markdown blockquote marker and its content spacing. */
-export function formatQuoteLine(line: string): string | null {
+export function formatQuoteLine(
+  line: string,
+  option?: FormatOption,
+): string | null {
   const match = line.match(/^\s*(>+)[ \t]*(.*)$/u);
   if (!match) return null;
-  const content = formatText(match[2]!.trimStart());
+  const content = formatText(match[2]!.trimStart(), option, 'sentence');
   return content ? `${match[1]} ${content}` : match[1]!;
 }
 
@@ -145,26 +172,33 @@ export function formatQuoteLine(line: string): string | null {
 export function formatOrdinaryLine(
   line: string,
   context: ListIndentContext,
+  option?: FormatOption,
 ): string {
-  const quoteLine = formatQuoteLine(line);
+  // Prioritize processing header row.
+  const headingLine = formatHeadingLine(line, option);
+  if (headingLine !== null) {
+    context.levels = [];
+    return headingLine.replace(/[ \t]+$/u, '');
+  }
+
+  const quoteLine = formatQuoteLine(line, option);
   if (quoteLine !== null) {
     context.levels = [];
     return quoteLine.replace(/[ \t]+$/u, '');
   }
 
-  const listLine = formatListLine(line, context);
+  const listLine = formatListLine(line, context, option);
   if (listLine !== null) {
     return listLine.replace(/[ \t]+$/u, '');
   }
 
-  // Preserve and standardize 2-space indentation for multi-line list items
-  const continuationLine = formatListContinuationLine(line, context);
+  const continuationLine = formatListContinuationLine(line, context, option);
   if (continuationLine !== null) {
     return continuationLine.replace(/[ \t]+$/u, '');
   }
 
   context.levels = [];
-  return formatText(line)
+  return formatText(line, option, 'sentence')
     .trimStart()
     .replace(/[ \t]+$/u, '');
 }
@@ -179,6 +213,7 @@ export function getQuoteLine(line: string): QuoteLine | null {
 export function formatDeepQuote(
   lines: readonly string[],
   start: number,
+  option?: FormatOption,
 ): { lines: string[]; next: number } | null {
   const first = getQuoteLine(lines[start]!);
   if (!first) return null;
@@ -192,12 +227,14 @@ export function formatDeepQuote(
     next++;
   }
 
+  // Promote to a ```quote block only when the number of non-empty lines is >= 3.
   if (content.filter((line) => line.trim() !== '').length < 3) return null;
-  const listContext: ListIndentContext = { levels: [0] };
+
+  const listContext: ListIndentContext = { levels: [] };
   return {
     lines: [
       '```quote',
-      ...content.map((line) => formatOrdinaryLine(line, listContext)),
+      ...content.map((line) => formatOrdinaryLine(line, listContext, option)),
       '```',
     ],
     next,
@@ -208,18 +245,19 @@ export function formatDeepQuote(
 export function formatTable(
   lines: readonly string[],
   start: number,
+  option?: FormatOption,
 ): { lines: string[]; next: number } | null {
   if (!lines[start]!.includes('|')) return null;
   const delimiterCells = getTableDelimiterCells(lines[start + 1] ?? '');
   if (!delimiterCells) return null;
 
   const formatted = [
-    formatTableRow(splitTableCells(lines[start]!)),
+    formatTableRow(splitTableCells(lines[start]!), option),
     formatTableDelimiter(delimiterCells),
   ];
   let next = start + 2;
   while (next < lines.length && lines[next]!.includes('|')) {
-    formatted.push(formatTableRow(splitTableCells(lines[next]!)));
+    formatted.push(formatTableRow(splitTableCells(lines[next]!), option));
     next++;
   }
   return { lines: formatted, next };
@@ -233,7 +271,7 @@ export function formatSemanticFence(
   formatFn: (content: string, options?: FormatOption) => string,
   options?: FormatOption,
 ): { lines: string[]; next: number } | null {
-  if (!fence.language || !semanticFenceLanguages.has(fence.language)) {
+  if (!fence.language || !semanticFence.has(fence.language)) {
     return null;
   }
 
@@ -267,7 +305,5 @@ export function trimDocumentBoundary(lines: readonly string[]): string {
   if (start === end) return '';
 
   const body = lines.slice(start, end);
-  const listContext: ListIndentContext = { levels: [0] };
-  body[0] = formatOrdinaryLine(body[0]!, listContext);
   return body.join('\n').replace(/[ \t]+$/u, '');
 }

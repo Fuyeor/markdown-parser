@@ -1,0 +1,119 @@
+{
+  "blank lines": [
+    {
+      "desc": "respects maxBlankLine configuration",
+      "text": "First\n\n\n\nSecond",
+      "expect": "First\n\nSecond"
+    },
+    {
+      "desc": "respects maxBlankLine configuration",
+      "text": "First\n\n\n\nSecond",
+      "option": {
+        "maxBlankLine": 2
+      },
+      "expect": "First\n\n\nSecond"
+    },
+    {
+      "desc": "respects maxBlankLine configuration",
+      "text": "First\n\n\n\nSecond",
+      "option": {
+        "maxBlankLine": 0
+      },
+      "expect": "First\nSecond"
+    }
+  ],
+  "glossary with lookaround boundaries": [
+    {
+      "desc": "replaces exact terms and multi-word phrases without touching extensions or paths",
+      "text": "我经常用 ts 开发。把 MP4 切分为 .ts 文件。/api/v1 接口很稳定。react native 很流行。",
+      "option": {
+        "autoCase": {
+          "glossary": {
+            "ts": "TypeScript",
+            "api": "API",
+            "react native": "React Native"
+          }
+        }
+      },
+      "expect": "我经常用 TypeScript 开发。把 MP4 切分为 .ts 文件。/api/v1 接口很稳定。React Native 很流行。"
+    }
+  ],
+  "autoCase": [
+    {
+      "desc": "applies sentence casing",
+      "text": "hello world. this is fuyeor.",
+      "option": {
+        "autoCase": {
+          "sentence": "capitalize"
+        }
+      },
+      "expect": "Hello world. This is fuyeor."
+    },
+    {
+      "desc": "applies heading Title Case according to Chicago/AP style",
+      "text": "# the old man and the sea\n\ncontent.",
+      "option": {
+        "autoCase": {
+          "heading": "title"
+        }
+      },
+      "expect": "# The Old Man and the Sea\n\ncontent."
+    },
+    {
+      "desc": "applies heading Capitalize casing",
+      "text": "# the old man and the sea",
+      "option": {
+        "autoCase": {
+          "heading": "capitalize"
+        }
+      },
+      "expect": "# The Old Man And The Sea"
+    }
+  ],
+  "autoUpperWord and autoSpacing in continuous script": [
+    {
+      "desc": "capitalizes standalone English words in CJK context",
+      "text": "react nativeの動作原理",
+      "option": {
+        "continuousScript": {
+          "autoUpperWord": true,
+          "autoSpacing": true
+        }
+      },
+      "expect": "React Native の動作原理"
+    },
+    {
+      "desc": "applies auto spacing between Thai script and Latin or digits",
+      "text": "ภาษาไทยEnglishและตัวเลข100บาท",
+      "expect": "ภาษาไทย English และตัวเลข 100 บาท"
+    },
+    {
+      "desc": "applies autoUpperWord and spacing in Thai context",
+      "text": "เขียนโปรแกรมด้วยreact native",
+      "option": {
+        "continuousScript": {
+          "autoUpperWord": true,
+          "autoSpacing": true
+        }
+      },
+      "expect": "เขียนโปรแกรมด้วย React Native"
+    },
+    {
+      "desc": "applies auto spacing between Lao, Khmer, Tibetan scripts and Latin",
+      "text": "ພາສາລາວLao ភាសាខ្មែរKhmer བོད་ཡིག་Tibetan",
+      "expect": "ພາສາລາວ Lao ភាសាខ្មែរ Khmer བོད་ཡིག་ Tibetan"
+    }
+  ],
+  "punctuation normalization": [
+    {
+      "desc": "converts ASCII punctuation to full-width in CJK context while preserving code and digits",
+      "text": "放行,防止。限定符:去掉。(纯 SYN,能通过)。数字 1,000 与 3.14 和代码 (Direction::Out) 以及 (true) 保持原样。",
+      "expect": "放行，防止。限定符：去掉。（纯 SYN，能通过）。数字 1,000 与 3.14 和代码 (Direction::Out) 以及 (true) 保持原样。"
+    },
+    {
+      "desc": "preserves half-width punctuation in Thai while applying spacing",
+      "text": "สวัสดี,ครับ(ภาษาไทย)",
+      "expect": "สวัสดี,ครับ(ภาษาไทย)"
+    }
+  ]
+}

@@ -1,20 +1,35 @@
 // @ffm/formatter/src/text.ts
 import {
-  cjkLatinBoundary,
+  latinBoundary,
+  continuousScript,
   inlineMarkupPattern,
+  latinOrDigit,
   linkTargetPattern,
 } from './constant';
+import {
+  applyAutoCase,
+  applyContinuousScript,
+  applyGlossary,
+  applyPunctuation,
+} from './transform';
+import type { FormatOption } from './type';
 
-/** Check whether a single character is a Han-script character. */
+/** Check whether a single character is a CJK Han or Kana character. */
 export function isCjkCharacter(character: string | undefined): boolean {
-  return character !== undefined && /^\p{Script=Han}$/u.test(character);
+  return (
+    character !== undefined &&
+    new RegExp(`^[${continuousScript}]$`, 'u').test(character)
+  );
 }
 
 /** Check whether a single character is a Latin letter or an ASCII digit. */
 export function isLatinOrDigitCharacter(
   character: string | undefined,
 ): boolean {
-  return character !== undefined && /^[A-Za-z0-9]$/u.test(character);
+  return (
+    character !== undefined &&
+    new RegExp(`^[${latinOrDigit}]$`, 'u').test(character)
+  );
 }
 
 /** Collapse runs of horizontal whitespace in unprotected text to one space. */
@@ -24,7 +39,7 @@ export function normalizeHorizontalWhitespace(segment: string): string {
 
 /** Apply CJK spacing to plain text without interpreting protected inline code. */
 export function formatCjkBoundaries(segment: string): string {
-  return segment.replace(cjkLatinBoundary, ' ');
+  return segment.replace(latinBoundary, ' ');
 }
 
 /** Add spaces around inline markup when its content crosses a CJK boundary. */
@@ -61,13 +76,39 @@ export function trimLinkTargets(segment: string): string {
   );
 }
 
-/** Apply inline spacing and link cleanup to an unprotected text segment. */
-export function formatTextSegment(segment: string): string {
-  return formatCjkBoundaries(
+/** Apply typography rules and inline spacing to an unprotected text segment. */
+export function formatTextSegment(
+  segment: string,
+  option: FormatOption | undefined,
+  context: 'heading' | 'sentence' = 'sentence',
+): string {
+  let text = segment;
+
+  // 1. Glossary replacement
+  text = applyGlossary(text, option?.autoCase?.glossary);
+
+  // 2. Custom transformer callback
+  if (option?.transformer) {
+    text = option.transformer(text);
+  }
+
+  // 3. Western auto casing
+  text = applyAutoCase(text, option?.autoCase, context);
+
+  // 4. Continuous script formatting
+  text = applyContinuousScript(text, option?.continuousScript);
+
+  // 5. CJK punctuation normalization
+  text = applyPunctuation(text);
+
+  // 6. Whitespace and inline markup spacing
+  text = formatCjkBoundaries(
     formatInlineMarkupBoundaries(
-      normalizeHorizontalWhitespace(trimLinkTargets(segment)),
+      normalizeHorizontalWhitespace(trimLinkTargets(text)),
     ),
   );
+
+  return text;
 }
 
 /** Count a contiguous run of the selected marker character. */
@@ -95,20 +136,30 @@ export function formatProtectedToken(
         : '$';
   const inner = token.slice(marker.length, -marker.length);
   const leadingSpace =
-    isCjkCharacter(previous) && isLatinOrDigitCharacter(inner[0]) ? ' ' : '';
+    isCjkCharacter(previous) &&
+    (isLatinOrDigitCharacter(inner[0]) || isCjkCharacter(inner[0]))
+      ? ' '
+      : '';
   const trailingSpace =
-    isCjkCharacter(next) && isLatinOrDigitCharacter(inner.at(-1)) ? ' ' : '';
+    isCjkCharacter(next) &&
+    (isLatinOrDigitCharacter(inner.at(-1)) || isCjkCharacter(inner.at(-1)))
+      ? ' '
+      : '';
   return `${leadingSpace}${token}${trailingSpace}`;
 }
 
 /** Format ordinary text while preserving inline code and math tokens byte-for-byte. */
-export function formatText(line: string): string {
+export function formatText(
+  line: string,
+  option?: FormatOption,
+  context: 'heading' | 'sentence' = 'sentence',
+): string {
   let result = '';
   let segmentStart = 0;
   let index = 0;
 
   const appendPlainText = (end: number) => {
-    result += formatTextSegment(line.slice(segmentStart, end));
+    result += formatTextSegment(line.slice(segmentStart, end), option, context);
   };
 
   while (index < line.length) {

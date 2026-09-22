@@ -25,21 +25,19 @@ describe('converter input validation', () => {
 });
 
 describe('converter option', () => {
-  it('respects maxConsecutiveBlankLines option for empty paragraphs and blockquotes', () => {
+  it('respects maxBlankLine option for empty paragraphs and blockquotes', () => {
     const html = '<p>First</p><p></p><p></p><p></p><p></p><p>Second</p>';
 
     // default (keep 1 blank lines)
     expect(fromHTML(html)).toBe('First\n\nSecond');
 
     // keep 4 blank lines
-    expect(fromHTML(html, { maxConsecutiveBlankLines: 4 })).toBe(
-      'First\n\n\n\n\nSecond',
-    );
+    expect(fromHTML(html, { maxBlankLine: 4 })).toBe('First\n\n\n\n\nSecond');
 
     // keep 4 blank lines within blockquote
     const quoteHtml =
       '<blockquote><p>Line1</p><p></p><p></p><p>Line2</p><p>Line3</p></blockquote>';
-    expect(fromHTML(quoteHtml, { maxConsecutiveBlankLines: 2 })).toBe(
+    expect(fromHTML(quoteHtml, { maxBlankLine: 2 })).toBe(
       '```quote\nLine1\n\n\nLine2\n\nLine3\n```',
     );
   });

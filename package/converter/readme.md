@@ -24,7 +24,7 @@ console.log(output);
 
 // keep blank lines:
 const html = '<p>First</p><p></p><p></p><p></p><p></p><p>Second</p>';
-const result = fromHTML(html, { maxConsecutiveBlankLines: 4 });
+const result = fromHTML(html, { maxBlankLine: 4 });
 // First\n\n\n\n\nSecond
 ```
 

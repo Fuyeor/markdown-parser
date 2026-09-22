@@ -15,25 +15,34 @@ import type { Fence, FormatOption, ListIndentContext } from './type';
 export * from './block';
 export * from './constant';
 export * from './text';
+export * from './transform';
 export * from './type';
 
-/** Format a complete FFM document according to the editor's canonical style. */
-export function format(content: string, options?: FormatOption): string {
-  if (typeof content !== 'string')
+/** Format a complete FFM document according to canonical style and typography rules. */
+export function format(content: string, option?: FormatOption): string {
+  if (typeof content !== 'string') {
     throw new TypeError('content must be a string');
+  }
 
-  const maxBlank =
-    options?.maxConsecutiveBlankLines ??
-    defaultFormatOption.maxConsecutiveBlankLines;
+  // merge default config
+  const resolvedOption: FormatOption = {
+    ...defaultFormatOption,
+    ...option,
+    continuousScript: {
+      ...defaultFormatOption.continuousScript,
+      ...option?.continuousScript,
+    },
+    autoCase: {
+      ...defaultFormatOption.autoCase,
+      ...option?.autoCase,
+    },
+  };
 
-  if (!Number.isInteger(maxBlank) || maxBlank < 0)
-    throw new TypeError(
-      'maxConsecutiveBlankLines must be a non-negative integer',
-    );
-
+  const maxBlank = resolvedOption.maxBlankLine ?? 1;
   const lines = normalizeLineEndings(content).split('\n');
   const formatted: string[] = [];
-  const listContext: ListIndentContext = { levels: [0] };
+  const listContext: ListIndentContext = { levels: [] };
+
   let fence: Fence | null = null;
 
   for (let index = 0; index < lines.length; ) {
@@ -67,7 +76,7 @@ export function format(content: string, options?: FormatOption): string {
         index,
         openingFence,
         format,
-        options,
+        resolvedOption,
       );
       if (semanticFence) {
         formatted.push(...semanticFence.lines);
@@ -80,21 +89,21 @@ export function format(content: string, options?: FormatOption): string {
       continue;
     }
 
-    const deepQuote = formatDeepQuote(lines, index);
+    const deepQuote = formatDeepQuote(lines, index, resolvedOption);
     if (deepQuote) {
       formatted.push(...deepQuote.lines);
       index = deepQuote.next;
       continue;
     }
 
-    const table = formatTable(lines, index);
+    const table = formatTable(lines, index, resolvedOption);
     if (table) {
       formatted.push(...table.lines);
       index = table.next;
       continue;
     }
 
-    formatted.push(formatOrdinaryLine(line, listContext));
+    formatted.push(formatOrdinaryLine(line, listContext, resolvedOption));
     index++;
   }
 

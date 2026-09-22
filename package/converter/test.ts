@@ -14,4 +14,4 @@ console.log(inputHtml);
 
 console.log('🟪 Fuyeor Flavored Markdown\n');
 
-console.log(`${fromHTML(inputHtml, { maxConsecutiveBlankLines: 4 })}\n`);
+console.log(`${fromHTML(inputHtml, { maxBlankLine: 4 })}\n`);

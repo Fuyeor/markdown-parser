@@ -2,12 +2,13 @@
 
 ## Features
 
-- **CJK Typography**: Automatic Pangu spacing between Chinese/Japanese/Korean and Latin/digits without altering protected tokens (inline code/math).
+- **Typography**: Automatic spacing between Chinese/Japanese and Latin/digits without altering protected tokens (inline code/math).
 - **Table Normalization**: Canonical pipe table formatting and delimiter cleanup.
 - **List Indentation**: Consistent 2-space indentation depth for nested ordered and unordered lists.
 - **Semantic Fences**: Recursive formatting inside semantic containers (`quote`, `slide`, `chain`, `accordion`).
 - **Configurable Blank Lines**: Fine-grained control over consecutive blank line collapsing.
-- **Zero Dependencies**: Blazing fast and minimal bundle size.
+
+You can also test it online at [flavored.fuyeor.com](https://flavored.fuyeor.com/playground).
 
 ## Quick Start
 
@@ -15,46 +16,82 @@
 import { format } from '@ffm/formatter';
 
 const markdown = `
-# Title
-这是English文本和一个[链接](https://example.com)。
+# the old man and the sea
+这是english文本。
 |Name|Age|
 |------|-------|
-|Alice|20|
+|Fuyeor|20|
 `;
 
-const formatted = format(markdown);
+const formatted = format(markdown, {
+  autoCase: {
+    heading: 'title',
+    glossary: { 'english': 'English' },
+  },
+});
 console.log(formatted);
 ```
 
-### Output:
+**Output**:
 
-````markdown
-# Title
+```markdown
+# The Old Man and the Sea
 
-这是 English 文本和一个[链接](https://example.com)。
+这是 English 文本。
 
 | Name | Age |
 | --- | --- |
-| Alice | 20 |
-````
+| Fuyeor | 20 |
+```
 
-## Options
+## API Option
 
-`format(content: string, options?: FormatOptions): string`
+`format(content: string, option?: FormatOption): string`
 
 | Option | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `maxConsecutiveBlankLines` | `number` | `1` | Maximum allowable consecutive blank lines between blocks. Set to `2` to preserve intentional author whitespace. |
+| `maxBlankLine` | `number` | `1` | Maximum allowable consecutive blank lines between blocks. |
+| `autoCase.sentence` | `'capitalize'` | `undefined` | Capitalize the first letter of each sentence. |
+| `autoCase.heading` | `'sentence' \| 'title' \| 'capitalize'` | `undefined` | Heading casing style. `title` uses Chicago/AP style. |
+| `autoCase.glossary` | `Record<string, string>` | `undefined` | Term dictionary for boundary-safe replacements. |
+| `continuousScript.autoSpacing` | `boolean` | `true` | Insert spaces between continuous script and Latin/digit boundaries. |
+| `continuousScript.autoUpperWord` | `boolean` | `false` | Capitalize standalone English words in continuous script text. |
+| `continuousScript.fullwidthPunctuation` | `boolean` | `true` | Capitalize standalone English words in Chinese and Japanese text. |
+| `transformer` | `(text: string) => string` | `undefined` | Custom text transformer callback. |
 
-### Example with Options
+### Advanced Example
 
 ```ts
 import { format } from '@ffm/formatter';
 
-const source = 'First paragraph\n\n\n\nSecond paragraph';
+const source = `
+# introduction to webauthn and ts
+我经常用 ts 开发。/api/v1 接口很稳定。
+react nativeの動作原理
+`;
 
-// Retains at most 2 blank lines (3 newlines)
 const formatted = format(source, {
-  maxConsecutiveBlankLines: 2,
+  autoCase: {
+    heading: 'title',
+    glossary: {
+      ts: 'TypeScript',
+      webauthn: 'WebAuthn',
+    },
+  },
+  continuousScript: {
+    autoSpacing: true,
+    autoUpperWord: true,
+  },
+  maxBlankLine: 1,
 });
 ```
+
+**Output**:
+
+````markdown
+# Introduction to WebAuthn and TypeScript
+
+我经常用 TypeScript 开发。/api/v1 接口很稳定。
+
+React Native の動作原理
+````

@@ -1,11 +1,13 @@
 // @ffm/formatter/src/index.spec.ts
 // pnpm --filter @ffm/formatter test
+import spec from './fixture/spec.json' with { type: 'json' };
+import option from './fixture/option.json' with { type: 'json' };
+
 import { describe, expect, it } from 'vitest';
 import { format } from './index';
-import fixture from './fixture/spec.json' with { type: 'json' };
 
 describe('format fixture', () => {
-  for (const item of fixture) {
+  for (const item of spec) {
     it(item.section, () => {
       expect(format(item.origin)).toBe(item.formatted);
     });
@@ -16,14 +18,27 @@ describe('format fixture', () => {
   });
 });
 
-it('respects maxConsecutiveBlankLines configuration', () => {
-  const source = 'First\n\n\n\nSecond';
-  // Default (1)
-  expect(format(source)).toBe('First\n\nSecond');
-  // Allows 2 blank lines
-  expect(format(source, { maxConsecutiveBlankLines: 2 })).toBe(
-    'First\n\n\nSecond',
-  );
-  // Compact (0)
-  expect(format(source, { maxConsecutiveBlankLines: 0 })).toBe('First\nSecond');
+for (const [section, optionCase] of Object.entries(option)) {
+  describe(`format option - ${section}`, () => {
+    for (const item of optionCase as Array<{
+      desc: string;
+      text: string;
+      option?: Parameters<typeof format>[1];
+      expect: string;
+    }>) {
+      it(item.desc, () => {
+        expect(format(item.text, item.option)).toBe(item.expect);
+      });
+    }
+  });
+}
+
+describe('format option - custom transformer', () => {
+  it('executes custom user text transformer callback', () => {
+    const input = 'foo and bar';
+    const output = format(input, {
+      transformer: (text) => text.replaceAll('foo', 'FOO'),
+    });
+    expect(output).toBe('FOO and bar');
+  });
 });
