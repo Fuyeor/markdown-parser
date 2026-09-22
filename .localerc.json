@@ -1,10 +1,10 @@
 {
   "basic": {
-    "source": "packages/playground/node_modules/@fuyeor/locale/src/common.json",
-    "outDir": "packages/playground/public/assets/locale"
+    "source": "package/playground/node_modules/@fuyeor/locale/src/common.json",
+    "outDir": "package/playground/public/assets/locale"
   },
   "main": {
-    "source": "packages/playground/src/locale/locale.json",
-    "outDir": "packages/playground/public/assets/locale"
+    "source": "package/playground/src/@app/locale.json",
+    "outDir": "package/playground/public/assets/locale"
   }
 }

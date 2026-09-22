@@ -1,0 +1,30 @@
+{
+  "name": "@ffm/parser",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "test": "vitest run src/index.spec.ts",
+    "test:unit": "vitest run src/index.spec.ts -t \"cfm fixture\"",
+    "test:ffm": "vitest run src/index.spec.ts -t \"ffm fixture\"",
+    "test:safety": "vitest run src/index.spec.ts -t \"safety fixture\"",
+    "test:compat": "vitest run src/test/index.spec.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
+  },
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ffm/linkify": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.0"
+  }
+}

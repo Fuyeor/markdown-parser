@@ -1,4 +1,4 @@
 # /Cargo.toml
 [workspace]
-members = ["packages/markdown-parser-rust"]
+members = ["crate"]
 resolver = "3"
