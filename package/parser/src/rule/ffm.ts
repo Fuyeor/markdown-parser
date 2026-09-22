@@ -1,6 +1,6 @@
 // @ffm/parser/src/rule/ffm.ts
 import { BlockState } from '#/core/state';
-import { extractFencedBlock } from './blocks';
+import { extractFencedBlock } from './block';
 import type { BlockRule, ASTNode } from '#/type';
 
 const ffmKeyword = new Set(['quote', 'slide', 'chain', 'accordion']);
@@ -18,7 +18,7 @@ const nodeTitleRegex = /^\s*\*\*(?:\[([ xX])\]\s*)?(.+?)\*\*\s*$/;
 export const ffmBlockRule: BlockRule = {
   name: 'ffm_blocks',
   // same as code block to leverage fenced block parsing
-  markers: ['`', '~'],
+  marker: ['`', '~'],
   parse(state: BlockState, ctx) {
     const block = extractFencedBlock(state);
     if (!block) return null;

@@ -1,4 +1,4 @@
-// @ffm/parser/src/rule/blocks.ts
+// @ffm/parser/src/rule/block.ts
 import type { ASTNode, BlockRule } from '#/type';
 import { BlockState } from '#/core/state';
 
@@ -18,7 +18,7 @@ const fencedBlockCache = new WeakMap<
  */
 export const headingRule: BlockRule = {
   name: 'heading',
-  markers: ['#'],
+  marker: ['#'],
   parse(state: BlockState, ctx) {
     const line = state.currentLine;
     if (!line) return null;
@@ -42,7 +42,7 @@ export const headingRule: BlockRule = {
  */
 export const codeBlockRule: BlockRule = {
   name: 'code_block',
-  markers: ['`', '~'],
+  marker: ['`', '~'],
   parse(state: BlockState) {
     const block = extractFencedBlock(state);
     if (!block) return null;
@@ -202,7 +202,7 @@ const createTableCell = (
  */
 export const tableRule: BlockRule = {
   name: 'table',
-  markers: ['|'],
+  marker: ['|'],
   parse(state: BlockState, ctx) {
     const line = state.currentLine;
     if (!line || !line.includes('|')) return null;
@@ -270,7 +270,7 @@ export const tableRule: BlockRule = {
  */
 export const hrRule: BlockRule = {
   name: 'hr',
-  markers: ['-', '*', '_'],
+  marker: ['-', '*', '_'],
   parse(state: BlockState) {
     const line = state.currentLine;
     if (!line) return null;
@@ -291,7 +291,7 @@ export const hrRule: BlockRule = {
  */
 export const blockquoteRule: BlockRule = {
   name: 'blockquote',
-  markers: ['>'],
+  marker: ['>'],
   parse(state: BlockState, ctx) {
     const line = state.currentLine;
     if (!line || !line.trimStart().startsWith('>')) return null;
@@ -334,7 +334,7 @@ const LIST_INDENT_STEP = 2;
  */
 export const listRule: BlockRule = {
   name: 'list',
-  markers: ['-', '*', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+  marker: ['-', '*', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
   parse(state: BlockState, ctx) {
     const line = state.currentLine;
     if (!line) return null;
@@ -364,7 +364,7 @@ export const listRule: BlockRule = {
         // detect subsequent lines belonging to this item
         // (lines with indentation deeper than the marker).
         const markerTotalWidth = baseIndent + marker.length + 1;
-        // Normalize nested list markers to two-space logical levels, tolerating odd legacy indentation.
+        // Normalize nested list marker to two-space logical levels, tolerating odd legacy indentation.
         const nestedListIndent = baseIndent + LIST_INDENT_STEP;
 
         while (

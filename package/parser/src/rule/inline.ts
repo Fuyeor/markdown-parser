@@ -1,4 +1,4 @@
-// @ffm/parser/src/rule/inlines.ts
+// @ffm/parser/src/rule/inline.ts
 import type { InlineRule } from '#/type';
 import { InlineState } from '#/core/state';
 import { isSafeColorValue } from '#/core/color';
@@ -9,7 +9,7 @@ import { isSafeLinkUrl } from '#/core/url';
  */
 export const hardBreakRule: InlineRule = {
   name: 'hardbreak',
-  markers: ['\\', ' '],
+  marker: ['\\', ' '],
   parse(state: InlineState) {
     if (state.currentChar === '\\' && state.content[state.pos + 1] === '\n') {
       return {
@@ -26,7 +26,7 @@ export const hardBreakRule: InlineRule = {
  */
 export const boldRule: InlineRule = {
   name: 'bold',
-  markers: ['*'],
+  marker: ['*'],
   parse(state: InlineState, ctx) {
     if (!state.content.startsWith('**', state.pos)) return null;
 
@@ -53,7 +53,7 @@ export const boldRule: InlineRule = {
  */
 export const italicRule: InlineRule = {
   name: 'italic',
-  markers: ['*'],
+  marker: ['*'],
   parse(state: InlineState, ctx) {
     const char = state.currentChar;
     //  only triggers when it starts with * and
@@ -82,7 +82,7 @@ export const italicRule: InlineRule = {
  */
 export const inlineCodeRule: InlineRule = {
   name: 'inline_code',
-  markers: ['`'],
+  marker: ['`'],
   parse(state: InlineState) {
     if (state.currentChar !== '`') return null;
 
@@ -144,7 +144,7 @@ export const inlineCodeRule: InlineRule = {
  */
 export const linkRule: InlineRule = {
   name: 'link',
-  markers: ['['],
+  marker: ['['],
   parse(state: InlineState, ctx) {
     if (state.currentChar !== '[') return null;
 
@@ -180,7 +180,7 @@ export const linkRule: InlineRule = {
  */
 export const underlineRule: InlineRule = {
   name: 'underline',
-  markers: ['_'],
+  marker: ['_'],
   parse(state: InlineState, ctx) {
     if (!state.content.startsWith('__', state.pos)) return null;
 
@@ -202,7 +202,7 @@ export const underlineRule: InlineRule = {
  */
 export const strikeRule: InlineRule = {
   name: 'strike',
-  markers: ['-'],
+  marker: ['-'],
   parse(state: InlineState, ctx) {
     if (!state.content.startsWith('--', state.pos)) return null;
 

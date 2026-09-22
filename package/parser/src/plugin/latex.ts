@@ -2,8 +2,8 @@
 import { BlockState, InlineState } from '#/core/state';
 import type { BlockRule, InlineRule, MarkdownPlugin } from '#/type';
 
-const MATH_INLINE_MARKER = '$';
-const MATH_BLOCK_MARKER = '$$';
+const inlineMathMarker = '$';
+const blockMathMarker = '$$';
 
 // Find an unescaped dollar delimiter without interpreting LaTeX escapes.
 const findMathDelimiter = (
@@ -29,15 +29,15 @@ const findMathDelimiter = (
 // Parse inline $...$ formulas while leaving unmatched dollars as plain text.
 export const latexInlineRule: InlineRule = {
   name: 'math_inline',
-  markers: [MATH_INLINE_MARKER],
+  marker: [inlineMathMarker],
   parse(state: InlineState) {
-    if (state.currentChar !== MATH_INLINE_MARKER) return null;
-    if (state.content.startsWith(MATH_BLOCK_MARKER, state.pos)) return null;
+    if (state.currentChar !== inlineMathMarker) return null;
+    if (state.content.startsWith(blockMathMarker, state.pos)) return null;
 
     const endIndex = findMathDelimiter(
       state.content,
-      state.pos + MATH_INLINE_MARKER.length,
-      MATH_INLINE_MARKER,
+      state.pos + inlineMathMarker.length,
+      inlineMathMarker,
     );
     if (endIndex === -1) return null;
 
@@ -45,10 +45,10 @@ export const latexInlineRule: InlineRule = {
       node: {
         type: 'math_inline',
         value: state.content
-          .slice(state.pos + MATH_INLINE_MARKER.length, endIndex)
+          .slice(state.pos + inlineMathMarker.length, endIndex)
           .trim(),
       },
-      consumedChars: endIndex - state.pos + MATH_INLINE_MARKER.length,
+      consumedChars: endIndex - state.pos + inlineMathMarker.length,
     };
   },
 };
@@ -56,30 +56,30 @@ export const latexInlineRule: InlineRule = {
 // Parse a $$...$$ formula as one block, including formulas spanning lines.
 export const latexBlockRule: BlockRule = {
   name: 'math_block',
-  markers: [MATH_INLINE_MARKER],
+  marker: [inlineMathMarker],
   parse(state: BlockState) {
     const firstLine = state.currentLine;
     if (!firstLine) return null;
 
     const trimmedLine = firstLine.trimStart();
-    if (!trimmedLine.startsWith(MATH_BLOCK_MARKER)) return null;
+    if (!trimmedLine.startsWith(blockMathMarker)) return null;
 
     const contentLines: string[] = [];
     let consumedLines = 1;
-    let currentContent = trimmedLine.slice(MATH_BLOCK_MARKER.length);
-    let endIndex = findMathDelimiter(currentContent, 0, MATH_BLOCK_MARKER);
+    let currentContent = trimmedLine.slice(blockMathMarker.length);
+    let endIndex = findMathDelimiter(currentContent, 0, blockMathMarker);
 
     while (endIndex === -1) {
       contentLines.push(currentContent);
       if (state.lineIndex + consumedLines >= state.lineCount) return null;
       currentContent = state.lines[state.lineIndex + consumedLines];
       consumedLines++;
-      endIndex = findMathDelimiter(currentContent, 0, MATH_BLOCK_MARKER);
+      endIndex = findMathDelimiter(currentContent, 0, blockMathMarker);
     }
 
     contentLines.push(currentContent.slice(0, endIndex));
     const trailingContent = currentContent.slice(
-      endIndex + MATH_BLOCK_MARKER.length,
+      endIndex + blockMathMarker.length,
     );
     if (trailingContent.trim() !== '') return null;
 

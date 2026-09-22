@@ -10,7 +10,7 @@ export const SPECIAL_BLOCK_LANGUAGES = new Set(['mermaid', 'abc', 'smiles']);
 // Parse the FFM #[smiles = `...`] inline placeholder syntax.
 export const smilesInlineRule: InlineRule = {
   name: 'smiles_inline',
-  markers: ['#'],
+  marker: ['#'],
   parse(state: InlineState) {
     if (state.currentChar !== '#') return null;
 

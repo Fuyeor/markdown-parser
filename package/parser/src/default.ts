@@ -8,7 +8,7 @@ import {
   listRule,
   hrRule,
   blockquoteRule,
-} from './rule/blocks';
+} from './rule/block';
 import {
   hardBreakRule,
   inlineCodeRule,
@@ -17,7 +17,7 @@ import {
   underlineRule,
   italicRule,
   strikeRule,
-} from './rule/inlines';
+} from './rule/inline';
 import { ffmBlockRule } from './rule/ffm';
 import { latexPlugin } from './plugin/latex';
 import { extensionsPlugin } from './plugin/extensions';

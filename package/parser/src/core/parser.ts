@@ -1,6 +1,6 @@
 // @ffm/parser/src/core/parser.ts
-import { BlockState, InlineState } from './state';
 import { linkify } from '@ffm/linkify';
+import { BlockState, InlineState } from './state';
 import type {
   ASTNode,
   ASTTransform,
@@ -58,7 +58,7 @@ export class MarkdownParser {
   // register block rule
   // By default, it inserts at the end, or before/after a specified rule.
   addBlockRule(rule: BlockRule): this {
-    for (const marker of rule.markers) {
+    for (const marker of rule.marker) {
       const list = this.#blockRuleMap.get(marker) || [];
       list.push(rule);
       this.#blockRuleMap.set(marker, list);
@@ -68,8 +68,8 @@ export class MarkdownParser {
 
   // register inline rule
   addInlineRule(rule: InlineRule): this {
-    // register the rule under its markers for quick lookup during parsing
-    for (const marker of rule.markers) {
+    // register the rule under its marker for quick lookup during parsing
+    for (const marker of rule.marker) {
       const rulesForMarker = this.#inlineRuleMap.get(marker) || [];
       // ensure the rule is in the list for this marker
       rulesForMarker.unshift(rule);
