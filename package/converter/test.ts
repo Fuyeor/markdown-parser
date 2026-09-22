@@ -1,6 +1,6 @@
 // @ffm/converter/src/test.ts
 // npx tsx test.ts
-import { toFFM } from './src/index';
+import { fromHTML } from './src/index.node';
 
 // HTML snippet wanted to test
 const inputHtml = `
@@ -14,4 +14,4 @@ console.log(inputHtml);
 
 console.log('🟪 Fuyeor Flavored Markdown\n');
 
-console.log(`${toFFM(inputHtml, { maxConsecutiveBlankLines: 4 })}\n`);
+console.log(`${fromHTML(inputHtml, { maxConsecutiveBlankLines: 4 })}\n`);

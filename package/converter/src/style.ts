@@ -1,21 +1,26 @@
 // @ffm/converter/src/style.ts
-import { isTransparentColor, parseColor } from './color';
+import { isTransparentColorInNode, parseColorInNode } from './color/node';
 import { cssLengthPattern } from './constant';
-import type { Marks, Style } from './type';
+import type { ColorResolver, Mark, Style } from './type';
+
+export const defaultNodeColorResolver: ColorResolver = {
+  parseColor: parseColorInNode,
+  isTransparentColor: isTransparentColorInNode,
+};
 
 export function parseFontSize(value: string): string | null {
   const normalized = value.trim().replace(/\s*!important\s*$/iu, '');
   return cssLengthPattern.test(normalized) ? normalized : null;
 }
 
-// Parse supported inline declarations while preserving CSS last-valid semantics.
-export function parseStyleAttribute(value: string | undefined): {
-  style: Style;
-  marks: Partial<Marks>;
-} {
-  if (!value) return { style: {}, marks: {} };
+/** Parse inline style attribute declarations while extracting styles and typographic mark. */
+export function parseStyleAttribute(
+  value: string | undefined,
+  colorResolver: ColorResolver = defaultNodeColorResolver,
+): { style: Style; mark: Partial<Mark> } {
+  if (!value) return { style: {}, mark: {} };
   const style: Style = {};
-  const marks: Partial<Marks> = {};
+  const mark: Partial<Mark> = {};
 
   for (const declaration of value.split(';')) {
     const colonIndex = declaration.indexOf(':');
@@ -28,14 +33,16 @@ export function parseStyleAttribute(value: string | undefined): {
       .replace(/\s*!important\s*$/iu, '');
 
     if (property === 'color') {
-      const color = parseColor(propertyValue);
+      const color = colorResolver.parseColor(propertyValue);
       if (color !== null) style.color = color;
-      else if (isTransparentColor(propertyValue)) style.color = null;
+      else if (colorResolver.isTransparentColor(propertyValue))
+        style.color = null;
     } else if (property === 'background-color' || property === 'background') {
       // supports background-color and background
-      const background = parseColor(propertyValue);
+      const background = colorResolver.parseColor(propertyValue);
       if (background !== null) style.background = background;
-      else if (isTransparentColor(propertyValue)) style.background = null;
+      else if (colorResolver.isTransparentColor(propertyValue))
+        style.background = null;
     } else if (property === 'font-size') {
       const fontSize = parseFontSize(propertyValue);
       if (fontSize !== null) style.fontSize = fontSize;
@@ -43,20 +50,20 @@ export function parseStyleAttribute(value: string | undefined): {
       property === 'text-decoration' ||
       property === 'text-decoration-line'
     ) {
-      if (propertyValue.includes('underline')) marks.underline = true;
-      if (propertyValue.includes('line-through')) marks.strike = true;
+      if (propertyValue.includes('underline')) mark.underline = true;
+      if (propertyValue.includes('line-through')) mark.strike = true;
     } else if (property === 'font-weight') {
       if (['bold', 'bolder', '700', '800', '900'].includes(propertyValue)) {
-        marks.bold = true;
+        mark.bold = true;
       }
     } else if (property === 'font-style') {
       if (propertyValue === 'italic' || propertyValue === 'oblique') {
-        marks.italic = true;
+        mark.italic = true;
       }
     }
   }
 
-  return { style, marks };
+  return { style, mark };
 }
 
 export function mergeStyle(parent: Style, own: Style): Style {
@@ -67,16 +74,16 @@ export function cloneStyle(style: Style): Style {
   return { ...style };
 }
 
-export function cloneMarks(marks: Marks, patch: Partial<Marks>): Marks {
-  return { ...marks, ...patch };
+export function cloneMark(mark: Mark, patch: Partial<Mark>): Mark {
+  return { ...mark, ...patch };
 }
 
 export function styleKey(style: Style): string {
   return `${style.color ?? ''}|${style.background ?? ''}|${style.fontSize ?? ''}`;
 }
 
-export function marksKey(marks: Marks): string {
-  return `${marks.bold ? '1' : '0'}${marks.italic ? '1' : '0'}${marks.underline ? '1' : '0'}${marks.strike ? '1' : '0'}|${marks.link ?? ''}`;
+export function markKey(mark: Mark): string {
+  return `${mark.bold ? '1' : '0'}${mark.italic ? '1' : '0'}${mark.underline ? '1' : '0'}${mark.strike ? '1' : '0'}|${mark.link ?? ''}`;
 }
 
 export function formatStyle(style: Style): string {

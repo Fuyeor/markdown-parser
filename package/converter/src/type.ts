@@ -1,19 +1,15 @@
 // @ffm/converter/src/type.ts
-import type { FormatOption } from '@ffm/formatter';
-import type { parseDocument } from 'htmlparser2';
+export type TextNode = {
+  data: string;
+};
 
-export type ParsedDocument = ReturnType<typeof parseDocument>;
-export type ChildNode = ParsedDocument['children'][number];
-
-export type ElementNode = ChildNode & {
+export type ElementNode = {
   name: string;
   attribs: Record<string, string>;
   children: ChildNode[];
 };
 
-export type TextNode = ChildNode & {
-  data: string;
-};
+export type ChildNode = ElementNode | TextNode | { [key: string]: unknown };
 
 export type Style = {
   color?: string | null;
@@ -21,7 +17,7 @@ export type Style = {
   fontSize?: string;
 };
 
-export type Marks = {
+export type Mark = {
   bold: boolean;
   italic: boolean;
   underline: boolean;
@@ -32,7 +28,7 @@ export type Marks = {
 export type InlinePiece = {
   content: string;
   style: Style;
-  marks: Marks;
+  mark: Mark;
 };
 
 export type Rgba = {
@@ -47,5 +43,7 @@ export type TableRow = {
   isHeader: boolean;
 };
 
-/** Options for HTML to FFM conversion. */
-export type ToFFMOptions = FormatOption;
+export type ColorResolver = {
+  parseColor: (value: string) => string | null;
+  isTransparentColor: (value: string) => boolean;
+};

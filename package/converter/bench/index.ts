@@ -1,5 +1,5 @@
 // @ffm/converter/bench/index.ts
-import { toFFM } from '@ffm/converter';
+import { fromHTML } from '@ffm/converter';
 
 const ITERATIONS = 1_000;
 const html = `
@@ -17,7 +17,7 @@ const initialRss = process.memoryUsage().rss;
 const startedAt = process.hrtime.bigint();
 let output = '';
 for (let iteration = 0; iteration < ITERATIONS; iteration++) {
-  output = toFFM(html);
+  output = fromHTML(html);
 }
 const elapsedMilliseconds =
   Number(process.hrtime.bigint() - startedAt) / 1_000_000;

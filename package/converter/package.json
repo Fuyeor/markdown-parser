@@ -1,7 +1,7 @@
 {
   "name": "@ffm/converter",
   "version": "0.1.3",
-  "description": "Convert HTML fragments to Fuyeor Flavored Markdown.",
+  "description": "Convert HTML fragment to Fuyeor Flavored Markdown.",
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",
@@ -15,7 +15,11 @@
     "#/*": "./src/*"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "browser": "./src/index.browser.ts",
+      "node": "./src/index.node.ts",
+      "default": "./src/index.node.ts"
+    }
   },
   "dependencies": {
     "@ffm/formatter": "workspace:*",

@@ -13,9 +13,9 @@ The package is source-first and can be consumed by modern Node.js or browser app
 ## Usage
 
 ```ts
-import { toFFM } from '@ffm/converter';
+import { fromHtml } from '@ffm/converter';
 
-const output = toFFM('<h1>Hello</h1><p><strong>World</strong></p>');
+const output = fromHTML('<h1>Hello</h1><p><strong>World</strong></p>');
 
 console.log(output);
 // # Hello
@@ -24,11 +24,11 @@ console.log(output);
 
 // keep blank lines:
 const html = '<p>First</p><p></p><p></p><p></p><p></p><p>Second</p>';
-const result = toFFM(html, { maxConsecutiveBlankLines: 4 });
+const result = fromHTML(html, { maxConsecutiveBlankLines: 4 });
 // First\n\n\n\n\nSecond
 ```
 
-`toFFM` accepts an HTML fragment and returns a formatted string. It does not fetch external resources, execute scripts, or read stylesheets.
+`fromHTML` accepts an HTML fragment and returns a formatted string. It does not fetch external resources, execute scripts, or read stylesheets.
 
 ## Supported features
 

@@ -1,26 +1,28 @@
 // @ffm/converter/src/render.ts
 import {
-  blockElements,
+  blockElement,
   unsafeSchemePattern,
-  droppedElements,
-  emptyMarks,
+  droppedElement,
+  emptyMark,
   headingPattern,
   safeSchemePattern,
 } from './constant';
 import {
-  cloneMarks,
+  cloneMark,
   cloneStyle,
+  defaultNodeColorResolver,
   formatStyle,
-  marksKey,
+  markKey,
   mergeStyle,
   parseStyleAttribute,
   styleKey,
 } from './style';
 import type {
   ChildNode,
+  ColorResolver,
   ElementNode,
   InlinePiece,
-  Marks,
+  Mark,
   Style,
   TableRow,
   TextNode,
@@ -39,11 +41,11 @@ export function isTextNode(node: ChildNode): node is TextNode {
 }
 
 export function isDroppedElement(element: ElementNode): boolean {
-  return droppedElements.has(element.name);
+  return droppedElement.has(element.name);
 }
 
 export function isBlockElement(element: ElementNode): boolean {
-  if (blockElements.has(element.name)) return true;
+  if (blockElement.has(element.name)) return true;
   return element.children.some(
     (child) => isElement(child) && isBlockElement(child),
   );
@@ -88,20 +90,20 @@ function stripBoundaryNewlines(content: string): string {
   return content.replace(/^\n+/u, '').replace(/\n+$/u, '');
 }
 
-function applyTextMarks(content: string, marks: Marks): string {
+function applyTextMark(content: string, mark: Mark): string {
   let result = content;
-  if (marks.bold && marks.italic) result = `***${result}***`;
-  else if (marks.bold) result = `**${result}**`;
-  else if (marks.italic) result = `*${result}*`;
-  if (marks.strike) result = `--${result}--`;
-  if (marks.underline) result = `__${result}__`;
+  if (mark.bold && mark.italic) result = `***${result}***`;
+  else if (mark.bold) result = `**${result}**`;
+  else if (mark.italic) result = `*${result}*`;
+  if (mark.strike) result = `--${result}--`;
+  if (mark.underline) result = `__${result}__`;
   return result;
 }
 
 function samePieceFormatting(left: InlinePiece, right: InlinePiece): boolean {
   return (
     styleKey(left.style) === styleKey(right.style) &&
-    marksKey(left.marks) === marksKey(right.marks) &&
+    markKey(left.mark) === markKey(right.mark) &&
     !left.content.includes('\n') &&
     !right.content.includes('\n')
   );
@@ -118,7 +120,7 @@ export function serializePieces(pieces: readonly InlinePiece[]): string {
       merged.push({
         content: piece.content,
         style: cloneStyle(piece.style),
-        marks: { ...piece.marks },
+        mark: { ...piece.mark },
       });
     }
   }
@@ -132,7 +134,7 @@ export function serializePieces(pieces: readonly InlinePiece[]): string {
       const next = merged[index]!;
       if (
         styleKey(next.style) !== styleKey(first.style) ||
-        next.marks.link !== first.marks.link ||
+        next.mark.link !== first.mark.link ||
         next.content.includes('\n') ||
         first.content.includes('\n')
       )
@@ -141,10 +143,10 @@ export function serializePieces(pieces: readonly InlinePiece[]): string {
       index++;
     }
     const content = group
-      .map((piece) => applyTextMarks(piece.content, piece.marks))
+      .map((piece) => applyTextMark(piece.content, piece.mark))
       .join('');
-    const marked = first.marks.link
-      ? `[${content}](${first.marks.link})`
+    const marked = first.mark.link
+      ? `[${content}](${first.mark.link})`
       : content;
     const style = formatStyle(first.style);
     result += style ? `[${marked}]${style}` : marked;
@@ -155,28 +157,27 @@ export function serializePieces(pieces: readonly InlinePiece[]): string {
 export function renderInlineNode(
   node: ChildNode,
   style: Style,
-  marks: Marks,
+  mark: Mark,
+  colorResolver: ColorResolver = defaultNodeColorResolver,
 ): InlinePiece[] {
   if (isTextNode(node)) {
     if (!node.data) return [];
-    // escape text node
     const escaped = escapeMarkdownText(node.data);
-    return [
-      { content: escaped, style: cloneStyle(style), marks: { ...marks } },
-    ];
+    return [{ content: escaped, style: cloneStyle(style), mark: { ...mark } }];
   }
   if (!isElement(node) || isDroppedElement(node)) return [];
 
-  const { style: ownStyle, marks: ownMarks } = parseStyleAttribute(
+  const { style: ownStyle, mark: ownMark } = parseStyleAttribute(
     node.attribs.style,
+    colorResolver,
   );
   const nextStyle = mergeStyle(style, ownStyle);
-  let nextMarks = cloneMarks(marks, ownMarks);
+  let nextMark = cloneMark(mark, ownMark);
 
   const name = node.name;
   if (name === 'br') {
     return [
-      { content: '\n', style: cloneStyle(nextStyle), marks: { ...nextMarks } },
+      { content: '\n', style: cloneStyle(nextStyle), mark: { ...nextMark } },
     ];
   }
   if (name === 'img') {
@@ -187,7 +188,7 @@ export function renderInlineNode(
       {
         content: `![${alt}](${source})`,
         style: cloneStyle(nextStyle),
-        marks: { ...nextMarks },
+        mark: { ...mark },
       },
     ];
   }
@@ -199,19 +200,19 @@ export function renderInlineNode(
       {
         content: `${fence}${code}${fence}`,
         style: cloneStyle(nextStyle),
-        marks: { ...nextMarks },
+        mark: { ...nextMark },
       },
     ];
   }
 
   if (name === 'strong' || name === 'b')
-    nextMarks = cloneMarks(nextMarks, { bold: true });
+    nextMark = cloneMark(nextMark, { bold: true });
   else if (name === 'em' || name === 'i')
-    nextMarks = cloneMarks(nextMarks, { italic: true });
+    nextMark = cloneMark(nextMark, { italic: true });
   else if (name === 'u' || name === 'ins')
-    nextMarks = cloneMarks(nextMarks, { underline: true });
+    nextMark = cloneMark(nextMark, { underline: true });
   else if (name === 's' || name === 'del' || name === 'strike')
-    nextMarks = cloneMarks(nextMarks, { strike: true });
+    nextMark = cloneMark(nextMark, { strike: true });
 
   if (name === 'a') {
     const href = node.attribs.href;
@@ -224,12 +225,12 @@ export function renderInlineNode(
       normalizedHref !== '' &&
       !unsafeSchemePattern.test(normalizedHref) &&
       (!hasScheme || safeSchemePattern.test(normalizedHref));
-    if (isSafeUrl) nextMarks = cloneMarks(nextMarks, { link: href });
+    if (isSafeUrl) nextMark = cloneMark(nextMark, { link: href });
   }
 
   const pieces: InlinePiece[] = [];
   for (const child of node.children) {
-    pieces.push(...renderInlineNode(child, nextStyle, nextMarks));
+    pieces.push(...renderInlineNode(child, nextStyle, nextMark, colorResolver));
   }
   return pieces;
 }
@@ -237,15 +238,16 @@ export function renderInlineNode(
 export function renderInlineContent(
   nodes: readonly ChildNode[],
   style: Style,
-  marks: Marks,
+  mark: Mark,
+  colorResolver: ColorResolver = defaultNodeColorResolver,
 ): string {
   const pieces: InlinePiece[] = [];
   for (const node of nodes) {
     if (isTextNode(node)) {
       if (/^\s+$/u.test(node.data) && node.data.includes('\n')) continue;
-      pieces.push(...renderInlineNode(node, style, marks));
+      pieces.push(...renderInlineNode(node, style, mark, colorResolver));
     } else if (isElement(node) && !isBlockElement(node)) {
-      pieces.push(...renderInlineNode(node, style, marks));
+      pieces.push(...renderInlineNode(node, style, mark, colorResolver));
     }
   }
   return serializePieces(pieces);
@@ -256,6 +258,7 @@ export function renderList(
   element: ElementNode,
   style: Style,
   depth: number,
+  colorResolver: ColorResolver = defaultNodeColorResolver,
 ): string {
   const ordered = element.name === 'ol';
   const parsedStart = Number.parseInt(element.attribs.start ?? '', 10);
@@ -280,7 +283,7 @@ export function renderList(
     // split it into multiple lines based on line breaks
     // and add 2 spaces of FFM standard indentation
     const rawContent = stripBoundaryNewlines(
-      renderFlow(inlineChildren, style),
+      renderFlow(inlineChildren, style, colorResolver),
     ).trim();
 
     const marker = ordered ? `${number}.` : '-';
@@ -306,10 +309,12 @@ export function renderList(
     }
 
     for (const nestedList of nestedLists) {
-      const nested = renderList(nestedList, style, depth + 1).replace(
-        /\n+$/u,
-        '',
-      );
+      const nested = renderList(
+        nestedList,
+        style,
+        depth + 1,
+        colorResolver,
+      ).replace(/\n+$/u, '');
       if (nested) lines.push(nested);
     }
   }
@@ -344,7 +349,11 @@ function getTableRows(element: ElementNode): TableRow[] {
   return rows;
 }
 
-export function renderTable(element: ElementNode, style: Style): string {
+export function renderTable(
+  element: ElementNode,
+  style: Style,
+  colorResolver: ColorResolver = defaultNodeColorResolver,
+): string {
   const rows = getTableRows(element);
   if (rows.length === 0) return '';
   const headerIndex = rows.findIndex((row) => row.isHeader);
@@ -358,7 +367,9 @@ export function renderTable(element: ElementNode, style: Style): string {
     const cells = Array.from({ length: columnCount }, (_value, index) => {
       const cell = row[index];
       if (!cell) return '';
-      return renderFlow(cell.children, style).replace(/\s+/gu, ' ').trim();
+      return renderFlow(cell.children, style, colorResolver)
+        .replace(/\s+/gu, ' ')
+        .trim();
     });
     return `| ${cells.join(' | ')} |`;
   };
@@ -379,18 +390,32 @@ export function renderPre(element: ElementNode): string {
   return `${fence}\n${body}${fence}\n\n`;
 }
 
-export function renderBlockElement(element: ElementNode, style: Style): string {
+export function renderBlockElement(
+  element: ElementNode,
+  style: Style,
+  colorResolver: ColorResolver = defaultNodeColorResolver,
+): string {
   if (isDroppedElement(element)) return '';
-  const { style: ownStyle } = parseStyleAttribute(element.attribs.style);
+  const { style: ownStyle } = parseStyleAttribute(
+    element.attribs.style,
+    colorResolver,
+  );
   const nextStyle = mergeStyle(style, ownStyle);
   if (element.name === 'hr') return '---\n\n';
   if (element.name === 'pre') return renderPre(element);
   if (element.name === 'ul' || element.name === 'ol')
-    return renderList(element, nextStyle, 0);
-  if (element.name === 'table') return renderTable(element, nextStyle);
+    return renderList(element, nextStyle, 0, colorResolver);
+  if (element.name === 'li') {
+    const content = stripBoundaryNewlines(
+      renderFlow(element.children, nextStyle, colorResolver),
+    ).trim();
+    return content ? `- ${content}\n\n` : '';
+  }
+  if (element.name === 'table')
+    return renderTable(element, nextStyle, colorResolver);
   if (element.name === 'blockquote') {
     const rawContent = stripBoundaryNewlines(
-      renderFlow(element.children, nextStyle),
+      renderFlow(element.children, nextStyle, colorResolver),
     ).trim();
     if (!rawContent) return '';
     const textLines = rawContent.split(/\n+/u);
@@ -409,7 +434,8 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
     const content = renderInlineContent(
       element.children,
       nextStyle,
-      emptyMarks,
+      emptyMark,
+      colorResolver,
     ).trim();
     return content
       ? `${'#'.repeat(Number(headingMatch[1]))} ${content}\n\n`
@@ -418,7 +444,7 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
 
   // Remove simple line breaks at the beginning and end
   // retaining the line breaks intentionally left by the author within the paragraph
-  const content = renderFlow(element.children, nextStyle)
+  const content = renderFlow(element.children, nextStyle, colorResolver)
     .replace(/^\n+/u, '')
     .replace(/[ \t]+$/u, '');
 
@@ -434,7 +460,11 @@ export function renderBlockElement(element: ElementNode, style: Style): string {
   return `${content}\n\n`;
 }
 
-export function renderFlow(nodes: readonly ChildNode[], style: Style): string {
+export function renderFlow(
+  nodes: readonly ChildNode[],
+  style: Style,
+  colorResolver: ColorResolver = defaultNodeColorResolver,
+): string {
   let output = '';
   let inlinePieces: InlinePiece[] = [];
   const flushInline = () => {
@@ -470,12 +500,12 @@ export function renderFlow(nodes: readonly ChildNode[], style: Style): string {
         ...renderInlineNode(
           { ...node, data: textData } as TextNode,
           style,
-          emptyMarks,
+          emptyMark,
+          colorResolver,
         ),
       );
       continue;
     }
-
     if (!isElement(node) || isDroppedElement(node)) continue;
     if (isBlockElement(node)) {
       flushInline();
@@ -484,9 +514,11 @@ export function renderFlow(nodes: readonly ChildNode[], style: Style): string {
       if (output && !output.endsWith('\n\n')) {
         output += output.endsWith('\n') ? '\n' : '\n\n';
       }
-      output += renderBlockElement(node, style);
+      output += renderBlockElement(node, style, colorResolver);
     } else {
-      inlinePieces.push(...renderInlineNode(node, style, emptyMarks));
+      inlinePieces.push(
+        ...renderInlineNode(node, style, emptyMark, colorResolver),
+      );
     }
   }
   flushInline();
