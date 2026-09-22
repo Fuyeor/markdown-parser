@@ -11,37 +11,36 @@ mod linkify;
 mod parser;
 mod plain_text;
 mod render;
-mod rules;
+mod rule;
 mod safety;
 mod state;
 
 pub use ast::{Alignment, AstNode, NodeType};
 pub use linkify::{LinkMatch, linkify};
-pub use parser::{Linkifier, MarkdownParser, ParserContext, ParserError, ParserOptions};
+pub use parser::{Linkifier, MarkdownParser, ParserContext, ParserError, ParserOption};
 pub use plain_text::to_plain_text;
 pub use render::{render, render_optional};
 pub use safety::{is_safe_color_value, is_safe_link_url};
 pub use state::{BlockState, InlineState};
 
 /// Constructs a parser with the base Markdown rule set.
-pub fn create_markdown_parser(options: ParserOptions) -> MarkdownParser {
-    MarkdownParser::create_standard(options)
+pub fn create_common_parser(option: ParserOption) -> MarkdownParser {
+    MarkdownParser::create_common(option)
 }
 
 /// Constructs a parser with the base Markdown rules and FFM extensions.
-pub fn create_fuyeor_markdown_parser(options: ParserOptions) -> MarkdownParser {
-    MarkdownParser::create_ffm(options)
+pub fn create_ffm_parser(option: ParserOption) -> MarkdownParser {
+    MarkdownParser::create_ffm(option)
 }
 
 #[cfg(test)]
-mod cross_language_fixtures {
+mod shared_fixture {
     use serde::Deserialize;
     use serde_json::{Map, Value, json};
 
     use super::{
-        AstNode, MarkdownParser, ParserOptions, create_fuyeor_markdown_parser,
-        create_markdown_parser, is_safe_color_value, is_safe_link_url, linkify, render,
-        to_plain_text,
+        AstNode, MarkdownParser, ParserOption, create_common_parser, create_ffm_parser,
+        is_safe_color_value, is_safe_link_url, linkify, render, to_plain_text,
     };
 
     #[derive(Deserialize)]
@@ -59,7 +58,7 @@ mod cross_language_fixtures {
         assert: Vec<MarkdownAssertion>,
         error: Option<String>,
         no_throw: Option<bool>,
-        options: Option<FixtureOptions>,
+        option: Option<FixtureOption>,
     }
 
     #[derive(Deserialize)]
@@ -70,7 +69,7 @@ mod cross_language_fixtures {
     }
 
     #[derive(Deserialize)]
-    struct FixtureOptions {
+    struct FixtureOption {
         max_nesting_depth: Option<usize>,
     }
 
@@ -107,7 +106,7 @@ mod cross_language_fixtures {
 
     // Load a shared JSON fixture from the repository root.
     fn read_fixture<T: for<'de> Deserialize<'de>>(name: &str) -> T {
-        let path = format!("{}/../../fixtures/{name}", env!("CARGO_MANIFEST_DIR"));
+        let path = format!("{}/../fixture/{name}", env!("CARGO_MANIFEST_DIR"));
         serde_json::from_str(&std::fs::read_to_string(path).expect("fixture must exist"))
             .expect("fixture must be valid JSON")
     }
@@ -116,13 +115,13 @@ mod cross_language_fixtures {
     fn normalize_node(node: &AstNode) -> Value {
         let mut object = Map::new();
         object.insert("type".into(), json!(node.node_type.as_str()));
-        if let Some(content) = &node.content {
-            object.insert("content".into(), json!(content));
+        if let Some(value) = &node.value {
+            object.insert("value".into(), json!(value));
         }
-        if !node.children.is_empty() {
+        if !node.content.is_empty() {
             object.insert(
-                "children".into(),
-                Value::Array(node.children.iter().map(normalize_node).collect()),
+                "content".into(),
+                Value::Array(node.content.iter().map(normalize_node).collect()),
             );
         }
         if let Some(level) = node.level {
@@ -140,10 +139,10 @@ mod cross_language_fixtures {
         if let Some(start) = node.start {
             object.insert("start".into(), json!(start));
         }
-        if let Some(headers) = &node.headers {
+        if let Some(header) = &node.header {
             object.insert(
-                "headers".into(),
-                Value::Array(headers.iter().map(normalize_node).collect()),
+                "header".into(),
+                Value::Array(header.iter().map(normalize_node).collect()),
             );
         }
         if let Some(name) = &node.name {
@@ -179,29 +178,29 @@ mod cross_language_fixtures {
             })
     }
 
-    // Translate fixture options into the Rust parser API.
-    fn parser_options(case: &MarkdownCase) -> ParserOptions {
-        ParserOptions {
+    // Translate fixture option into the Rust parser API.
+    fn parser_option(case: &MarkdownCase) -> ParserOption {
+        ParserOption {
             max_nesting_depth: case
-                .options
+                .option
                 .as_ref()
-                .and_then(|options| options.max_nesting_depth)
+                .and_then(|option| option.max_nesting_depth)
                 .unwrap_or(64),
-            ..ParserOptions::default()
+            ..ParserOption::default()
         }
     }
 
     // Execute one standard or FFM Markdown case against the Rust parser.
     fn execute_markdown_case(case: &MarkdownCase, ffm: bool) {
-        let options = parser_options(case);
+        let option = parser_option(case);
         if case.error.as_deref() == Some("invalid_nesting_depth") {
-            assert!(MarkdownParser::try_new(options).is_err());
+            assert!(MarkdownParser::try_new(option).is_err());
             return;
         }
         let parser = if ffm {
-            create_fuyeor_markdown_parser(options)
+            create_ffm_parser(option)
         } else {
-            create_markdown_parser(options)
+            create_common_parser(option)
         };
         let ast = parser.parse(case.input.as_deref().unwrap_or(""));
         if let Some(expected_html) = &case.html {
@@ -230,7 +229,7 @@ mod cross_language_fixtures {
     }
 
     #[test]
-    fn executes_shared_markdown_fixtures() {
+    fn test_markdown() {
         let standard = read_fixture::<MarkdownFixtureFile>("markdown.json");
         assert_eq!(standard.schema_version, 2);
         for case in &standard.cases {
@@ -244,7 +243,7 @@ mod cross_language_fixtures {
     }
 
     #[test]
-    fn executes_shared_safety_and_linkify_fixtures() {
+    fn test_linkify() {
         let safety = read_fixture::<SafetyFixtureFile>("safety.json");
         assert_eq!(safety.schema_version, 1);
         for case in safety.links {

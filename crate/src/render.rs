@@ -33,53 +33,53 @@ fn render_into(output: &mut String, nodes: &[AstNode]) {
             NodeType::Heading => {
                 if let Some(level @ 1..=6) = node.level {
                     let _ = write!(output, "<h{level}>");
-                    render_into(output, &node.children);
+                    render_into(output, &node.content);
                     let _ = writeln!(output, "</h{level}>");
                 } else {
                     output.push_str("<span>");
-                    render_into(output, &node.children);
+                    render_into(output, &node.content);
                     output.push_str("</span>");
                 }
             }
             NodeType::Paragraph => {
                 output.push_str("<p>");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</p>\n");
             }
             NodeType::Text => {
-                if let Some(content) = &node.content {
-                    output.push_str(&escape_html(content));
+                if let Some(value) = &node.value {
+                    output.push_str(&escape_html(value));
                 }
             }
             NodeType::Bold => {
                 output.push_str("<strong>");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</strong>");
             }
             NodeType::Italic => {
                 output.push_str("<em>");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</em>");
             }
             NodeType::Underline => {
                 output.push_str("<u>");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</u>");
             }
             NodeType::Strike => {
                 output.push_str("<del>");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</del>");
             }
             NodeType::InlineCode => {
                 output.push_str("<code>");
-                if let Some(content) = &node.content {
-                    output.push_str(&escape_html(content));
+                if let Some(value) = &node.value {
+                    output.push_str(&escape_html(value));
                 }
                 output.push_str("</code>");
             }
             NodeType::ColorCode => {
-                let color = node.content.as_deref().unwrap_or_default();
+                let color = node.value.as_deref().unwrap_or_default();
                 if !is_safe_color_value(color) {
                     output.push_str(&escape_html(color));
                 } else {
@@ -95,10 +95,10 @@ fn render_into(output: &mut String, nodes: &[AstNode]) {
                 if is_safe_link_url(url) {
                     let escaped = escape_html(url);
                     let _ = write!(output, "<a href=\"{escaped}\">");
-                    render_into(output, &node.children);
+                    render_into(output, &node.content);
                     output.push_str("</a>");
                 } else {
-                    render_into(output, &node.children);
+                    render_into(output, &node.content);
                 }
             }
             NodeType::CodeBlock => {
@@ -115,8 +115,8 @@ fn render_into(output: &mut String, nodes: &[AstNode]) {
                     let _ = write!(output, " class=\"language-{}\"", escape_html(lang));
                 }
                 output.push('>');
-                if let Some(content) = &node.content {
-                    output.push_str(&escape_html(content));
+                if let Some(value) = &node.value {
+                    output.push_str(&escape_html(value));
                 }
                 output.push_str("\n</code></pre></div>\n");
             }
@@ -134,32 +134,32 @@ fn render_into(output: &mut String, nodes: &[AstNode]) {
                     String::new()
                 };
                 let _ = writeln!(output, "<{tag}{start}>");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 let _ = writeln!(output, "</{tag}>");
             }
             NodeType::ListItem => {
                 output.push_str("<li>");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</li>\n");
             }
             NodeType::Table => {
                 output.push_str("<table>\n");
-                if let Some(headers) = &node.headers {
+                if let Some(header) = &node.header {
                     output.push_str("<thead>\n<tr>\n");
-                    for cell in headers {
+                    for cell in header {
                         let _ = write!(output, "<th{}>", table_alignment(cell));
-                        render_into(output, &cell.children);
+                        render_into(output, &cell.content);
                         output.push_str("</th>\n");
                     }
                     output.push_str("</tr>\n</thead>\n");
                 }
-                if !node.children.is_empty() {
+                if !node.content.is_empty() {
                     output.push_str("<tbody>\n");
-                    for row in &node.children {
+                    for row in &node.content {
                         output.push_str("<tr>\n");
-                        for cell in &row.children {
+                        for cell in &row.content {
                             let _ = write!(output, "<td{}>", table_alignment(cell));
-                            render_into(output, &cell.children);
+                            render_into(output, &cell.content);
                             output.push_str("</td>\n");
                         }
                         output.push_str("</tr>\n");
@@ -171,12 +171,12 @@ fn render_into(output: &mut String, nodes: &[AstNode]) {
             NodeType::Hr => output.push_str("<hr />\n"),
             NodeType::Blockquote => {
                 output.push_str("<blockquote>\n");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</blockquote>\n");
             }
             NodeType::Accordion => {
                 output.push_str("<div class=\"ffm-accordion\">");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</div>");
             }
             NodeType::AccordionItem => {
@@ -184,12 +184,12 @@ fn render_into(output: &mut String, nodes: &[AstNode]) {
                 let _ = write!(output, "<details name=\"{name}\"><summary>");
                 render_optional_into(output, node.title.as_deref());
                 output.push_str("</summary><div class=\"accordion-content\">");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</div></details>");
             }
             NodeType::Chain => {
                 output.push_str("<div class=\"chain-container\">");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</div>");
             }
             NodeType::ChainItem => {
@@ -210,32 +210,32 @@ fn render_into(output: &mut String, nodes: &[AstNode]) {
                     output,
                     "<div class=\"chain-item {status_class}\"><div class=\"chain-marker\"></div><div class=\"chain-content-wrapper\">{title}<div class=\"chain-body\">"
                 );
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</div></div></div>");
             }
             NodeType::Slide => {
                 output.push_str(
                     "<div class=\"slide-container-wrapper\"><div class=\"slide-container\">",
                 );
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</div></div>");
             }
             NodeType::SlideItem => {
                 output.push_str("<div class=\"slide-item\">");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</div>");
             }
             NodeType::Hardbreak => output.push_str("<br />\n"),
             NodeType::Root | NodeType::TableRow | NodeType::TableCell | NodeType::Custom(_) => {
                 output.push_str("<span>");
-                render_into(output, &node.children);
+                render_into(output, &node.content);
                 output.push_str("</span>");
             }
         }
     }
 }
 
-/// Renders optional title children without allocating when absent.
+/// Renders optional title content without allocating when absent.
 fn render_optional_into(output: &mut String, nodes: Option<&[AstNode]>) {
     if let Some(nodes) = nodes {
         render_into(output, nodes);

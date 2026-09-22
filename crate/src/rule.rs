@@ -1,4 +1,4 @@
-// src/rules.rs
+// src/rule.rs
 use crate::ast::{Alignment, AstNode, NodeType};
 use crate::parser::ParserContext;
 use crate::safety::{is_safe_color_value, is_safe_link_url};
@@ -19,14 +19,14 @@ pub struct InlineMatch {
 /// Extensible block-rule interface matching the TypeScript parser contract.
 pub trait BlockRule {
     fn name(&self) -> &'static str;
-    fn markers(&self) -> &'static [char];
+    fn marker(&self) -> &'static [char];
     fn parse(&self, state: &BlockState, ctx: &ParserContext<'_>) -> Option<BlockMatch>;
 }
 
 /// Extensible inline-rule interface matching the TypeScript parser contract.
 pub trait InlineRule {
     fn name(&self) -> &'static str;
-    fn markers(&self) -> &'static [char];
+    fn marker(&self) -> &'static [char];
     fn parse(&self, state: &mut InlineState, ctx: &ParserContext<'_>) -> Option<InlineMatch>;
 }
 
@@ -125,7 +125,7 @@ impl BlockRule for HeadingRule {
         "heading"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['#']
     }
 
@@ -156,7 +156,7 @@ impl BlockRule for HeadingRule {
 
         let mut node = AstNode::new(NodeType::Heading);
         node.level = Some(level as u8);
-        node.children = if text.is_empty() {
+        node.content = if text.is_empty() {
             Vec::new()
         } else {
             ctx.parse_inline(&text)
@@ -176,7 +176,7 @@ impl BlockRule for CodeBlockRule {
         "code_block"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['`', '~']
     }
 
@@ -184,7 +184,7 @@ impl BlockRule for CodeBlockRule {
         let block = extract_fenced_block(state)?;
         let mut node = AstNode::new(NodeType::CodeBlock);
         node.lang = Some(block.lang);
-        node.content = Some(block.content);
+        node.value = Some(block.content);
         Some(BlockMatch {
             node,
             consumed_lines: block.consumed_lines,
@@ -297,7 +297,7 @@ fn create_table_cell(
     alignment: Option<Alignment>,
     ctx: &ParserContext<'_>,
 ) -> AstNode {
-    let mut node = AstNode::with_children(NodeType::TableCell, ctx.parse_inline(content));
+    let mut node = AstNode::with_content(NodeType::TableCell, ctx.parse_inline(content));
     node.align = alignment;
     node
 }
@@ -310,7 +310,7 @@ impl BlockRule for TableRule {
         "table"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['|']
     }
 
@@ -326,33 +326,33 @@ impl BlockRule for TableRule {
         if alignments.is_none() {
             let next = state.lines.get(state.line_index + 1)?;
             alignments = parse_table_alignments(next);
-            let parsed_headers = extract_table_cells(line);
-            if alignments.as_ref()?.len() != parsed_headers.len() {
+            let parsed_header = extract_table_cells(line);
+            if alignments.as_ref()?.len() != parsed_header.len() {
                 return None;
             }
-            header_cells = Some(parsed_headers);
+            header_cells = Some(parsed_header);
             consumed_lines = 2;
         }
 
         let alignments = alignments?;
         let column_count = alignments.len();
-        let headers = header_cells.map(|cells| normalize_table_cells(cells, column_count));
+        let header = header_cells.map(|cells| normalize_table_cells(cells, column_count));
         let mut rows = Vec::new();
         while let Some(row_line) = state.lines.get(state.line_index + consumed_lines)
             && row_line.contains('|')
         {
             let cells = normalize_table_cells(extract_table_cells(row_line), column_count);
-            let row_children = cells
+            let row_content = cells
                 .iter()
                 .enumerate()
                 .map(|(index, cell)| create_table_cell(cell, alignments[index], ctx))
                 .collect();
-            rows.push(AstNode::with_children(NodeType::TableRow, row_children));
+            rows.push(AstNode::with_content(NodeType::TableRow, row_content));
             consumed_lines += 1;
         }
 
-        let mut node = AstNode::with_children(NodeType::Table, rows);
-        node.headers = headers.map(|cells| {
+        let mut node = AstNode::with_content(NodeType::Table, rows);
+        node.header = header.map(|cells| {
             cells
                 .iter()
                 .enumerate()
@@ -374,7 +374,7 @@ impl BlockRule for HrRule {
         "hr"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['-', '*', '_']
     }
 
@@ -409,7 +409,7 @@ impl BlockRule for BlockquoteRule {
         "blockquote"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['>']
     }
 
@@ -431,7 +431,7 @@ impl BlockRule for BlockquoteRule {
             consumed_lines += 1;
         }
         let mut node = AstNode::new(NodeType::Blockquote);
-        node.children = ctx.parse_blocks(&content_lines.join("\n"));
+        node.content = ctx.parse_blocks(&content_lines.join("\n"));
         Some(BlockMatch {
             node,
             consumed_lines,
@@ -439,7 +439,7 @@ impl BlockRule for BlockquoteRule {
     }
 }
 
-const LIST_MARKERS: &[char] = &['-', '*', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const LIST_MARKER: &[char] = &['-', '*', '+', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 /// Parses a list-item prefix and returns indentation, marker and content.
 fn parse_list_item(line: &str) -> Option<(usize, String, String)> {
@@ -479,8 +479,8 @@ impl BlockRule for ListRule {
         "list"
     }
 
-    fn markers(&self) -> &'static [char] {
-        LIST_MARKERS
+    fn marker(&self) -> &'static [char] {
+        LIST_MARKER
     }
 
     fn parse(&self, state: &BlockState, ctx: &ParserContext<'_>) -> Option<BlockMatch> {
@@ -553,13 +553,13 @@ impl BlockRule for ListRule {
             }
 
             let mut item = AstNode::new(NodeType::ListItem);
-            item.children = ctx.parse_blocks(&item_lines.join("\n"));
+            item.content = ctx.parse_blocks(&item_lines.join("\n"));
             items.push(item);
             consumed_lines += item_consumed_lines;
             let _ = item_marker;
         }
 
-        let mut node = AstNode::with_children(NodeType::List, items);
+        let mut node = AstNode::with_content(NodeType::List, items);
         node.ordered = Some(ordered);
         node.start = start_number;
         Some(BlockMatch {
@@ -577,7 +577,7 @@ impl InlineRule for HardBreakRule {
         "hardbreak"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['\\', ' ']
     }
 
@@ -601,7 +601,7 @@ impl InlineRule for InlineCodeRule {
         "inline_code"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['`']
     }
 
@@ -648,7 +648,7 @@ impl InlineRule for InlineCodeRule {
             NodeType::InlineCode
         };
         let mut node = AstNode::new(node_type);
-        node.content = Some(raw);
+        node.value = Some(raw);
         Some(InlineMatch {
             node,
             consumed_bytes: end + marker_len - state.pos,
@@ -664,7 +664,7 @@ impl InlineRule for LinkRule {
         "link"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['[']
     }
 
@@ -684,7 +684,7 @@ impl InlineRule for LinkRule {
         }
         let mut node = AstNode::new(NodeType::Link);
         node.url = Some(url);
-        node.children = ctx.parse_inline(&inner);
+        node.content = ctx.parse_inline(&inner);
         Some(InlineMatch {
             node,
             consumed_bytes: url_end + 1 - state.pos,
@@ -700,7 +700,7 @@ impl InlineRule for UnderlineRule {
         "underline"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['_']
     }
 
@@ -710,7 +710,7 @@ impl InlineRule for UnderlineRule {
         }
         let end = state.find_next_token("__", state.pos + 2)?;
         let mut node = AstNode::new(NodeType::Underline);
-        node.children = ctx.parse_inline(&state.content[state.pos + 2..end]);
+        node.content = ctx.parse_inline(&state.content[state.pos + 2..end]);
         Some(InlineMatch {
             node,
             consumed_bytes: end + 2 - state.pos,
@@ -726,7 +726,7 @@ impl InlineRule for StrikeRule {
         "strike"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['-']
     }
 
@@ -736,7 +736,7 @@ impl InlineRule for StrikeRule {
         }
         let end = state.find_next_token("--", state.pos + 2)?;
         let mut node = AstNode::new(NodeType::Strike);
-        node.children = ctx.parse_inline(&state.content[state.pos + 2..end]);
+        node.content = ctx.parse_inline(&state.content[state.pos + 2..end]);
         Some(InlineMatch {
             node,
             consumed_bytes: end + 2 - state.pos,
@@ -752,7 +752,7 @@ impl InlineRule for BoldRule {
         "bold"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['*']
     }
 
@@ -762,7 +762,7 @@ impl InlineRule for BoldRule {
         }
         let end = state.find_next_token("**", state.pos + 2)?;
         let mut node = AstNode::new(NodeType::Bold);
-        node.children = ctx.parse_inline(&state.content[state.pos + 2..end]);
+        node.content = ctx.parse_inline(&state.content[state.pos + 2..end]);
         Some(InlineMatch {
             node,
             consumed_bytes: end + 2 - state.pos,
@@ -778,7 +778,7 @@ impl InlineRule for ItalicRule {
         "italic"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['*']
     }
 
@@ -791,7 +791,7 @@ impl InlineRule for ItalicRule {
             return None;
         }
         let mut node = AstNode::new(NodeType::Italic);
-        node.children = ctx.parse_inline(&state.content[state.pos + 1..end]);
+        node.content = ctx.parse_inline(&state.content[state.pos + 1..end]);
         Some(InlineMatch {
             node,
             consumed_bytes: end + 1 - state.pos,
@@ -802,14 +802,14 @@ impl InlineRule for ItalicRule {
 const FFM_KEYWORDS: &[&str] = &["quote", "slide", "chain", "accordion"];
 
 /// Parses FFM fenced blocks before generic code blocks.
-pub struct FfmBlockRule;
+pub struct FuyeorBlockRule;
 
-impl BlockRule for FfmBlockRule {
+impl BlockRule for FuyeorBlockRule {
     fn name(&self) -> &'static str {
         "ffm_blocks"
     }
 
-    fn markers(&self) -> &'static [char] {
+    fn marker(&self) -> &'static [char] {
         &['`', '~']
     }
 
@@ -822,20 +822,17 @@ impl BlockRule for FfmBlockRule {
 
         let node = match block_type {
             "quote" => {
-                AstNode::with_children(NodeType::Blockquote, ctx.parse_blocks(&block.content))
+                AstNode::with_content(NodeType::Blockquote, ctx.parse_blocks(&block.content))
             }
             "slide" => {
                 let slides = split_slide_contents(&block.content)
                     .into_iter()
                     .filter(|content| !content.trim().is_empty())
                     .map(|content| {
-                        AstNode::with_children(
-                            NodeType::SlideItem,
-                            ctx.parse_blocks(content.trim()),
-                        )
+                        AstNode::with_content(NodeType::SlideItem, ctx.parse_blocks(content.trim()))
                     })
                     .collect();
-                AstNode::with_children(NodeType::Slide, slides)
+                AstNode::with_content(NodeType::Slide, slides)
             }
             "accordion" | "chain" => parse_foldable_block(block_type, &block.content, ctx),
             _ => unreachable!("FFM keywords are exhaustive"),
@@ -910,7 +907,7 @@ fn parse_foldable_block(block_type: &str, content: &str, ctx: &ParserContext<'_>
     for line in content.split('\n') {
         if let Some((checkbox, title)) = parse_ffm_title(line) {
             if let Some(mut previous) = current_item.take() {
-                previous.children = ctx.parse_blocks(current_lines.join("\n").trim());
+                previous.content = ctx.parse_blocks(current_lines.join("\n").trim());
                 items.push(previous);
             } else if !current_lines.is_empty() && !current_lines.join("").trim().is_empty() {
                 preamble_lines = std::mem::take(&mut current_lines);
@@ -936,24 +933,24 @@ fn parse_foldable_block(block_type: &str, content: &str, ctx: &ParserContext<'_>
     }
 
     if let Some(mut last) = current_item {
-        last.children = ctx.parse_blocks(current_lines.join("\n").trim());
+        last.content = ctx.parse_blocks(current_lines.join("\n").trim());
         items.push(last);
     } else if !current_lines.is_empty() && !current_lines.join("").trim().is_empty() {
         preamble_lines = current_lines;
     }
 
-    let mut children = if preamble_lines.is_empty() {
+    let mut content = if preamble_lines.is_empty() {
         Vec::new()
     } else {
         ctx.parse_blocks(preamble_lines.join("\n").trim())
     };
-    children.extend(items);
+    content.extend(items);
     let node_type = if block_type == "accordion" {
         NodeType::Accordion
     } else {
         NodeType::Chain
     };
-    let mut node = AstNode::with_children(node_type, children);
+    let mut node = AstNode::with_content(node_type, content);
     node.name = accordion_name;
     node
 }

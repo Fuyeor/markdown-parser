@@ -128,10 +128,10 @@ impl Alignment {
 pub struct AstNode {
     /// The semantic node type.
     pub node_type: NodeType,
-    /// Literal text or code content, when present.
-    pub content: Option<String>,
+    /// Literal text or code content value, when present.
+    pub value: Option<String>,
     /// Child nodes in source order.
-    pub children: Vec<AstNode>,
+    pub content: Vec<AstNode>,
     /// ATX heading level.
     pub level: Option<u8>,
     /// Fenced code info string.
@@ -143,7 +143,7 @@ pub struct AstNode {
     /// Ordered-list starting number.
     pub start: Option<u64>,
     /// Table header cells.
-    pub headers: Option<Vec<AstNode>>,
+    pub header: Option<Vec<AstNode>>,
     /// Accordion or chain group name.
     pub name: Option<String>,
     /// Accordion or chain item title nodes.
@@ -163,14 +163,14 @@ impl AstNode {
     pub fn new(node_type: NodeType) -> Self {
         Self {
             node_type,
-            content: None,
-            children: Vec::new(),
+            value: None,
+            content: Vec::new(),
             level: None,
             lang: None,
             url: None,
             ordered: None,
             start: None,
-            headers: None,
+            header: None,
             name: None,
             title: None,
             is_completed: None,
@@ -181,16 +181,16 @@ impl AstNode {
     }
 
     /// Creates a text node with the supplied content.
-    pub fn text(content: impl Into<String>) -> Self {
+    pub fn text(value: impl Into<String>) -> Self {
         let mut node = Self::new(NodeType::Text);
-        node.content = Some(content.into());
+        node.value = Some(value.into());
         node
     }
 
     /// Creates a node with child nodes.
-    pub fn with_children(node_type: NodeType, children: Vec<AstNode>) -> Self {
+    pub fn with_content(node_type: NodeType, content: Vec<AstNode>) -> Self {
         let mut node = Self::new(node_type);
-        node.children = children;
+        node.content = content;
         node
     }
 }

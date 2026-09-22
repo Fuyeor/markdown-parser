@@ -27,8 +27,8 @@ fn append_block_nodes(nodes: &[AstNode], output: &mut String) {
 fn append_block_node(node: &AstNode, output: &mut String) {
     match &node.node_type {
         NodeType::Text | NodeType::InlineCode | NodeType::ColorCode => {
-            if let Some(content) = &node.content {
-                output.push_str(content);
+            if let Some(value) = &node.value {
+                output.push_str(value);
             }
         }
         NodeType::Heading
@@ -37,10 +37,10 @@ fn append_block_node(node: &AstNode, output: &mut String) {
         | NodeType::Italic
         | NodeType::Underline
         | NodeType::Strike
-        | NodeType::Link => append_inline_nodes(&node.children, output),
+        | NodeType::Link => append_inline_nodes(&node.content, output),
         NodeType::CodeBlock => {
-            if let Some(content) = &node.content {
-                output.push_str(content);
+            if let Some(value) = &node.value {
+                output.push_str(value);
             }
         }
         NodeType::Blockquote
@@ -49,43 +49,43 @@ fn append_block_node(node: &AstNode, output: &mut String) {
         | NodeType::Slide
         | NodeType::SlideItem
         | NodeType::Accordion
-        | NodeType::Chain => append_block_nodes(&node.children, output),
+        | NodeType::Chain => append_block_nodes(&node.content, output),
         NodeType::AccordionItem => {
             append_inline_nodes(node.title.as_deref().unwrap_or_default(), output);
-            if !output.is_empty() && !output.ends_with('\n') && !node.children.is_empty() {
+            if !output.is_empty() && !output.ends_with('\n') && !node.content.is_empty() {
                 output.push('\n');
             }
-            append_block_nodes(&node.children, output);
+            append_block_nodes(&node.content, output);
         }
         NodeType::ChainItem => {
             if let Some(title) = &node.title {
                 append_inline_nodes(title, output);
-                if !output.is_empty() && !output.ends_with('\n') && !node.children.is_empty() {
+                if !output.is_empty() && !output.ends_with('\n') && !node.content.is_empty() {
                     output.push('\n');
                 }
             }
-            append_block_nodes(&node.children, output);
+            append_block_nodes(&node.content, output);
         }
         NodeType::Table => {
-            if let Some(headers) = &node.headers {
-                append_table_cells(headers, output);
+            if let Some(header) = &node.header {
+                append_table_cells(header, output);
             }
-            if !node.children.is_empty() {
+            if !node.content.is_empty() {
                 if !output.is_empty() {
                     push_separator(output);
                 }
-                append_block_nodes(&node.children, output);
+                append_block_nodes(&node.content, output);
             }
         }
-        NodeType::TableRow => append_table_cells(&node.children, output),
-        NodeType::TableCell => append_inline_nodes(&node.children, output),
+        NodeType::TableRow => append_table_cells(&node.content, output),
+        NodeType::TableCell => append_inline_nodes(&node.content, output),
         NodeType::Hardbreak => output.push('\n'),
         NodeType::Hr => {}
-        NodeType::Root | NodeType::Custom(_) => append_block_nodes(&node.children, output),
+        NodeType::Root | NodeType::Custom(_) => append_block_nodes(&node.content, output),
     }
 }
 
-/// Appends inline children without inserting separators between formatting nodes.
+/// Appends inline content without inserting separators between formatting nodes.
 fn append_inline_nodes(nodes: &[AstNode], output: &mut String) {
     for node in nodes {
         append_block_node(node, output);

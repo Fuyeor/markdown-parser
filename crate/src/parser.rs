@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use crate::ast::{AstNode, NodeType};
 use crate::linkify::{LinkMatch, linkify};
-use crate::rules::{BlockRule, FfmBlockRule, InlineRule};
+use crate::rule::{BlockRule, FuyeorBlockRule, InlineRule};
 use crate::safety::is_safe_link_url;
 use crate::state::{BlockState, InlineState};
 
@@ -21,16 +21,16 @@ const PRELIGHT_BLOCK_RULES: &[&str] = &[
 /// A linkifier callback used by the parser's inline text projection.
 pub type Linkifier = fn(&str) -> Vec<LinkMatch>;
 
-/// Parser options matching the TypeScript parser constructor.
+/// Parser option matching the TypeScript parser constructor.
 #[derive(Clone, Copy)]
-pub struct ParserOptions {
+pub struct ParserOption {
     /// Maximum recursive block/inline parsing depth.
     pub max_nesting_depth: usize,
     /// Callback used to discover links in plain text.
     pub linkifier: Linkifier,
 }
 
-impl Default for ParserOptions {
+impl Default for ParserOption {
     fn default() -> Self {
         Self {
             max_nesting_depth: 64,
@@ -109,14 +109,14 @@ pub struct MarkdownParser {
 }
 
 impl MarkdownParser {
-    /// Creates a parser and fails fast if its options are invalid.
-    pub fn new(options: ParserOptions) -> Self {
-        Self::try_new(options).expect("invalid MarkdownParser options")
+    /// Creates a parser and fails fast if its option are invalid.
+    pub fn new(option: ParserOption) -> Self {
+        Self::try_new(option).expect("invalid MarkdownParser option")
     }
 
     /// Creates a parser without panicking on invalid configuration.
-    pub fn try_new(options: ParserOptions) -> Result<Self, ParserError> {
-        if options.max_nesting_depth == 0 {
+    pub fn try_new(option: ParserOption) -> Result<Self, ParserError> {
+        if option.max_nesting_depth == 0 {
             return Err(ParserError::InvalidMaxNestingDepth);
         }
         Ok(Self {
@@ -124,8 +124,8 @@ impl MarkdownParser {
             inline_rules: Vec::new(),
             block_rule_map: HashMap::new(),
             inline_rule_map: HashMap::new(),
-            max_nesting_depth: options.max_nesting_depth,
-            linkifier: options.linkifier,
+            max_nesting_depth: option.max_nesting_depth,
+            linkifier: option.linkifier,
         })
     }
 
@@ -135,9 +135,9 @@ impl MarkdownParser {
         R: BlockRule + 'static,
     {
         let rule_index = self.block_rules.len();
-        let markers = rule.markers();
+        let marker = rule.marker();
         self.block_rules.push(Box::new(rule));
-        for marker in markers {
+        for marker in marker {
             self.block_rule_map
                 .entry(*marker)
                 .or_default()
@@ -152,9 +152,9 @@ impl MarkdownParser {
         R: InlineRule + 'static,
     {
         let rule_index = self.inline_rules.len();
-        let markers = rule.markers();
+        let marker = rule.marker();
         self.inline_rules.push(Box::new(rule));
-        for marker in markers {
+        for marker in marker {
             self.inline_rule_map
                 .entry(*marker)
                 .or_default()
@@ -176,41 +176,41 @@ impl MarkdownParser {
     }
 
     /// Parses the input with the standard rule set.
-    pub fn create_standard(options: ParserOptions) -> Self {
-        let mut parser = Self::new(options);
-        parser.add_block_rule(crate::rules::CodeBlockRule);
-        parser.add_block_rule(crate::rules::ListRule);
-        parser.add_block_rule(crate::rules::HeadingRule);
-        parser.add_block_rule(crate::rules::TableRule);
-        parser.add_block_rule(crate::rules::HrRule);
-        parser.add_block_rule(crate::rules::BlockquoteRule);
-        parser.add_inline_rule(crate::rules::HardBreakRule);
-        parser.add_inline_rule(crate::rules::InlineCodeRule);
-        parser.add_inline_rule(crate::rules::LinkRule);
-        parser.add_inline_rule(crate::rules::BoldRule);
-        parser.add_inline_rule(crate::rules::UnderlineRule);
-        parser.add_inline_rule(crate::rules::ItalicRule);
-        parser.add_inline_rule(crate::rules::StrikeRule);
+    pub fn create_common(option: ParserOption) -> Self {
+        let mut parser = Self::new(option);
+        parser.add_block_rule(crate::rule::CodeBlockRule);
+        parser.add_block_rule(crate::rule::ListRule);
+        parser.add_block_rule(crate::rule::HeadingRule);
+        parser.add_block_rule(crate::rule::TableRule);
+        parser.add_block_rule(crate::rule::HrRule);
+        parser.add_block_rule(crate::rule::BlockquoteRule);
+        parser.add_inline_rule(crate::rule::HardBreakRule);
+        parser.add_inline_rule(crate::rule::InlineCodeRule);
+        parser.add_inline_rule(crate::rule::LinkRule);
+        parser.add_inline_rule(crate::rule::BoldRule);
+        parser.add_inline_rule(crate::rule::UnderlineRule);
+        parser.add_inline_rule(crate::rule::ItalicRule);
+        parser.add_inline_rule(crate::rule::StrikeRule);
         parser
     }
 
     /// Parses the input with the standard rule set plus FFM fenced blocks.
-    pub fn create_ffm(options: ParserOptions) -> Self {
-        let mut parser = Self::new(options);
-        parser.add_block_rule(FfmBlockRule);
-        parser.add_block_rule(crate::rules::CodeBlockRule);
-        parser.add_block_rule(crate::rules::ListRule);
-        parser.add_block_rule(crate::rules::HeadingRule);
-        parser.add_block_rule(crate::rules::TableRule);
-        parser.add_block_rule(crate::rules::HrRule);
-        parser.add_block_rule(crate::rules::BlockquoteRule);
-        parser.add_inline_rule(crate::rules::HardBreakRule);
-        parser.add_inline_rule(crate::rules::InlineCodeRule);
-        parser.add_inline_rule(crate::rules::LinkRule);
-        parser.add_inline_rule(crate::rules::BoldRule);
-        parser.add_inline_rule(crate::rules::UnderlineRule);
-        parser.add_inline_rule(crate::rules::ItalicRule);
-        parser.add_inline_rule(crate::rules::StrikeRule);
+    pub fn create_ffm(option: ParserOption) -> Self {
+        let mut parser = Self::new(option);
+        parser.add_block_rule(FuyeorBlockRule);
+        parser.add_block_rule(crate::rule::CodeBlockRule);
+        parser.add_block_rule(crate::rule::ListRule);
+        parser.add_block_rule(crate::rule::HeadingRule);
+        parser.add_block_rule(crate::rule::TableRule);
+        parser.add_block_rule(crate::rule::HrRule);
+        parser.add_block_rule(crate::rule::BlockquoteRule);
+        parser.add_inline_rule(crate::rule::HardBreakRule);
+        parser.add_inline_rule(crate::rule::InlineCodeRule);
+        parser.add_inline_rule(crate::rule::LinkRule);
+        parser.add_inline_rule(crate::rule::BoldRule);
+        parser.add_inline_rule(crate::rule::UnderlineRule);
+        parser.add_inline_rule(crate::rule::ItalicRule);
+        parser.add_inline_rule(crate::rule::StrikeRule);
         parser
     }
 
@@ -233,7 +233,7 @@ impl MarkdownParser {
         runtime: &RefCell<ParseRuntime>,
     ) -> Vec<AstNode> {
         if depth > self.max_nesting_depth {
-            return vec![AstNode::with_children(
+            return vec![AstNode::with_content(
                 NodeType::Paragraph,
                 vec![AstNode::text(state.remaining_lines().join("\n"))],
             )];
@@ -316,7 +316,7 @@ impl MarkdownParser {
 
             if !paragraph_lines.is_empty() {
                 let inline_content = paragraph_lines.join("\n");
-                nodes.push(AstNode::with_children(
+                nodes.push(AstNode::with_content(
                     NodeType::Paragraph,
                     self.parse_inline_inner(&inline_content, depth, runtime),
                 ));
@@ -415,7 +415,7 @@ impl MarkdownParser {
             }
             let mut link = AstNode::new(NodeType::Link);
             link.url = Some(matched.url);
-            link.children = vec![AstNode::text(matched.text)];
+            link.content = vec![AstNode::text(matched.text)];
             nodes.push(link);
             last_index = matched.last_index;
         }
