@@ -64,9 +64,9 @@
     "@ffm/formatter": "workspace:*"
   },
   "devDependencies": {
-    "@types/vscode": "^1.80.0",
+    "@types/vscode": "^1.138.0",
     "esbuild": "^0.27.7",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.0"
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
   }
 }

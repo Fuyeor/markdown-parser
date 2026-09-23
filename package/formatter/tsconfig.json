@@ -1,9 +1,11 @@
 {
   "extends": "../parser/tsconfig.json",
   "compilerOptions": {
+    "paths": {
+      "#/*": ["./src/*"]
+    },
     "rootDir": "src",
     "noEmit": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": []
+  "include": ["src/**/*.ts"]
 }
