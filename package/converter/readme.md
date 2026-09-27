@@ -13,7 +13,7 @@ The package is source-first and can be consumed by modern Node.js or browser app
 ## Usage
 
 ```ts
-import { fromHtml } from '@ffm/converter';
+import { fromHTML } from '@ffm/converter';
 
 const output = fromHTML('<h1>Hello</h1><p><strong>World</strong></p>');
 
