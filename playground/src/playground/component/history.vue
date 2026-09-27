@@ -190,7 +190,7 @@ const formatTime = (timestamp: number): string => {
 }
 
 .document-history {
-  margin: 10px;
+  margin: 0 10px 10px;
 }
 
 .document-history-title {
@@ -204,20 +204,18 @@ const formatTime = (timestamp: number): string => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 0 20px;
+  padding: 6px 0 28px;
 }
 
 .document-search-input {
-  box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  padding: 8px 12px;
-  border: var(--border-subtle);
-  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  border: none;
+  border-radius: var(--radius-lg);
   color: var(--text-secondary);
   background: var(--surface-raised);
   font-size: 0.85rem;
-  outline: none;
 
   &:focus {
     box-shadow: var(--input-border-shadow);
@@ -262,11 +260,6 @@ const formatTime = (timestamp: number): string => {
 .document-item:focus-visible,
 .document-item.active {
   background-color: var(--surface-raised);
-}
-
-.document-item.active .document-icon {
-  color: #6b46c1;
-  opacity: 1;
 }
 
 .document-info {

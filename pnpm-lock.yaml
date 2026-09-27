@@ -90,6 +90,56 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(@types/node@26.6.2)(jsdom@29.1.1)(vite@8.0.9(@types/node@26.6.2)(esbuild@0.28.2)(terser@5.51.2)(tsx@4.23.15))
 
+  package/editor/core:
+    dependencies:
+      '@ffm/converter':
+        specifier: workspace:*
+        version: link:../../converter
+      '@ffm/formatter':
+        specifier: workspace:*
+        version: link:../../formatter
+      '@ffm/parser':
+        specifier: workspace:*
+        version: link:../../parser
+      alien-signals:
+        specifier: ^2.0.0
+        version: 2.0.8
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.2
+        version: 26.6.2
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.0.1
+        version: 5.0.1(@types/node@26.6.2)(jsdom@29.1.1)(vite@8.0.9(@types/node@26.6.2)(esbuild@0.28.2)(terser@5.51.2)(tsx@4.23.15))
+
+  package/editor/vue:
+    dependencies:
+      '@ffm/editor':
+        specifier: workspace:*
+        version: link:../core
+      alien-signals:
+        specifier: ^2.0.0
+        version: 2.0.8
+      vue:
+        specifier: ^3.5.0
+        version: 3.5.43(typescript@7.0.2)
+    devDependencies:
+      '@fuyeor/tsconfig':
+        specifier: 0.1.1
+        version: 0.1.1
+      '@types/node':
+        specifier: ^26.6.2
+        version: 26.6.2
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.0.1
+        version: 5.0.1(@types/node@26.6.2)(jsdom@29.1.1)(vite@8.0.9(@types/node@26.6.2)(esbuild@0.28.2)(terser@5.51.2)(tsx@4.23.15))
+
   package/formatter:
     dependencies:
       '@ffm/parser':
@@ -171,31 +221,34 @@ importers:
       '@ffm/parser':
         specifier: workspace:*
         version: link:../package/parser
+      '@ffm/vue-editor':
+        specifier: workspace:*
+        version: link:../package/editor/vue
       '@ffm/vue-renderer':
         specifier: workspace:*
         version: link:../package/vue-renderer
       '@fuyeor/commons':
+        specifier: ^0.1.3
+        version: 0.1.3(vue@3.5.43(typescript@7.0.2))
+      '@fuyeor/config':
+        specifier: ^0.1.2
+        version: 0.1.2(vite@8.0.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@26.6.2)(esbuild@0.27.7)(terser@5.51.2)(tsx@4.23.15))(vue@3.5.43(typescript@7.0.2))
+      '@fuyeor/interactify':
         specifier: ^0.1.2
         version: 0.1.2(vue@3.5.43(typescript@7.0.2))
-      '@fuyeor/config':
-        specifier: ^0.1.1
-        version: 0.1.1(vite@8.0.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@26.6.2)(esbuild@0.27.7)(terser@5.51.2)(tsx@4.23.15))(vue@3.5.43(typescript@7.0.2))
-      '@fuyeor/interactify':
-        specifier: ^0.1.1
-        version: 0.1.1(vue@3.5.43(typescript@7.0.2))
       '@fuyeor/locale':
         specifier: ^0.1.0
         version: 0.1.0(vue@3.5.43(typescript@7.0.2))
       '@fuyeor/vue-router':
-        specifier: ^0.0.9
-        version: 0.0.9(vue@3.5.43(typescript@7.0.2))
+        specifier: ^0.1.1
+        version: 0.1.1(vue@3.5.43(typescript@7.0.2))
       vue:
         specifier: ^3.5.43
         version: 3.5.43(typescript@7.0.2)
     devDependencies:
       '@fuyeor/tsconfig':
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.1.1
+        version: 0.1.1
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -631,23 +684,18 @@ packages:
   '@floating-ui/vue@1.1.11':
     resolution: {integrity: sha512-HzHKCNVxnGS35r9fCHBc3+uCnjw9IWIlCPL683cGgM9Kgj2BiAl8x1mS7vtvP6F9S/e/q4O6MApwSHj8hNLGfw==}
 
-  '@fuyeor/commons@0.1.0':
-    resolution: {integrity: sha256-0ftDuLXPoQiLotiSRC2cmVF/+cViXO11ZV2pTpbkXbM=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/commons/0.1.0.tgz}
+  '@fuyeor/commons@0.1.3':
+    resolution: {integrity: sha256-36mnDCt9UsjKePZ6qdneCE3LIbmsTPD1v9QPYY28bCg=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/commons/0.1.3.tgz}
     peerDependencies:
       vue: '*'
 
-  '@fuyeor/commons@0.1.2':
-    resolution: {integrity: sha256-X1Ejy4MgCaO8iFkvph8SavvY2kFJtaCXdJ6OYG8ceJE=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/commons/0.1.2.tgz}
-    peerDependencies:
-      vue: '*'
-
-  '@fuyeor/config@0.1.1':
-    resolution: {integrity: sha256-YdN7bfe71NeQWfak1cpnKna7byyJ3PYhnBbqDFCDRVo=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/config/0.1.1.tgz}
+  '@fuyeor/config@0.1.2':
+    resolution: {integrity: sha256-4fO+5Tx17NAI39GkHaINUavxegOAPBqfvPqxLiEMWwA=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/config/0.1.2.tgz}
     peerDependencies:
       vite: ' ^8.0.0'
 
-  '@fuyeor/interactify@0.1.1':
-    resolution: {integrity: sha256-rz+0xlSjMcNjFnmliyDT3TkB8Y08XLiuRiTfZz7FqTQ=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/interactify/0.1.1.tgz}
+  '@fuyeor/interactify@0.1.2':
+    resolution: {integrity: sha256-/Na4qR/3apJt8PyycFtB9fBh5B+mijDoer7voN4p8ys=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/interactify/0.1.2.tgz}
     peerDependencies:
       vue: '*'
 
@@ -670,16 +718,11 @@ packages:
     peerDependencies:
       vue: '*'
 
-  '@fuyeor/tsconfig@0.1.0':
-    resolution: {integrity: sha256-j5XnwkpNS2BAC5xfOcxuE25IxO8TPT0XDjtQ7j8r2HU=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/tsconfig/0.1.0.tgz}
+  '@fuyeor/tsconfig@0.1.1':
+    resolution: {integrity: sha256-5/PAy5S1GysE2606Cy6qdVYICEKBK9siTH9TYmV90Bo=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/tsconfig/0.1.1.tgz}
 
-  '@fuyeor/vue-router@0.0.9':
-    resolution: {integrity: sha256-Hhbeyxi0tBIO7qPueEvCC1uzWdO2S3yCPZ8hPAQCMdM=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/vue-router/0.0.9.tgz}
-    peerDependencies:
-      vue: '*'
-
-  '@fuyeor/vue-router@0.1.0':
-    resolution: {integrity: sha256-+y1kO8p9TdcQaYtZFjc/PJBs+Yykhr8h8mPjbGzJ95k=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/vue-router/0.1.0.tgz}
+  '@fuyeor/vue-router@0.1.1':
+    resolution: {integrity: sha256-yezvozpQ+NRHExJzpBwfd6cG2b/7PSsj/zJByh8kagQ=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/vue-router/0.1.1.tgz}
     peerDependencies:
       vue: '*'
 
@@ -704,9 +747,6 @@ packages:
   '@jridgewell/source-map@0.3.11':
     resolution: {integrity: sha512-ZMp1V8ZFcPG5dIWnQLr3NSI1MiCU7UETdS/A0G8V/XWHvJv3ZsFqutJn1Y5RPmAPX6F3BiE397OqveU/9NCuIA==}
 
-  '@jridgewell/sourcemap-codec@1.5.5':
-    resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
-
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
@@ -718,12 +758,6 @@ packages:
 
   '@lit/reactive-element@2.1.2':
     resolution: {integrity: sha512-pbCDiVMnne1lYUIaYNN5wrwQXDtHaYtg7YEFPeW+hws6U47WeFvISGUWekPGKWOP1ygrs0ef0o1VJMk1exos5A==}
-
-  '@napi-rs/wasm-runtime@1.1.4':
-    resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
-    peerDependencies:
-      '@emnapi/core': ^1.7.1
-      '@emnapi/runtime': ^1.7.1
 
   '@napi-rs/wasm-runtime@1.2.4':
     resolution: {integrity: sha512-AJxoUD2/15ESHbvpcyjU274nsAPLuOtPHCk0vKJM5pj//Fg/B1FXNWjPnXTT9PymCYYiHo4zPj0ZomXBKhoy7g==}
@@ -948,9 +982,6 @@ packages:
     peerDependencies:
       vue: ^2.7.0 || ^3.0.0
 
-  '@tybys/wasm-util@0.10.1':
-    resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
-
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
 
@@ -1160,6 +1191,9 @@ packages:
     resolution: {integrity: sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+
+  alien-signals@2.0.8:
+    resolution: {integrity: sha512-844G1VLkk0Pe2SJjY0J8vp8ADI73IM4KliNu2OGlYzWpO28NexEUvjHTcFjFX3VXoiUtwTbHxLNI9ImkcoBqzA==}
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -1426,11 +1460,6 @@ packages:
   mitata@0.1.14:
     resolution: {integrity: sha512-8kRs0l636eT4jj68PFXOR2D5xl4m56T478g16SzUPOYgkzQU+xaw62guAQxzBPm+SXb15GQi1cCpDxJfkr4CSA==}
 
-  nanoid@3.3.18:
-    resolution: {integrity: sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w==}
-    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-
   nanoid@3.3.19:
     resolution: {integrity: sha512-Y2tUNy4ouw6tq5oDSKeQYGOyhkUBhNOcGV/02KC+6kd9eDGqdZd++mjMiIDilrBYvjEnCYvVtsuHCuP+okSfug==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -1462,17 +1491,9 @@ packages:
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
-  picomatch@4.0.4:
-    resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
-    engines: {node: '>=12'}
-
   picomatch@4.0.7:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
-
-  postcss@8.5.26:
-    resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
-    engines: {node: ^10 || ^12 || >=14}
 
   postcss@8.5.28:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
@@ -1553,10 +1574,6 @@ packages:
   tinyexec@1.3.0:
     resolution: {integrity: sha512-QKAl9m8gWWGHV8jZcPeym6j+XULi6tOf1mT83WYJ4Lk2ytW/uwAWkrP0uFsdoYMdueVJ0qs26wZ+23xeB4ibNQ==}
     engines: {node: '>=18'}
-
-  tinyglobby@0.2.16:
-    resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
-    engines: {node: '>=12.0.0'}
 
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
@@ -2034,19 +2051,13 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@fuyeor/commons@0.1.0(vue@3.5.43(typescript@7.0.2))':
+  '@fuyeor/commons@0.1.3(vue@3.5.43(typescript@7.0.2))':
     dependencies:
       '@fuyeor/locale': 0.1.0(vue@3.5.43(typescript@7.0.2))
-      '@fuyeor/vue-router': 0.1.0(vue@3.5.43(typescript@7.0.2))
+      '@fuyeor/vue-router': 0.1.1(vue@3.5.43(typescript@7.0.2))
       vue: 3.5.43(typescript@7.0.2)
 
-  '@fuyeor/commons@0.1.2(vue@3.5.43(typescript@7.0.2))':
-    dependencies:
-      '@fuyeor/locale': 0.1.0(vue@3.5.43(typescript@7.0.2))
-      '@fuyeor/vue-router': 0.0.9(vue@3.5.43(typescript@7.0.2))
-      vue: 3.5.43(typescript@7.0.2)
-
-  '@fuyeor/config@0.1.1(vite@8.0.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@26.6.2)(esbuild@0.27.7)(terser@5.51.2)(tsx@4.23.15))(vue@3.5.43(typescript@7.0.2))':
+  '@fuyeor/config@0.1.2(vite@8.0.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@26.6.2)(esbuild@0.27.7)(terser@5.51.2)(tsx@4.23.15))(vue@3.5.43(typescript@7.0.2))':
     dependencies:
       '@vitejs/plugin-vue': 6.0.9(vite@8.0.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@26.6.2)(esbuild@0.27.7)(terser@5.51.2)(tsx@4.23.15))(vue@3.5.43(typescript@7.0.2))
       html-minifier-terser: 7.2.0
@@ -2055,11 +2066,11 @@ snapshots:
     transitivePeerDependencies:
       - vue
 
-  '@fuyeor/interactify@0.1.1(vue@3.5.43(typescript@7.0.2))':
+  '@fuyeor/interactify@0.1.2(vue@3.5.43(typescript@7.0.2))':
     dependencies:
-      '@fuyeor/commons': 0.1.0(vue@3.5.43(typescript@7.0.2))
+      '@fuyeor/commons': 0.1.3(vue@3.5.43(typescript@7.0.2))
       '@fuyeor/locale': 0.1.0(vue@3.5.43(typescript@7.0.2))
-      '@fuyeor/vue-router': 0.0.9(vue@3.5.43(typescript@7.0.2))
+      '@fuyeor/vue-router': 0.1.1(vue@3.5.43(typescript@7.0.2))
       '@fuyeor/vue-vaul': 0.4.8(vue@3.5.43(typescript@7.0.2))
       markdown-it: 14.3.2
       photoswipe: 5.4.4
@@ -2082,13 +2093,9 @@ snapshots:
     dependencies:
       vue: 3.5.43(typescript@7.0.2)
 
-  '@fuyeor/tsconfig@0.1.0': {}
+  '@fuyeor/tsconfig@0.1.1': {}
 
-  '@fuyeor/vue-router@0.0.9(vue@3.5.43(typescript@7.0.2))':
-    dependencies:
-      vue: 3.5.43(typescript@7.0.2)
-
-  '@fuyeor/vue-router@0.1.0(vue@3.5.43(typescript@7.0.2))':
+  '@fuyeor/vue-router@0.1.1(vue@3.5.43(typescript@7.0.2))':
     dependencies:
       vue: 3.5.43(typescript@7.0.2)
 
@@ -2109,7 +2116,7 @@ snapshots:
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/resolve-uri@3.1.2': {}
@@ -2119,27 +2126,18 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@jridgewell/sourcemap-codec@1.5.5': {}
-
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
   '@jridgewell/trace-mapping@0.3.31':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
 
   '@lit-labs/ssr-dom-shim@1.6.0': {}
 
   '@lit/reactive-element@2.1.2':
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.6.0
-
-  '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
-    dependencies:
-      '@emnapi/core': 1.9.2
-      '@emnapi/runtime': 1.9.2
-      '@tybys/wasm-util': 0.10.1
-    optional: true
 
   '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
     dependencies:
@@ -2236,7 +2234,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.9.2
       '@emnapi/runtime': 1.9.2
-      '@napi-rs/wasm-runtime': 1.1.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
     optional: true
 
   '@rolldown/binding-win32-arm64-msvc@1.0.0-rc.10':
@@ -2267,11 +2265,6 @@ snapshots:
     dependencies:
       '@tanstack/virtual-core': 3.17.11
       vue: 3.5.43(typescript@7.0.2)
-
-  '@tybys/wasm-util@0.10.1':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
 
   '@tybys/wasm-util@0.10.4':
     dependencies:
@@ -2452,6 +2445,8 @@ snapshots:
 
   acorn@8.18.0: {}
 
+  alien-signals@2.0.8: {}
+
   argparse@2.0.1: {}
 
   aria-hidden@1.2.6:
@@ -2597,10 +2592,6 @@ snapshots:
       '@types/estree': 1.0.9
 
   expect-type@1.4.0: {}
-
-  fdir@6.5.0(picomatch@4.0.4):
-    optionalDependencies:
-      picomatch: 4.0.4
 
   fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
@@ -2764,8 +2755,6 @@ snapshots:
 
   mitata@0.1.14: {}
 
-  nanoid@3.3.18: {}
-
   nanoid@3.3.19: {}
 
   no-case@3.0.4:
@@ -2795,15 +2784,7 @@ snapshots:
 
   picocolors@1.1.1: {}
 
-  picomatch@4.0.4: {}
-
   picomatch@4.0.7: {}
-
-  postcss@8.5.26:
-    dependencies:
-      nanoid: 3.3.18
-      picocolors: 1.1.1
-      source-map-js: 1.2.1
 
   postcss@8.5.28:
     dependencies:
@@ -2914,11 +2895,6 @@ snapshots:
 
   tinyexec@1.3.0: {}
 
-  tinyglobby@0.2.16:
-    dependencies:
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
-
   tinyglobby@0.2.17:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.7)
@@ -2997,10 +2973,10 @@ snapshots:
   vite@8.0.9(@types/node@26.6.2)(esbuild@0.27.7)(terser@5.51.2)(tsx@4.23.15):
     dependencies:
       lightningcss: 1.33.0
-      picomatch: 4.0.4
-      postcss: 8.5.26
+      picomatch: 4.0.7
+      postcss: 8.5.28
       rolldown: 1.0.0-rc.16
-      tinyglobby: 0.2.16
+      tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 26.6.2
       esbuild: 0.27.7
@@ -3011,10 +2987,10 @@ snapshots:
   vite@8.0.9(@types/node@26.6.2)(esbuild@0.28.2)(terser@5.51.2)(tsx@4.23.15):
     dependencies:
       lightningcss: 1.33.0
-      picomatch: 4.0.4
-      postcss: 8.5.26
+      picomatch: 4.0.7
+      postcss: 8.5.28
       rolldown: 1.0.0-rc.16
-      tinyglobby: 0.2.16
+      tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 26.6.2
       esbuild: 0.28.2

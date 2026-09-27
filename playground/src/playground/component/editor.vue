@@ -1,20 +1,18 @@
 <!-- @/playground/component/editor.vue -->
 <template>
-  <article class="section editor">
+  <article class="section textarea">
     <toolbar
       :can-undo="canUndo"
       :can-redo="canRedo"
       @undo="undo"
       @redo="redo"
+      @clean="handleClean"
       @format="formatDocument"
       @tool="applyTool"
+      @share="emit('share')"
       @copy-source="emit('copy-source')"
       @copy-html="emit('copy-html')"
-    >
-      <template #share>
-        <slot name="share" />
-      </template>
-    </toolbar>
+    />
 
     <div
       class="editor-scroll-container"
@@ -50,15 +48,24 @@
         />
       </div>
     </div>
+
+    <stats-bar
+      v-if="stats"
+      :created-at="createdAt"
+      :updated-at="updatedAt"
+      :stats="stats"
+    />
   </article>
 </template>
 
 <script setup lang="ts">
 import Toolbar from './toolbar.vue';
+import StatsBar from './stats-bar.vue';
 
 import { ref } from 'vue';
 import { useMarkdownEditor } from '@/playground/composable/useMarkdownEditor';
 import { usePlaygroundSource } from '@/playground/composable/usePlaygroundSource';
+import { useScrollSync } from '@/playground/composable/useScrollSync';
 import { useMarkdownHighlighter } from '@/playground/composable/useMarkdownHighlighter';
 import { useDocumentStats } from '@/playground/composable/useDocumentStats';
 
@@ -74,6 +81,7 @@ const props = withDefaults(
 );
 
 const { source } = usePlaygroundSource();
+const { markScrollSource, isScrollFromOther } = useScrollSync();
 
 const editor = ref<HTMLTextAreaElement | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
@@ -82,12 +90,13 @@ const highlightTarget = ref<HTMLElement | null>(null);
 const {
   canUndo,
   canRedo,
+  undo,
+  redo,
+  clearSource,
   replaceSource,
   recordInput,
   applyTool,
   formatDocument,
-  undo,
-  redo,
 } = useMarkdownEditor(source, editor);
 
 const { lines } = useMarkdownHighlighter(source, highlightTarget);
@@ -96,6 +105,8 @@ const { stats } = useDocumentStats(source);
 // The outer container owns scrolling so line numbers and the mirrored text stay aligned.
 const emit = defineEmits<{
   (e: 'scroll', percentage: number): void;
+  (e: 'clean'): void;
+  (e: 'share'): void;
   (e: 'copy-source'): void;
   (e: 'copy-html'): void;
 }>();
@@ -122,15 +133,38 @@ const handleInput = (event: Event) => {
   }
 };
 
-// The outer container owns scrolling so line numbers and the mirrored text stay aligned.
-const syncScroll = (event: Event) => {
-  const target = event.target as HTMLElement;
-  const maxScroll = target.scrollHeight - target.clientHeight;
-  const percentage = maxScroll > 0 ? target.scrollTop / maxScroll : 0;
-  emit('scroll', percentage);
+const handleClean = () => {
+  if (!source.value) return;
+  clearSource();
+  emit('clean');
 };
 
+let rafId = 0;
+
+// 用户滚动 editor → 通知对面
+const syncScroll = (event: Event) => {
+  // 这次是 preview 的程序设置引发的 scroll 事件，忽略
+  if (isScrollFromOther('editor')) return;
+
+  markScrollSource('editor');
+
+  const target = event.target as HTMLElement;
+  if (rafId) return;
+  rafId = window.requestAnimationFrame(() => {
+    rafId = 0;
+    const maxScroll = target.scrollHeight - target.clientHeight;
+    const percentage = maxScroll > 0 ? target.scrollTop / maxScroll : 0;
+    emit('scroll', percentage);
+  });
+};
+
+// 对面要求 editor 跳到某位置
 const scrollToPercentage = (percentage: number) => {
+  // 用户此刻正在滚 editor，别再跟对面较劲
+  if (isScrollFromOther('preview')) return;
+
+  markScrollSource('preview'); // 告诉 syncScroll：下一次是我自己触发的
+
   const target = scrollContainer.value;
   if (!target) return;
   const maxScroll = target.scrollHeight - target.clientHeight;
@@ -141,27 +175,18 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
 </script>
 
 <style>
-.editor,
-.preview {
+.textarea {
   display: flex;
   min-width: 0;
   min-height: 0;
   flex: 1 1 0;
   flex-direction: column;
-}
-
-.editor {
-  border-right: var(--border-subtle);
+  background: var(--surface-top);
 
   textarea:hover,
   textarea:focus {
     box-shadow: none;
   }
-}
-
-.tab-container {
-  height: 3rem;
-  border-bottom: var(--border-subtle);
 }
 
 .editor-scroll-container {
@@ -192,8 +217,6 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
   left: 0;
   width: 100%;
   grid-column: 1;
-  background: var(--surface-top);
-  border-right: var(--border-default);
   pointer-events: none;
   z-index: 1;
 }
@@ -261,5 +284,29 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
 .editor-textarea::selection {
   background: rgba(43, 108, 176, 0.25);
   color: transparent;
+}
+
+@media (width <= 900px) {
+  .textarea {
+    --surface-top: #20253a;
+
+    z-index: 10;
+    background: var(--surface-top);
+    padding: 0 !important;
+    border-radius: 26px 26px 0 0;
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.2),
+      0 0 1px 0 rgba(0, 0, 0, 0.08),
+      0px 0.5px 0.5px 0.5px hsla(0, 0%, 100%, 0.05) inset;
+  }
+
+  .editor-scroll-container {
+    scrollbar-width: none;
+  }
+
+  .line-number {
+    font-size: 0.8rem;
+    padding: 0 6px;
+  }
 }
 </style>

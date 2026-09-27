@@ -25,6 +25,38 @@ export function useMarkdownEditor(
   const canUndo = computed(() => historyIndex.value > 0);
   const canRedo = computed(() => historyIndex.value < history.value.length - 1);
 
+  const undo = () => {
+    if (!canUndo.value) return;
+    debouncedRecordHistory.cancel();
+    historyIndex.value -= 1;
+    source.value = history.value[historyIndex.value];
+  };
+
+  const redo = () => {
+    if (!canRedo.value) return;
+    debouncedRecordHistory.cancel();
+    historyIndex.value += 1;
+    source.value = history.value[historyIndex.value];
+  };
+
+  const clearSource = () => {
+    if (!source.value) return;
+
+    const element = editor.value;
+    if (element) {
+      setSource('', 0, 0, element.scrollTop);
+    } else {
+      setSource('', 0, 0);
+    }
+  };
+
+  const replaceSource = (value: string) => {
+    debouncedRecordHistory.cancel();
+    source.value = value;
+    history.value = [value];
+    historyIndex.value = 0;
+  };
+
   // Keep the editor history bounded so repeated formatting does not grow memory indefinitely.
   const recordHistory = (value: string) => {
     const nextHistory = history.value.slice(0, historyIndex.value + 1);
@@ -40,13 +72,6 @@ export function useMarkdownEditor(
   const debouncedRecordHistory = debounce((value: string) => {
     recordHistory(value);
   }, 300);
-
-  const replaceSource = (value: string) => {
-    debouncedRecordHistory.cancel();
-    source.value = value;
-    history.value = [value];
-    historyIndex.value = 0;
-  };
 
   const recordInput = () => debouncedRecordHistory(source.value);
 
@@ -159,28 +184,15 @@ export function useMarkdownEditor(
     }
   };
 
-  const undo = () => {
-    if (!canUndo.value) return;
-    debouncedRecordHistory.cancel();
-    historyIndex.value -= 1;
-    source.value = history.value[historyIndex.value];
-  };
-
-  const redo = () => {
-    if (!canRedo.value) return;
-    debouncedRecordHistory.cancel();
-    historyIndex.value += 1;
-    source.value = history.value[historyIndex.value];
-  };
-
   return {
     canUndo,
     canRedo,
+    undo,
+    redo,
+    clearSource,
     replaceSource,
     recordInput,
     applyTool,
     formatDocument,
-    undo,
-    redo,
   };
 }

@@ -2,21 +2,18 @@
 <template>
   <article class="section preview">
     <Tabs
-      :tabs="tabs"
+      containerClass="preview-tab"
+      :tabs="tab"
       :active-tab-value="activeTab"
       :is-router-nav="false"
       @tab-click="activeTab = $event"
     >
       <template #preview>{{ t('playground.preview.render') }}</template>
-      <template #ast>JSON/AST</template>
+      <template #ast>AST</template>
       <template #html>HTML</template>
     </Tabs>
     <div class="output-content" ref="outputContent" @scroll="handleScroll">
-      <div v-if="activeTab === 'preview'" class="markdown-rendered">
-        <component :is="previewComponent" />
-      </div>
-      <pre v-else-if="activeTab === 'ast'">{{ astJson }}</pre>
-      <pre v-else>{{ renderedHtml }}</pre>
+      <component :is="activeView" />
     </div>
   </article>
 </template>
@@ -31,32 +28,20 @@ import {
 } from '@ffm/parser';
 import { renderToVue } from '@ffm/vue-renderer';
 import { usePlaygroundSource } from '@/playground/composable/usePlaygroundSource';
+import { useScrollSync } from '@/playground/composable/useScrollSync';
 
-const { t } = useLocale();
-const { source } = usePlaygroundSource();
-const activeTab = ref('preview');
-const outputContent = ref<HTMLElement | null>(null);
 const emit = defineEmits<{
   (event: 'scroll', percentage: number): void;
 }>();
 
-const handleScroll = (event: Event) => {
-  const target = event.target as HTMLElement;
-  const maxScroll = target.scrollHeight - target.clientHeight;
-  const percentage = maxScroll > 0 ? target.scrollTop / maxScroll : 0;
-  emit('scroll', percentage);
-};
+const { t } = useLocale();
+const { source } = usePlaygroundSource();
+const { markScrollSource, isScrollFromOther } = useScrollSync();
 
-const scrollToPercentage = (percentage: number) => {
-  if (!outputContent.value) return;
-  const target = outputContent.value;
-  const maxScroll = target.scrollHeight - target.clientHeight;
-  if (maxScroll > 0) {
-    target.scrollTop = maxScroll * percentage;
-  }
-};
+const activeTab = ref('preview');
+const outputContent = ref<HTMLElement | null>(null);
 
-const tabs: TabItem[] = [
+const tab: TabItem[] = [
   { value: 'preview' },
   { value: 'ast' },
   { value: 'html' },
@@ -64,37 +49,119 @@ const tabs: TabItem[] = [
 
 const parser = createFuyeorMarkdownParser();
 const ast = computed(() => parser(source.value));
-const astJson = computed(() => JSON.stringify(ast.value, null, 2));
-const renderedHtml = computed(() => renderMarkdown(ast.value));
-const previewComponent = computed(() => ({
-  render: () => h('div', renderToVue(ast.value)),
-}));
+const json = computed(() => JSON.stringify(ast.value, null, 2));
+const html = computed(() => renderMarkdown(ast.value));
 
-defineExpose({ scrollToPercentage, renderedHtml });
+const activeView = computed(() => {
+  switch (activeTab.value) {
+    case 'ast':
+      return () => h('pre', json.value);
+    case 'html':
+      return () => h('pre', html.value);
+    default:
+      return () =>
+        h('div', { class: 'markdown-rendered' }, renderToVue(ast.value));
+  }
+});
+
+let rafId = 0;
+
+const handleScroll = (event: Event) => {
+  if (isScrollFromOther('preview')) return;
+
+  markScrollSource('preview');
+
+  const target = event.target as HTMLElement;
+  if (rafId) return;
+  rafId = window.requestAnimationFrame(() => {
+    rafId = 0;
+    const maxScroll = target.scrollHeight - target.clientHeight;
+    const percentage = maxScroll > 0 ? target.scrollTop / maxScroll : 0;
+    emit('scroll', percentage);
+  });
+};
+
+const scrollToPercentage = (percentage: number) => {
+  if (isScrollFromOther('editor')) return;
+
+  markScrollSource('editor');
+
+  const target = outputContent.value;
+  if (!target) return;
+  const maxScroll = target.scrollHeight - target.clientHeight;
+  if (maxScroll > 0) target.scrollTop = maxScroll * percentage;
+};
+
+defineExpose({ scrollToPercentage, html });
 </script>
 
 <style>
-.preview {
-  overflow: hidden;
-  border-left: 1px solid var(--border-subtle, #e2e8f0);
+.preview-tab.tab-container {
+  z-index: 9;
+  margin: 0;
+  display: flex;
+  position: sticky;
+  border: none;
+  top: 0;
+
+  :after {
+    display: none;
+  }
+
+  span {
+    background-color: var(--surface-raised);
+    border-radius: 24px;
+    flex: none;
+    min-width: 80px;
+    height: auto;
+    margin: 10px;
+    padding: 5px 16px;
+    transition: background-color 0.3s;
+  }
+
+  span:hover {
+    background-color: var(--surface-top-hover);
+  }
+
+  span.active {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  span.active::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-brand);
+    vertical-align: middle;
+  }
 }
 
 .output-content {
-  min-height: 0;
-  flex: 1;
-  overflow: auto;
-  padding: 24px;
-  background-color: var(--surface-raised-hover);
+  padding: 12px 12px;
+  height: 100vh;
+  overflow-y: auto;
+
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 }
 
-.markdown-rendered {
-  max-width: 900px;
-  margin: 0 auto;
-}
+@media (width <= 768px) {
+  .preview-tab.tab-container {
+    top: var(--height-sticky-header);
+    height: calc(var(--height-sticky-header) - 10px);
+  }
 
-.output-content pre {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
+  .output-content {
+    padding: 6px 16px 48px 16px;
+    height: stretch;
+    scrollbar-width: none;
+  }
 }
 </style>

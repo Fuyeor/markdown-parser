@@ -1,4 +1,4 @@
-<!-- @app/component/left-sidebar.vue -->
+<!-- @app/component/left.vue -->
 <template>
   <left-sidebar>
     <template #nav>
@@ -13,13 +13,6 @@
 
       <document-history />
     </template>
-
-    <template #footer>
-      <LocaleSwitcher
-        :supported-locales="supportedLocale"
-        @change="handleLocaleChange"
-      />
-    </template>
   </left-sidebar>
 </template>
 
@@ -29,14 +22,8 @@ import DocumentHistory from '@/playground/component/history.vue';
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl } from '@fuyeor/commons';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
-import {
-  LeftSidebar,
-  SidebarMenu,
-  LocaleSwitcher,
-  useSidebarItems,
-} from '@fuyeor/interactify';
+import { LeftSidebar, SidebarMenu, useSidebarItems } from '@fuyeor/interactify';
 import { rawSidebarNav } from '@app/config/sidebar/menu';
-import { supportedLocale } from '@app/config/locale';
 
 const route = useRoute();
 const router = useRouter();
@@ -67,15 +54,6 @@ const handleLocaleChange = (newLocale: string) => {
 
   .foldable-header {
     margin: 10px 0;
-  }
-
-  /* Sidebar footer layout */
-  .footer {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px 16px;
-    border-top: 1px solid #edf0f2;
   }
 }
 </style>

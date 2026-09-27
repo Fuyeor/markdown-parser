@@ -1,5 +1,5 @@
 {
-  "extends": "@fuyeor/tsconfig/base.json",
+  "extends": "@fuyeor/tsconfig/browser.json",
   "compilerOptions": {
     "paths": {
       "@app/*": ["./src/@app/*"],
