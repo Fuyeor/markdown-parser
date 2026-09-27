@@ -8,4 +8,9 @@ export const rawSidebarNav: SidebarItemConfig[] = [
     icon: getIconUrl('home'),
     textKey: 'home',
   },
+  {
+    target: '/editor',
+    icon: getIconUrl('extension'),
+    textKey: 'editor',
+  },
 ];

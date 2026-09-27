@@ -6,11 +6,14 @@
     <router-view />
   </main>
 
+  <right-sidebar />
+
   <toast-provider />
 </template>
 
 <script setup lang="ts">
-import LeftSidebar from '@app/component/left-sidebar.vue';
+import LeftSidebar from '@app/component/left.vue';
+import RightSidebar from '@app/component/right.vue';
 
 import { useHeadManager } from '@fuyeor/commons';
 import { ToastProvider, useFontLoader } from '@fuyeor/interactify';

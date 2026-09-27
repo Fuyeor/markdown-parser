@@ -1,8 +1,7 @@
 // @/router/index.ts
 import { createRouter, RouterView, type RouteRecord } from '@fuyeor/vue-router';
 import { useTransitionBar } from '@fuyeor/interactify';
-import { useLocaleStore } from '@fuyeor/commons';
-import { localeRegex } from '@app/config/locale';
+import { useLocaleStore, supportedLocaleRegex } from '@fuyeor/commons';
 
 const { start, done } = useTransitionBar();
 
@@ -17,7 +16,8 @@ const appRoutes: Array<RouteRecord> = [
     },
   },
   {
-    // flavored.fuyeor.com/playground or /playground/:id
+    // flavored.fuyeor.com/playground
+    // flavored.fuyeor.com/playground/:id
     // The optional segment uses URLPattern syntax required by @fuyeor/vue-router.
     path: 'playground{/:id}?',
     name: 'Playground',
@@ -26,13 +26,23 @@ const appRoutes: Array<RouteRecord> = [
       titleKey: 'playground',
     },
   },
+  {
+    // flavored.fuyeor.com/editor
+    // flavored.fuyeor.com/editor/:id
+    path: 'editor{/:id}?',
+    name: 'Editor',
+    component: () => import('@/editor/index.vue'),
+    meta: {
+      titleKey: 'editor',
+    },
+  },
 ];
 
 // root router
 const routes: Array<RouteRecord> = [
   {
     // optional locale prefix wrapper, only allows supported locales
-    path: `{/:locale(${localeRegex})}?`,
+    path: `{/:locale(${supportedLocaleRegex})}?`,
     component: RouterView,
     // 将所有应用路由放入 children
     // 注意：子路由的 path 如果不以 / 开头，会拼接在父路由后面

@@ -2,7 +2,10 @@
 packages:
   - 'extension/vscode'
   - 'package/*'
+  - 'package/editor/*'
   - 'playground/'
 allowBuilds:
   vue-demi: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@fuyeor/tsconfig@0.1.1'

@@ -1,0 +1,30 @@
+{
+  "name": "@ffm/editor",
+  "version": "0.1.0",
+  "description": "The rich text editor core for Fuyeor Flavored Markdown (.ffm) document",
+  "license": "MIT",
+  "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ffm/parser": "workspace:*",
+    "@ffm/formatter": "workspace:*",
+    "@ffm/converter": "workspace:*",
+    "alien-signals": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  }
+}

@@ -40,15 +40,24 @@ const { formatDate } = useDateFormatter();
 <style>
 .document-stats-bar {
   display: flex;
-  min-height: 32px;
+  height: 40px;
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 16px;
   padding: 6px 16px;
-  border-top: var(--border-default);
   color: var(--text-secondary);
   background: var(--surface-top);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 1.4;
+
+  @media (width <= 900px) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    > span {
+      flex: none;
+    }
+    scrollbar-width: none;
+  }
 }
 </style>

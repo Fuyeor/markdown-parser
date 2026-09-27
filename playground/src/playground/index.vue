@@ -1,41 +1,32 @@
 <!-- @/playground/index.vue -->
 <template>
-  <div class="playground-layout">
-    <section class="playground">
-      <editor
-        ref="editorComponent"
-        :created-at="currentDocument?.created_at"
-        :updated-at="currentDocument?.updated_at"
-        @scroll="handleEditorScroll"
-        @copy-source="handleCopySource"
-        @copy-html="handleCopyHtml"
-      >
-        <template #share>
-          <share-modal />
-        </template>
-      </editor>
-
+  <div class="playground">
+    <layout-anchor>
       <preview ref="previewComponent" @scroll="handlePreviewScroll" />
-    </section>
+    </layout-anchor>
 
-    <stats-bar
-      v-if="editorComponent?.stats"
+    <editor
+      ref="editorComponent"
       :created-at="currentDocument?.created_at"
       :updated-at="currentDocument?.updated_at"
-      :stats="editorComponent.stats"
+      @scroll="handleEditorScroll"
+      @share="handleShare"
+      @copy-source="copyText(source)"
+      @copy-html="handleCopyHtml"
     />
+
+    <share-modal ref="shareModalRef" />
   </div>
 </template>
 
 <script setup lang="ts">
 import Editor from './component/editor.vue';
 import Preview from './component/preview.vue';
-import StatsBar from './component/stats-bar.vue';
 import ShareModal from './component/share-modal.vue';
 
 import { computed, ref, watch } from 'vue';
 import { useLocale } from '@fuyeor/locale';
-import { useToast } from '@fuyeor/interactify';
+import { useToast, useCopy, LayoutAnchor } from '@fuyeor/interactify';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { debounce } from '@fuyeor/commons';
 import { get } from './api';
@@ -48,6 +39,7 @@ const route = useRoute();
 const router = useRouter();
 
 const { t, locale } = useLocale();
+const { copyText } = useCopy();
 const { showToast } = useToast();
 const { source } = usePlaygroundSource();
 
@@ -60,9 +52,9 @@ const {
 
 const editorComponent = ref<InstanceType<typeof Editor> | null>(null);
 const previewComponent = ref<InstanceType<typeof Preview> | null>(null);
+const shareModalRef = ref<InstanceType<typeof ShareModal> | null>(null);
 const isRouteLoading = ref(true);
 
-let synchronizingScroll = false;
 let skipNextSourceChange = false;
 let creatingDocument = false;
 
@@ -71,19 +63,12 @@ const currentDocument = computed(() => {
   return documents.value.find((document) => document.id === id);
 });
 
-const releaseScrollSync = () => {
-  window.requestAnimationFrame(() => {
-    synchronizingScroll = false;
-  });
-};
-
-const handleCopySource = async () => {
-  await window.navigator.clipboard.writeText(source.value);
-  showToast(t('copy.success'), { type: 'success' });
+const handleShare = () => {
+  shareModalRef.value?.open();
 };
 
 const handleCopyHtml = async () => {
-  const html = previewComponent.value?.renderedHtml;
+  const html = previewComponent.value?.html;
   if (!html) return;
 
   const clipboardItem = new window.ClipboardItem({
@@ -95,17 +80,11 @@ const handleCopyHtml = async () => {
 };
 
 const handleEditorScroll = (percentage: number) => {
-  if (synchronizingScroll) return;
-  synchronizingScroll = true;
   previewComponent.value?.scrollToPercentage(percentage);
-  releaseScrollSync();
 };
 
 const handlePreviewScroll = (percentage: number) => {
-  if (synchronizingScroll) return;
-  synchronizingScroll = true;
   editorComponent.value?.scrollToPercentage(percentage);
-  releaseScrollSync();
 };
 
 const extractTitle = (content: string, untitled: string): string => {
@@ -256,55 +235,29 @@ watch(
 </script>
 
 <style>
-.playground-layout {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-}
-
 .playground {
   display: flex;
-  flex: 1;
-  min-height: 0;
+  flex-direction: column;
+  height: calc(100vh - 20px);
   width: 100%;
 }
 
-.section {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
+/* scroll performance optimization */
+.editor-scroll-container,
+.output-content {
+  contain: layout paint;
 }
 
 @media (width <= 900px) {
-  .playground-layout {
+  .playground {
     position: absolute;
     top: var(--height-header);
     height: calc(100% - var(--height-header));
   }
 
-  .playground {
-    flex-direction: column-reverse;
-  }
-}
-
-.preview {
-  .tab-container {
-    flex-shrink: 0;
-    margin: 0;
-
-    .tab-item {
-      align-items: stretch;
-    }
-  }
-
-  pre {
-    margin: 0;
-    white-space: pre-wrap;
-    word-break: break-all;
+  .section {
+    padding: 6px 12px;
+    height: 50%;
   }
 }
 </style>

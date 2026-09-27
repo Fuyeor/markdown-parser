@@ -1,8 +1,8 @@
 :root {
-  --width-body: 100%;
-  --width-main: 1000px;
+  --width-body: 1500px;
+  --width-main: 700px;
   --width-left-sidebar: 350px;
-  --width-right-sidebar: 0;
+  --width-right-sidebar: 450px;
 }
 
 :root {
@@ -63,16 +63,64 @@ html {
 }
 
 body {
+  margin: 0;
   overflow: hidden;
 }
 
 .left-sidebar {
   min-width: var(--width-left-sidebar);
+
+  .nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .nav-item,
+  .foldable-header {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin: 10px;
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.4s linear;
+  }
+
+  .foldable-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .document-history {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .document-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+}
+
+.right-sidebar {
+  padding: 20px 0 30px 20px;
 }
 
 @media (width >= 1000px) {
   main {
-    width: 100%;
+    margin: 20px 0;
+    border-radius: var(--radius-lg);
+    overflow: clip;
   }
 
   .header {

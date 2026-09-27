@@ -6,11 +6,6 @@ import { createViteConfig } from '@fuyeor/config/vite.config.js';
 export default defineConfig(() => {
   return createViteConfig(
     {
-      resolve: {
-        alias: {
-          '@app': resolve(__dirname, './src/@app'),
-        },
-      },
       server: {
         host: '0.0.0.0',
         port: 7820,

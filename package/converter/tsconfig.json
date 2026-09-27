@@ -1,19 +1,11 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../parser/tsconfig.json",
   "compilerOptions": {
     "paths": {
       "#/*": ["./src/*"]
     },
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "lib": ["ESNext", "DOM"],
-    "strict": true,
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
+    "rootDir": "src",
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "test.ts"],
-  "exclude": ["src/**/*.spec.ts"]
+  "include": ["src/**/*.ts"]
 }
