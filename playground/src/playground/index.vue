@@ -5,8 +5,8 @@
       <preview ref="previewComponent" @scroll="handlePreviewScroll" />
     </layout-anchor>
 
-    <editor
-      ref="editorComponent"
+    <text-area
+      ref="textComponent"
       :created-at="currentDocument?.created_at"
       :updated-at="currentDocument?.updated_at"
       @scroll="handleEditorScroll"
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import Editor from './component/editor.vue';
+import TextArea from './component/textarea.vue';
 import Preview from './component/preview.vue';
 import ShareModal from './component/share-modal.vue';
 
@@ -50,7 +50,7 @@ const {
   error: storageError,
 } = useIndexedDb();
 
-const editorComponent = ref<InstanceType<typeof Editor> | null>(null);
+const textComponent = ref<InstanceType<typeof TextArea> | null>(null);
 const previewComponent = ref<InstanceType<typeof Preview> | null>(null);
 const shareModalRef = ref<InstanceType<typeof ShareModal> | null>(null);
 const isRouteLoading = ref(true);
@@ -84,7 +84,7 @@ const handleEditorScroll = (percentage: number) => {
 };
 
 const handlePreviewScroll = (percentage: number) => {
-  editorComponent.value?.scrollToPercentage(percentage);
+  textComponent.value?.scrollToPercentage(percentage);
 };
 
 const extractTitle = (content: string, untitled: string): string => {
@@ -122,8 +122,8 @@ const debouncedCreate = debounce(async (content: string) => {
 const replaceSourceIfChanged = (content: string) => {
   if (source.value === content) return;
   skipNextSourceChange = true;
-  const editor = editorComponent.value;
-  if (editor) editor.replaceSource(content);
+  const textarea = textComponent.value;
+  if (textarea) textarea.replaceSource(content);
   else source.value = content;
 };
 
@@ -243,7 +243,7 @@ watch(
 }
 
 /* scroll performance optimization */
-.editor-scroll-container,
+.textarea-scroll-container,
 .output-content {
   contain: layout paint;
 }

@@ -82,9 +82,9 @@ const handleScroll = (event: Event) => {
 };
 
 const scrollToPercentage = (percentage: number) => {
-  if (isScrollFromOther('editor')) return;
+  if (isScrollFromOther('textarea')) return;
 
-  markScrollSource('editor');
+  markScrollSource('textarea');
 
   const target = outputContent.value;
   if (!target) return;

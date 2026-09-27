@@ -1,4 +1,4 @@
-<!-- @/playground/component/editor.vue -->
+<!-- @/playground/component/textarea.vue -->
 <template>
   <article class="section textarea">
     <toolbar
@@ -15,12 +15,12 @@
     />
 
     <div
-      class="editor-scroll-container"
+      class="textarea-scroll-container"
       ref="scrollContainer"
       @scroll="syncScroll"
     >
-      <div class="editor-grid" ref="highlightTarget">
-        <div class="editor-gutter-bg" aria-hidden="true" />
+      <div class="textarea-grid" ref="highlightTarget">
+        <div class="textarea-gutter-bg" aria-hidden="true" />
         <template v-for="(line, i) in lines" :key="i">
           <div
             aria-hidden="true"
@@ -38,9 +38,9 @@
         </template>
 
         <textarea
-          ref="editor"
+          ref="textarea"
           spellcheck="false"
-          class="editor-textarea"
+          class="textarea-content"
           :value="source"
           @input="handleInput"
           @compositionstart="handleCompositionStart"
@@ -83,7 +83,7 @@ const props = withDefaults(
 const { source } = usePlaygroundSource();
 const { markScrollSource, isScrollFromOther } = useScrollSync();
 
-const editor = ref<HTMLTextAreaElement | null>(null);
+const textarea = ref<HTMLTextAreaElement | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
 const highlightTarget = ref<HTMLElement | null>(null);
 
@@ -97,7 +97,7 @@ const {
   recordInput,
   applyTool,
   formatDocument,
-} = useMarkdownEditor(source, editor);
+} = useMarkdownEditor(source, textarea);
 
 const { lines } = useMarkdownHighlighter(source, highlightTarget);
 const { stats } = useDocumentStats(source);
@@ -141,12 +141,12 @@ const handleClean = () => {
 
 let rafId = 0;
 
-// 用户滚动 editor → 通知对面
+// 用户滚动 textarea → 通知对面
 const syncScroll = (event: Event) => {
   // 这次是 preview 的程序设置引发的 scroll 事件，忽略
-  if (isScrollFromOther('editor')) return;
+  if (isScrollFromOther('textarea')) return;
 
-  markScrollSource('editor');
+  markScrollSource('textarea');
 
   const target = event.target as HTMLElement;
   if (rafId) return;
@@ -158,9 +158,9 @@ const syncScroll = (event: Event) => {
   });
 };
 
-// 对面要求 editor 跳到某位置
+// 对面要求 textarea 跳到某位置
 const scrollToPercentage = (percentage: number) => {
-  // 用户此刻正在滚 editor，别再跟对面较劲
+  // 用户此刻正在滚 textarea，别再跟对面较劲
   if (isScrollFromOther('preview')) return;
 
   markScrollSource('preview'); // 告诉 syncScroll：下一次是我自己触发的
@@ -171,7 +171,7 @@ const scrollToPercentage = (percentage: number) => {
   if (maxScroll > 0) target.scrollTop = maxScroll * percentage;
 };
 
-defineExpose({ editor, replaceSource, stats, scrollToPercentage });
+defineExpose({ textarea, replaceSource, stats, scrollToPercentage });
 </script>
 
 <style>
@@ -189,7 +189,7 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
   }
 }
 
-.editor-scroll-container {
+.textarea-scroll-container {
   min-height: 0;
   flex: 1;
   overflow-x: hidden;
@@ -198,7 +198,7 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
   line-height: 1.6;
 }
 
-.editor-grid {
+.textarea-grid {
   display: grid;
   grid-template-columns: auto 1fr;
   /* 强制所有行靠顶紧凑排列，剩余空间留在底部 */
@@ -210,7 +210,7 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
 }
 
 /* Line number background */
-.editor-gutter-bg {
+.textarea-gutter-bg {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -251,7 +251,7 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
   min-height: 1.6em;
 }
 
-.editor-textarea {
+.textarea-content {
   position: absolute;
   grid-column: 2;
   top: 16px;
@@ -281,7 +281,7 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
 }
 
 /* Make selection visible on the transparent textarea */
-.editor-textarea::selection {
+.textarea-content::selection {
   background: rgba(43, 108, 176, 0.25);
   color: transparent;
 }
@@ -300,7 +300,7 @@ defineExpose({ editor, replaceSource, stats, scrollToPercentage });
       0px 0.5px 0.5px 0.5px hsla(0, 0%, 100%, 0.05) inset;
   }
 
-  .editor-scroll-container {
+  .textarea-scroll-container {
     scrollbar-width: none;
   }
 

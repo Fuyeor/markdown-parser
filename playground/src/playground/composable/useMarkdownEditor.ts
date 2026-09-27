@@ -18,7 +18,7 @@ export type MarkdownTool =
 
 export function useMarkdownEditor(
   source: Ref<string>,
-  editor: Ref<HTMLTextAreaElement | null>,
+  textarea: Ref<HTMLTextAreaElement | null>,
 ) {
   const history = ref([source.value]);
   const historyIndex = ref(0);
@@ -42,7 +42,7 @@ export function useMarkdownEditor(
   const clearSource = () => {
     if (!source.value) return;
 
-    const element = editor.value;
+    const element = textarea.value;
     if (element) {
       setSource('', 0, 0, element.scrollTop);
     } else {
@@ -57,7 +57,7 @@ export function useMarkdownEditor(
     historyIndex.value = 0;
   };
 
-  // Keep the editor history bounded so repeated formatting does not grow memory indefinitely.
+  // Keep the textarea history bounded so repeated formatting does not grow memory indefinitely.
   const recordHistory = (value: string) => {
     const nextHistory = history.value.slice(0, historyIndex.value + 1);
     if (nextHistory.at(-1) === value) return;
@@ -83,7 +83,7 @@ export function useMarkdownEditor(
   ) => {
     debouncedRecordHistory.cancel();
     source.value = value;
-    const element = editor.value;
+    const element = textarea.value;
 
     if (element) {
       element.value = value;
@@ -96,7 +96,7 @@ export function useMarkdownEditor(
   };
 
   const applyTool = (tool: MarkdownTool) => {
-    const element = editor.value;
+    const element = textarea.value;
     if (!element) return;
     const start = element.selectionStart;
     const end = element.selectionEnd;
@@ -171,7 +171,7 @@ export function useMarkdownEditor(
     const formatted = formatMarkdown(source.value);
     if (formatted === source.value) return;
 
-    const element = editor.value;
+    const element = textarea.value;
     if (element) {
       setSource(
         formatted,

@@ -3,6 +3,7 @@ packages:
   - 'extension/vscode'
   - 'package/*'
   - 'package/editor/*'
+  - 'package/renderer/*'
   - 'playground/'
 allowBuilds:
   vue-demi: true
