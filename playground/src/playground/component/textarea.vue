@@ -8,6 +8,7 @@
       @redo="redo"
       @clean="handleClean"
       @format="formatDocument"
+      @option="emit('option')"
       @tool="applyTool"
       @share="emit('share')"
       @copy-source="emit('copy-source')"
@@ -80,6 +81,16 @@ const props = withDefaults(
   },
 );
 
+// The outer container owns scrolling so line numbers and the mirrored text stay aligned.
+const emit = defineEmits<{
+  (e: 'scroll', percentage: number): void;
+  (e: 'clean'): void;
+  (e: 'option'): void;
+  (e: 'share'): void;
+  (e: 'copy-source'): void;
+  (e: 'copy-html'): void;
+}>();
+
 const { source } = usePlaygroundSource();
 const { markScrollSource, isScrollFromOther } = useScrollSync();
 
@@ -101,15 +112,6 @@ const {
 
 const { lines } = useMarkdownHighlighter(source, highlightTarget);
 const { stats } = useDocumentStats(source);
-
-// The outer container owns scrolling so line numbers and the mirrored text stay aligned.
-const emit = defineEmits<{
-  (e: 'scroll', percentage: number): void;
-  (e: 'clean'): void;
-  (e: 'share'): void;
-  (e: 'copy-source'): void;
-  (e: 'copy-html'): void;
-}>();
 
 // 输入法组合状态锁
 const isComposing = ref(false);

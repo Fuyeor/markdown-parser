@@ -1,28 +1,21 @@
 // @/playground/composable/useCompression.ts
 
 /**
- * Encode a string to a base64-encoded compressed format using the CompressionStream API.
+ * Encode a string to a base64url-encoded compressed format.
  */
 export async function encodeSnippet(content: string): Promise<string> {
   if (!content) return '';
   try {
-    const stream = new Blob([content])
+    const stream = new window.Blob([content])
       .stream()
-      .pipeThrough(new CompressionStream('deflate-raw'));
-    const response = new Response(stream);
-    const blob = await response.blob();
-    const buffer = await blob.arrayBuffer();
-    const bytes = new Uint8Array(buffer);
+      .pipeThrough(new window.CompressionStream('deflate-raw'));
+    const response = new window.Response(stream);
+    const buffer = await response.arrayBuffer();
 
-    // Convert to base64url format
-    let binary = '';
-    for (let i = 0; i < bytes.length; i++) {
-      binary += String.fromCharCode(bytes[i]!);
-    }
-    return btoa(binary)
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
+    return new window.Uint8Array(buffer).toBase64({
+      alphabet: 'base64url',
+      omitPadding: true,
+    });
   } catch (error) {
     console.error('Failed to compress snippet:', error);
     return '';
@@ -30,27 +23,19 @@ export async function encodeSnippet(content: string): Promise<string> {
 }
 
 /**
- * Decode a base64-encoded compressed format back to a string using the DecompressionStream API.
+ * Decode a base64url-encoded compressed format back to a string.
  */
 export async function decodeSnippet(snippet: string): Promise<string> {
   if (!snippet) return '';
   try {
-    // Convert base64url back to base64
-    let base64 = snippet.replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) {
-      base64 += '=';
-    }
-
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-
-    const stream = new Blob([bytes])
+    const byte = window.Uint8Array.fromBase64(snippet, {
+      alphabet: 'base64url',
+    });
+    const stream = new window.Blob([byte])
       .stream()
-      .pipeThrough(new DecompressionStream('deflate-raw'));
-    const response = new Response(stream);
+      .pipeThrough(new window.DecompressionStream('deflate-raw'));
+    const response = new window.Response(stream);
+
     return await response.text();
   } catch (error) {
     console.error('Failed to decompress snippet:', error);

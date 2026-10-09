@@ -10,6 +10,7 @@
       :created-at="currentDocument?.created_at"
       :updated-at="currentDocument?.updated_at"
       @scroll="handleEditorScroll"
+      @option="handleOption"
       @share="handleShare"
       @copy-source="copyText(source)"
       @copy-html="handleCopyHtml"
@@ -65,6 +66,10 @@ const currentDocument = computed(() => {
 
 const handleShare = () => {
   shareModalRef.value?.open();
+};
+
+const handleOption = () => {
+  router.push({ name: 'Option.Editor' });
 };
 
 const handleCopyHtml = async () => {
@@ -161,6 +166,15 @@ const loadRouteDocument = async () => {
   debouncedCreate.cancel();
   debouncedSave.cancel();
 
+  if (window.location.hash.startsWith('#snippet=')) {
+    const snippet = await decodeSnippet(
+      window.location.hash.slice('#snippet='.length),
+    );
+    replaceSourceIfChanged(snippet ?? '');
+    isRouteLoading.value = false;
+    return;
+  }
+
   const id = String(route.params.id ?? '');
   const document = id
     ? documents.value.find((item) => item.id === id)
@@ -178,15 +192,6 @@ const loadRouteDocument = async () => {
 
   if (document) {
     replaceSourceIfChanged(document.content);
-    isRouteLoading.value = false;
-    return;
-  }
-
-  if (window.location.hash.startsWith('#snippet=')) {
-    const snippet = await decodeSnippet(
-      window.location.hash.slice('#snippet='.length),
-    );
-    replaceSourceIfChanged(snippet ?? '');
     isRouteLoading.value = false;
     return;
   }

@@ -66,6 +66,7 @@ const emit = defineEmits<{
   (event: 'redo'): void;
   (event: 'clean'): void;
   (event: 'format'): void;
+  (event: 'option'): void;
   (event: 'share'): void;
   (event: 'copy-source'): void;
   (event: 'copy-html'): void;
@@ -102,11 +103,18 @@ const documentTool = computed<ToolbarItem[][]>(() => [
       tooltip: t('editor.clean'),
       action: () => emit('clean'),
     },
+  ],
+  [
     {
       icon: getTwemojiUrl('2728'),
       isColorful: true,
       tooltip: t('editor.format'),
       action: () => emit('format'),
+    },
+    {
+      icon: getIconUrl('settings'),
+      tooltip: t('editor.option'),
+      action: () => emit('option'),
     },
   ],
   [

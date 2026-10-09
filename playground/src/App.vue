@@ -17,6 +17,7 @@ import RightSidebar from '@app/component/right.vue';
 
 import { useHeadManager } from '@fuyeor/commons';
 import { ToastProvider, useFontLoader } from '@fuyeor/interactify';
+import { useAppearanceState } from '@app/state/appearance';
 
 // load font
 useFontLoader();
@@ -25,4 +26,6 @@ useHeadManager({
   nameKey: 'site.name',
   titleKey: 'site.title',
 });
+// apply theme
+useAppearanceState();
 </script>

@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, type Ref } from 'vue';
 import { format as formatMarkdown } from '@ffm/formatter';
 import { debounce } from '@fuyeor/commons';
+import { useFormatOption, toFormatOption } from './useFormatOption';
 
 export type MarkdownTool =
   | 'bold'
@@ -20,6 +21,8 @@ export function useMarkdownEditor(
   source: Ref<string>,
   textarea: Ref<HTMLTextAreaElement | null>,
 ) {
+  const formatOptionState = useFormatOption();
+
   const history = ref([source.value]);
   const historyIndex = ref(0);
   const canUndo = computed(() => historyIndex.value > 0);
@@ -168,7 +171,8 @@ export function useMarkdownEditor(
   };
 
   const formatDocument = () => {
-    const formatted = formatMarkdown(source.value);
+    const option = toFormatOption(formatOptionState.value);
+    const formatted = formatMarkdown(source.value, option);
     if (formatted === source.value) return;
 
     const element = textarea.value;

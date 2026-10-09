@@ -36,6 +36,43 @@ const appRoutes: Array<RouteRecord> = [
       titleKey: 'editor',
     },
   },
+  {
+    // flavored.fuyeor.com/option
+    path: 'option',
+    name: 'Option',
+    redirect: (to) => ({
+      name: 'Option.General',
+      // keep all includes locale
+      params: to.params,
+      replace: true,
+    }),
+    component: () => import('@/option/index.vue'),
+    meta: {
+      isModal: true,
+      areaKey: 'option',
+      titleKey: 'option',
+    },
+    children: [
+      {
+        // flavored.fuyeor.com/option/general
+        path: 'general',
+        name: 'Option.General',
+        component: () => import('@/option/view/general.vue'),
+        meta: {
+          titleKey: 'option.preferences',
+        },
+      },
+      {
+        // flavored.fuyeor.com/option/editor
+        path: 'editor',
+        name: 'Option.Editor',
+        component: () => import('@/option/view/editor.vue'),
+        meta: {
+          titleKey: 'option.preferences',
+        },
+      },
+    ],
+  },
 ];
 
 // root router
@@ -82,6 +119,8 @@ router.beforeEach(async (to) => {
     return {
       name: to.name,
       params: { ...to.params, locale: localeStore.locale },
+      query: to.query,
+      replace: true,
     };
   }
 

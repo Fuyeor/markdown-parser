@@ -299,6 +299,162 @@
     "ru": "Копировать Markdown",
     "zh-hans": "复制 Markdown"
   },
+  "editor.format.continuous": {
+    "ar": "تكوين اللغات غير المفصولة",
+    "de": "Konfiguration für zusammenhängende Sprachen",
+    "en": "Continuous Script Language Config",
+    "es": "Configuración de idiomas de escritura continua",
+    "fr": "Configuration des langues à écriture continue",
+    "ja": "連続記述言語設定",
+    "ko": "연속 표기 언어 설정",
+    "pt": "Configuração de idiomas de escrita contínua",
+    "ru": "Конфигурация языков с непрерывным письмом",
+    "zh-hans": "连写语言配置"
+  },
+  "editor.format.continuous.autoSpacing": {
+    "ar": "إضافة مسافات تلقائياً بين اللغات الغربية",
+    "de": "Automatisch Leerzeichen zwischen lateinischen Zeichen einfügen",
+    "en": "Auto-insert spacing between Latin characters",
+    "es": "Insertar espacios automáticamente entre caracteres latinos",
+    "fr": "Insérer automatiquement des espaces entre les caractères latins",
+    "ja": "英字の間に自動でスペースを挿入",
+    "ko": "영문 자사이 자동 공백 추가",
+    "pt": "Inserir automaticamente espaços entre caracteres latinos",
+    "ru": "Автоматически добавлять пробелы между латинскими символами",
+    "zh-hans": "自动在西文间添加空格"
+  },
+  "editor.format.continuous.autoUpperWord": {
+    "ar": "تكبير الحرف الأول من الكلمات الغربية تلقائياً",
+    "de": "Ersten Buchstaben lateinischer Wörter automatisch großschreiben",
+    "en": "Auto-capitalize first letter of Latin words",
+    "es": "Capitalizar automáticamente la primera letra de las palabras latinas",
+    "fr": "Mettre automatiquement en majuscule la première lettre des mots latins",
+    "ja": "英単語の頭文字を自動大文字化",
+    "ko": "영단어 첫 글자 자동 대문자 변환",
+    "pt": "Capitalizar automaticamente a primeira letra de palavras latinas",
+    "ru": "Автоматически делать заглавной первую букву латинских слов",
+    "zh-hans": "自动大写西文首字母"
+  },
+  "editor.format.continuous.desc": {
+    "ar": "قد تكون هذه الخيارات مفيدة إذا كنت تستخدم الصينية أو اليابانية أو التايلاندية أو ما شابه.",
+    "de": "Diese Optionen können nützlich sein, wenn Sie Chinesisch, Japanisch, Thailändisch oder ähnliche Sprachen verwenden.",
+    "en": "These options may be useful if you use Chinese, Japanese, Thai, etc.",
+    "es": "Estas opciones pueden ser útiles si usas chino, japonés, tailandés, etc.",
+    "fr": "Ces options peuvent être utiles si vous utilisez le chinois, le japonais, le thaï, etc.",
+    "ja": "中国語、日本語、タイ語などを使用する場合にこれらのオプションが役立ちます。",
+    "ko": "중국어, 일본어, 태국어 등을 사용하는 경우 이러한 옵션이 유용할 수 있습니다.",
+    "pt": "Estas opções podem ser úteis se você usar chinês, japonês, tailandês, etc.",
+    "ru": "Эти опции могут быть полезны, если вы используете китайский, японский, тайский языки и т. д.",
+    "zh-hans": "如果您使用中文、日文、泰文等，这些选项可能有用。"
+  },
+  "editor.format.continuous.fullwidth": {
+    "ar": "الاستبدال التلقائي برموز بعرض كامل",
+    "de": "Automatisch durch Vollbreiten-Zeichen ersetzen",
+    "en": "Auto-replace with full-width characters",
+    "es": "Reemplazar automáticamente con caracteres de ancho completo",
+    "fr": "Remplacer automatiquement par des caractères pleine largeur",
+    "ja": "全角文字に自動置換",
+    "ko": "전각 문자로 자동 바꾸기",
+    "pt": "Substituir automaticamente por caracteres de largura total",
+    "ru": "Автоматически заменять на полноширинные символы",
+    "zh-hans": "自动替换为全角符号"
+  },
+  "editor.format.custom": {
+    "ar": "استبدال مخصص",
+    "de": "Benutzerdefinierte Ersetzung",
+    "en": "Custom Replacement",
+    "es": "Reemplazo personalizado",
+    "fr": "Remplacement personnalisé",
+    "ja": "カスタム置換",
+    "ko": "사용자 정의 교체",
+    "pt": "Substituição personalizada",
+    "ru": "Пользовательская замена",
+    "zh-hans": "自定义替换"
+  },
+  "editor.format.custom.add": {
+    "ar": "إضافة قاعدة",
+    "de": "Regel hinzufügen",
+    "en": "Add Rule",
+    "es": "Añadir regla",
+    "fr": "Ajouter une règle",
+    "ja": "ルールを追加",
+    "ko": "규칙 추가",
+    "pt": "Adicionar regra",
+    "ru": "Добавить правило",
+    "zh-hans": "添加规则"
+  },
+  "editor.format.glossary": {
+    "ar": "مسرد الاستبدال المخصص",
+    "de": "Benutzerdefiniertes Ersetzungswörterbuch",
+    "en": "Custom Replacement Glossary",
+    "es": "Glosario de reemplazo personalizado",
+    "fr": "Glossaire de remplacement personnalisé",
+    "ja": "カスタム置換用語集",
+    "ko": "사용자 정의 교체 용어집",
+    "pt": "Glossário de substituição personalizado",
+    "ru": "Пользовательский словарь замены",
+    "zh-hans": "自定义替换词表"
+  },
+  "editor.format.heading": {
+    "ar": "تنسيق العناوين",
+    "de": "Überschriftenformatierung",
+    "en": "Heading Formatting",
+    "es": "Formato de encabezado",
+    "fr": "Formatage des titres",
+    "ja": "見出しのフォーマット",
+    "ko": "제목 서식",
+    "pt": "Formatação de títulos",
+    "ru": "Форматирование заголовков",
+    "zh-hans": "标题格式化"
+  },
+  "editor.format.heading.capitalize": {
+    "ar": "تنسيق العناوين: تكبير كل كلمة",
+    "de": "Überschrift: Jedes Wort großschreiben",
+    "en": "Capitalize each word",
+    "es": "Capitalizar cada palabra",
+    "fr": "Mettre une majuscule à chaque mot",
+    "ja": "すべての単語を大文字化",
+    "ko": "각 단어 첫 글자 대문자",
+    "pt": "Capitalizar cada palavra",
+    "ru": "Заглавные буквы для каждого слова",
+    "zh-hans": "所有单词首字母大写"
+  },
+  "editor.format.heading.sentence": {
+    "ar": "تنسيق العناوين: نمط الجملة",
+    "de": "Überschrift: Satzanfang groß",
+    "en": "Sentence case",
+    "es": "Estilo oración",
+    "fr": "Majuscule au début de la phrase",
+    "ja": "文体",
+    "ko": "문장형 대소문자",
+    "pt": "Estilo de frase",
+    "ru": "Как в предложении",
+    "zh-hans": "句首字母大写"
+  },
+  "editor.format.heading.title": {
+    "ar": "تنسيق العناوين: نمط العنوان",
+    "de": "Überschrift: Titelformat",
+    "en": "Title case",
+    "es": "Estilo título",
+    "fr": "Style de titre",
+    "ja": "タイトルケース",
+    "ko": "제목형 대소문자",
+    "pt": "Estilo de título",
+    "ru": "Стиль заголовка",
+    "zh-hans": "实词大写"
+  },
+  "editor.format.sentence": {
+    "ar": "تكبير الحرف الأول من الجملة تلقائياً",
+    "de": "Ersten Buchstaben des Satzes automatisch großschreiben",
+    "en": "Auto-capitalize first letter of sentence",
+    "es": "Capitalizar automáticamente la primera letra de la oración",
+    "fr": "Mettre automatiquement en majuscule la première lettre de la phrase",
+    "ja": "文頭の文字を自動大文字化",
+    "ko": "문장 첫 글자 자동 대문자 변환",
+    "pt": "Capitalizar automaticamente a primeira letra da frase",
+    "ru": "Автоматически делать заглавной первую букву предложения",
+    "zh-hans": "自动句首字母大写"
+  },
   "editor.italic": {
     "ar": "مائل",
     "de": "Kursiv",
@@ -395,6 +551,18 @@
     "ru": "Маркированный список",
     "zh-hans": "无序列表"
   },
+  "editor.option": {
+    "ar": "إعدادات المحرر",
+    "de": "Editor-Optionen",
+    "en": "Editor Settings",
+    "es": "Configuración del editor",
+    "fr": "Paramètres de l'éditeur",
+    "ja": "エディタ設定",
+    "ko": "편집기 설정",
+    "pt": "Configurações do editor",
+    "ru": "Настройки редактора",
+    "zh-hans": "编辑器设置"
+  },
   "editor.quote": {
     "ar": "اقتباس",
     "de": "Blockzitat",
@@ -406,6 +574,18 @@
     "pt": "Citação",
     "ru": "Цитата",
     "zh-hans": "引用"
+  },
+  "editor.replacer": {
+    "ar": "استبدال مجمع",
+    "de": "Stapelverarbeitung",
+    "en": "Batch Replacer",
+    "es": "Reemplazador por lotes",
+    "fr": "Remplacement par lots",
+    "ja": "一括置換",
+    "ko": "일괄 바꾸기",
+    "pt": "Substituidor em lote",
+    "ru": "Пакетная замена",
+    "zh-hans": "批量替换"
   },
   "editor.strike": {
     "ar": "يتوسطه خط",
@@ -1078,6 +1258,42 @@
     "pt": "tem seu ",
     "ru": "имеет своё ",
     "zh-hans": "都有它的"
+  },
+  "option.desc": {
+    "ar": "مركز الإعدادات",
+    "de": "Einstellungszentrum",
+    "en": "Settings Center",
+    "es": "Centro de configuración",
+    "fr": "Centre des paramètres",
+    "ja": "設定センター",
+    "ko": "설정 센터",
+    "pt": "Central de configurações",
+    "ru": "Центр настроек",
+    "zh-hans": "设置中心"
+  },
+  "option.editor": {
+    "ar": "إعدادات المحرر",
+    "de": "Editor-Einstellungen",
+    "en": "Editor Settings",
+    "es": "Configuración del editor",
+    "fr": "Paramètres de l'éditeur",
+    "ja": "エディタ設定",
+    "ko": "편집기 설정",
+    "pt": "Configurações do editor",
+    "ru": "Настройки редактора",
+    "zh-hans": "编辑器设置"
+  },
+  "option.general": {
+    "ar": "المظهر واللغة",
+    "de": "Thema und Sprache",
+    "en": "Theme & Language",
+    "es": "Tema e idioma",
+    "fr": "Thème et langue",
+    "ja": "テーマと言語",
+    "ko": "테마 및 언어",
+    "pt": "Tema e idioma",
+    "ru": "Тема и язык",
+    "zh-hans": "主题和语言"
   },
   "playground": {
     "ar": "ساحة التجربة",
