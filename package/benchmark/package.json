@@ -7,7 +7,7 @@
     "@ffm/parser": "workspace:*",
     "linkify-it": "^6.1.0",
     "markdown-it": "^14.3.2",
-    "marked": "^18.0.14",
+    "marked": "^18.1.0",
     "mitata": "^0.1.14"
   },
   "scripts": {

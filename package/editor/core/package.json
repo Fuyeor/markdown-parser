@@ -17,14 +17,13 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@ffm/parser": "workspace:*",
-    "@ffm/formatter": "workspace:*",
     "@ffm/converter": "workspace:*",
-    "alien-signals": "^2.0.0"
+    "@ffm/formatter": "workspace:*",
+    "@ffm/parser": "workspace:*",
+    "alien-signals": "^2.0.8"
   },
   "devDependencies": {
-    "@types/node": "^26.6.2",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.3"
   }
 }

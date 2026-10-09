@@ -15,10 +15,12 @@ WORKDIR /app
 COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # copy shared package
 COPY package/converter/package.json package/converter/
+COPY package/editor/core/package.json package/editor/core/
+COPY package/editor/vue/package.json package/editor/vue/
 COPY package/formatter/package.json package/formatter/
 COPY package/linkify/package.json package/linkify/
 COPY package/parser/package.json package/parser/
-COPY package/vue-renderer/package.json package/vue-renderer/
+COPY package/renderer/vue/package.json package/renderer/vue/
 COPY playground/package.json playground/
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
