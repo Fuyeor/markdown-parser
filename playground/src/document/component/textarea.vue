@@ -8,6 +8,7 @@
       @redo="redo"
       @clean="handleClean"
       @format="formatDocument"
+      @search="replacerOpen = true"
       @option="emit('option')"
       @tool="applyTool"
       @share="emit('share')"
@@ -50,6 +51,14 @@
       </div>
     </div>
 
+    <replacer
+      v-if="replacerOpen"
+      :source="source"
+      @replace="handleReplace"
+      @highlight="handleHighlight"
+      @close="replacerOpen = false"
+    />
+
     <stats-bar
       v-if="stats"
       :created-at="createdAt"
@@ -61,9 +70,10 @@
 
 <script setup lang="ts">
 import Toolbar from './toolbar/index.vue';
+import Replacer from './toolbar/replacer.vue';
 import StatsBar from './stats-bar.vue';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useMarkdownEditor } from '@/document/composable/useMarkdownEditor';
 import { usePlaygroundSource } from '@/document/composable/usePlaygroundSource';
 import { useScrollSync } from '@/document/composable/useScrollSync';
@@ -94,6 +104,7 @@ const emit = defineEmits<{
 const { source } = usePlaygroundSource();
 const { markScrollSource, isScrollFromOther } = useScrollSync();
 
+const replacerOpen = ref(false);
 const textarea = ref<HTMLTextAreaElement | null>(null);
 const scrollContainer = ref<HTMLElement | null>(null);
 const highlightTarget = ref<HTMLElement | null>(null);
@@ -140,6 +151,47 @@ const handleClean = () => {
   clearSource();
   emit('clean');
 };
+
+// 替换后直接写 source，index.vue 里的 watch(source, ...) 会走保存流程
+const handleReplace = (value: string) => {
+  source.value = value;
+};
+
+// 让当前匹配项在 textarea 中可见并选中
+const handleHighlight = (start: number, end: number) => {
+  const el = textarea.value;
+  if (!el) return;
+  el.focus();
+  el.setSelectionRange(start, end);
+  scrollMatchIntoView(el, start, end);
+};
+
+// 计算行号并滚动到可视区，避免逐行测量
+const scrollMatchIntoView = (
+  el: HTMLTextAreaElement,
+  start: number,
+  end: number,
+) => {
+  const before = el.value.slice(0, start);
+  const lineIndex = before.split('\n').length - 1;
+  const computed = window.getComputedStyle(el);
+  const lineHeight = Number.parseFloat(computed.lineHeight);
+  if (!Number.isFinite(lineHeight)) return;
+
+  const target = lineIndex * lineHeight;
+  const viewTop = el.scrollTop;
+  const viewBottom = viewTop + el.clientHeight - lineHeight;
+  if (target < viewTop) el.scrollTop = target;
+  else if (target > viewBottom)
+    el.scrollTop = target - el.clientHeight + lineHeight * 2;
+};
+
+// 关闭搜索时取消选区，避免残留选中状态
+watch(replacerOpen, (open) => {
+  if (open) return;
+  const el = textarea.value;
+  if (el) el.setSelectionRange(el.value.length, el.value.length);
+});
 
 let rafId = 0;
 

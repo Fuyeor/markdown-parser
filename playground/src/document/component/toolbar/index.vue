@@ -66,6 +66,7 @@ const emit = defineEmits<{
   (event: 'redo'): void;
   (event: 'clean'): void;
   (event: 'format'): void;
+  (event: 'search'): void;
   (event: 'option'): void;
   (event: 'share'): void;
   (event: 'copy-source'): void;
@@ -110,6 +111,11 @@ const documentTool = computed<ToolbarItem[][]>(() => [
       isColorful: true,
       tooltip: t('editor.format'),
       action: () => emit('format'),
+    },
+    {
+      icon: getIconUrl('search'),
+      tooltip: t('editor.replacer'),
+      action: () => emit('search'),
     },
     {
       icon: getIconUrl('settings'),
