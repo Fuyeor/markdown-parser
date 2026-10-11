@@ -1,4 +1,4 @@
-<!-- @/playground/component/share-modal.vue -->
+<!-- @/document/component/toolbar/share.vue -->
 <template>
   <modal v-model="isShareModalOpen">
     <template #header>
@@ -11,13 +11,13 @@
 </template>
 
 <script setup lang="ts">
-import CopyClipboard from './copy-clipboard.vue';
+import CopyClipboard from './clipboard.vue';
 
 import { ref } from 'vue';
 import { useLocale } from '@fuyeor/locale';
 import { Modal } from '@fuyeor/interactify';
-import { encodeSnippet } from '@/playground/composable/useCompression';
-import { usePlaygroundSource } from '@/playground/composable/usePlaygroundSource';
+import { encodeSnippet } from '@/document/composable/useCompression';
+import { usePlaygroundSource } from '@/document/composable/usePlaygroundSource';
 
 const { t } = useLocale();
 const { source } = usePlaygroundSource();
@@ -28,7 +28,7 @@ const shareLink = ref('');
 // Build a stable playground share URL so local document IDs are never exposed.
 const open = async () => {
   const snippet = await encodeSnippet(source.value);
-  const url = new window.URL('/playground', window.location.origin);
+  const url = new window.URL('/document', window.location.origin);
   url.hash = `snippet=${snippet}`;
   shareLink.value = url.toString();
   isShareModalOpen.value = true;

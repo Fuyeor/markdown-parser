@@ -1,14 +1,14 @@
-// @/playground/composable/useIndexedDb.ts
+// @/document/composable/useIndexedDb.ts
 import { onMounted, ref } from 'vue';
-import { countDocumentStats } from '@/playground/composable/useDocumentStats';
+import { countDocumentStats } from '@/document/composable/useDocumentStats';
 
 export interface HistoryDocument {
   id: string;
   title: string;
-  created_at: number;
-  updated_at: number;
   content: string;
-  word_count?: number;
+  word?: number;
+  created: number;
+  updated: number;
 }
 
 type SyncMessage =
@@ -16,10 +16,14 @@ type SyncMessage =
   | { type: 'DELETE'; id: string }
   | { type: 'CLEAR' };
 
-const DB_NAME = 'ffm-playground';
-const STORE_NAME = 'documents';
-const UPDATED_AT_INDEX = 'updated_at';
-const DB_VERSION = 1;
+const db = {
+  name: 'ffm-playground',
+  version: 1,
+  table: {
+    name: 'document',
+    updatedAtIndex: 'updated',
+  },
+};
 
 const documents = ref<HistoryDocument[]>([]);
 const isReady = ref(false);
@@ -32,7 +36,7 @@ const upsertDocumentState = (document: HistoryDocument) => {
   const index = documents.value.findIndex((item) => item.id === document.id);
   if (index >= 0) documents.value[index] = { ...document };
   else documents.value.push({ ...document });
-  documents.value.sort((a, b) => b.updated_at - a.updated_at);
+  documents.value.sort((a, b) => b.updated - a.updated);
 };
 
 const removeDocumentState = (id: string) => {
@@ -41,7 +45,7 @@ const removeDocumentState = (id: string) => {
 
 const initBroadcastChannel = () => {
   if (broadcastChannel) return;
-  broadcastChannel = new window.BroadcastChannel(DB_NAME);
+  broadcastChannel = new window.BroadcastChannel(db.name);
 
   broadcastChannel.onmessage = (event: MessageEvent<SyncMessage>) => {
     const message = event.data;
@@ -57,8 +61,8 @@ const executeStore = (
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!database) return reject(new Error('IndexedDB is not initialized'));
-    const transaction = database.transaction(STORE_NAME, mode);
-    const request = action(transaction.objectStore(STORE_NAME));
+    const transaction = database.transaction(db.table.name, mode);
+    const request = action(transaction.objectStore(db.table.name));
 
     request.onerror = () =>
       reject(request.error ?? new Error('IndexedDB request failed'));
@@ -72,10 +76,10 @@ const loadAllDocuments = (): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!database) return reject(new Error('IndexedDB is not initialized'));
 
-    const transaction = database.transaction(STORE_NAME, 'readwrite');
+    const transaction = database.transaction(db.table.name, 'readwrite');
     const request = transaction
-      .objectStore(STORE_NAME)
-      .index(UPDATED_AT_INDEX)
+      .objectStore(db.table.name)
+      .index(db.table.updatedAtIndex)
       .openCursor(null, 'prev');
     const result: HistoryDocument[] = [];
 
@@ -91,10 +95,10 @@ const loadAllDocuments = (): Promise<void> => {
 
       const document = cursor.value as HistoryDocument;
       const normalizedDocument =
-        document.word_count === undefined
+        document.word === undefined
           ? {
               ...document,
-              word_count: countDocumentStats(document.content).words,
+              word: countDocumentStats(document.content).words,
             }
           : document;
       result.push(normalizedDocument);
@@ -115,19 +119,21 @@ const initialize = (): Promise<void> => {
   if (initialization) return initialization;
 
   initialization = new Promise<void>((resolve, reject) => {
-    const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+    const request = window.indexedDB.open(db.name, db.version);
 
     request.onerror = () =>
       reject(request.error ?? new Error('Failed to open IndexedDB'));
     request.onupgradeneeded = () => {
       const upgradedDatabase = request.result;
       const upgradeTransaction = request.transaction;
-      const store = upgradedDatabase.objectStoreNames.contains(STORE_NAME)
-        ? upgradeTransaction?.objectStore(STORE_NAME)
-        : upgradedDatabase.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      const store = upgradedDatabase.objectStoreNames.contains(db.table.name)
+        ? upgradeTransaction?.objectStore(db.table.name)
+        : upgradedDatabase.createObjectStore(db.table.name, { keyPath: 'id' });
 
-      if (store && !store.indexNames.contains(UPDATED_AT_INDEX)) {
-        store.createIndex(UPDATED_AT_INDEX, 'updated_at', { unique: false });
+      if (store && !store.indexNames.contains(db.table.updatedAtIndex)) {
+        store.createIndex(db.table.updatedAtIndex, 'updated', {
+          unique: false,
+        });
       }
     };
     request.onsuccess = () => {

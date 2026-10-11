@@ -1,4 +1,4 @@
-<!-- @/playground/component/MarkdownToolbar.vue -->
+<!-- @/document/component/toolbar/index.vue -->
 <template>
   <nav class="editor-toolbar">
     <!-- history / share / copy -->
@@ -53,7 +53,7 @@
 import { computed } from 'vue';
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl, getTwemojiUrl } from '@fuyeor/commons';
-import type { MarkdownTool } from '@/playground/composable/useMarkdownEditor';
+import type { MarkdownTool } from '@/document/composable/useMarkdownEditor';
 
 const props = defineProps<{
   canUndo: boolean;

@@ -1,4 +1,4 @@
-// @/playground/composable/useScrollSync.ts
+// @/document/composable/useScrollSync.ts
 import { onScopeDispose } from 'vue';
 
 export type ScrollSource = 'textarea' | 'preview';

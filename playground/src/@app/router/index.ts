@@ -16,24 +16,17 @@ const appRoutes: Array<RouteRecord> = [
     },
   },
   {
-    // flavored.fuyeor.com/playground
-    // flavored.fuyeor.com/playground/:id
+    // flavored.fuyeor.com/document
+    // flavored.fuyeor.com/document/:id
     // The optional segment uses URLPattern syntax required by @fuyeor/vue-router.
-    path: 'playground{/:id}?',
-    name: 'Playground',
-    component: () => import('@/playground/index.vue'),
+    path: 'document{/:id}?',
+    name: 'Document',
+    component: () => import('@/document/index.vue'),
+    props: (route) => ({
+      mode: route.query.mode,
+    }),
     meta: {
       titleKey: 'playground',
-    },
-  },
-  {
-    // flavored.fuyeor.com/editor
-    // flavored.fuyeor.com/editor/:id
-    path: 'editor{/:id}?',
-    name: 'Editor',
-    component: () => import('@/editor/index.vue'),
-    meta: {
-      titleKey: 'editor',
     },
   },
   {
@@ -120,6 +113,7 @@ router.beforeEach(async (to) => {
       name: to.name,
       params: { ...to.params, locale: localeStore.locale },
       query: to.query,
+      hash: to.hash,
       replace: true,
     };
   }

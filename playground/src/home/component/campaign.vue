@@ -25,7 +25,7 @@
 import { useLocale } from '@fuyeor/locale';
 import HomeImagePlaceholder from './image-placehoder.vue';
 import HomeSectionLabel from './section-label.vue';
-import { usePlaygroundLink } from '@/playground/composable/usePlaygroundLink';
+import { usePlaygroundLink } from '@/document/composable/usePlaygroundLink';
 
 const { t } = useLocale();
 const playgroundLink = usePlaygroundLink();

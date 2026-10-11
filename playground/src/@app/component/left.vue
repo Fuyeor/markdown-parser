@@ -2,10 +2,30 @@
 <template>
   <left-sidebar>
     <template #nav>
-      <SidebarMenu :items="sidebarNav" />
+      <router-link class="nav-item" :to="{ name: 'Home' }">
+        <img :src="getIconUrl('home')" class="nav-icon" alt="" />
+        <p class="nav-text">{{ t('home') }}</p>
+      </router-link>
+
       <router-link
-        :to="{ name: 'Playground', params: { ...route.params, id: undefined } }"
         class="nav-item"
+        :to="{
+          name: 'Document',
+          params: { ...route.params, id: undefined },
+          query: { mode: 'rich' },
+        }"
+      >
+        <img :src="getIconUrl('extension')" class="nav-icon" alt="" />
+        <p class="nav-text">{{ t('editor') }}</p>
+      </router-link>
+
+      <router-link
+        class="nav-item"
+        :to="{
+          name: 'Document',
+          params: { ...route.params, id: undefined },
+          query: { mode: 'code' },
+        }"
       >
         <img :src="getIconUrl('palette')" class="nav-icon" alt="" />
         <p class="nav-text">{{ t('playground') }}</p>
@@ -17,29 +37,17 @@
 </template>
 
 <script setup lang="ts">
-import DocumentHistory from '@/playground/component/history.vue';
+import DocumentHistory from '@/document/component/history.vue';
 
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl } from '@fuyeor/commons';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
-import { LeftSidebar, SidebarMenu, useSidebarItems } from '@fuyeor/interactify';
-import { rawSidebarNav } from '@app/config/sidebar/menu';
+import { LeftSidebar } from '@fuyeor/interactify';
 
 const route = useRoute();
 const router = useRouter();
 
 const { t } = useLocale();
-
-const { processedItems: sidebarNav } = useSidebarItems(rawSidebarNav, {
-  t,
-});
-
-const handleLocaleChange = (newLocale: string) => {
-  router.replace({
-    name: route.name,
-    params: { ...route.params, locale: newLocale },
-  });
-};
 </script>
 
 <style>

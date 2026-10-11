@@ -1,29 +1,36 @@
-<!-- @/playground/index.vue -->
+<!-- @/document/index.vue -->
 <template>
-  <div class="playground">
-    <layout-anchor>
-      <preview ref="previewComponent" @scroll="handlePreviewScroll" />
-    </layout-anchor>
+  <div class="playground" :data-mode="mode">
+    <template v-if="mode === 'rich'">
+      <editor :key="route.params.id" :content="source" />
+    </template>
 
-    <text-area
-      ref="textComponent"
-      :created-at="currentDocument?.created_at"
-      :updated-at="currentDocument?.updated_at"
-      @scroll="handleEditorScroll"
-      @option="handleOption"
-      @share="handleShare"
-      @copy-source="copyText(source)"
-      @copy-html="handleCopyHtml"
-    />
+    <template v-else>
+      <layout-anchor>
+        <preview ref="previewComponent" @scroll="handlePreviewScroll" />
+      </layout-anchor>
+
+      <text-area
+        ref="textComponent"
+        :created-at="currentDocument?.created"
+        :updated-at="currentDocument?.updated"
+        @scroll="handleEditorScroll"
+        @option="handleOption"
+        @share="handleShare"
+        @copy-source="copyText(source)"
+        @copy-html="handleCopyHtml"
+      />
+    </template>
 
     <share-modal ref="shareModalRef" />
   </div>
 </template>
 
 <script setup lang="ts">
+import Editor from './component/editor.vue';
 import TextArea from './component/textarea.vue';
 import Preview from './component/preview.vue';
-import ShareModal from './component/share-modal.vue';
+import ShareModal from './component/toolbar/share.vue';
 
 import { computed, ref, watch } from 'vue';
 import { useLocale } from '@fuyeor/locale';
@@ -35,6 +42,8 @@ import { decodeSnippet } from './composable/useCompression';
 import { usePlaygroundSource } from './composable/usePlaygroundSource';
 import { useIndexedDb, type HistoryDocument } from './composable/useIndexedDb';
 import { countDocumentStats } from './composable/useDocumentStats';
+
+defineProps<{ mode: 'rich' | 'code' }>();
 
 const route = useRoute();
 const router = useRouter();
@@ -109,9 +118,9 @@ const saveDocumentContent = async (id: string, content: string) => {
   const document: HistoryDocument = {
     ...previous,
     title: extractTitle(content, t('documents.untitled')),
-    updated_at: window.Date.now(),
+    updated: Date.now(),
     content,
-    word_count: countDocumentStats(content).words,
+    word: countDocumentStats(content).words,
   };
   await saveDocument(document);
 };
@@ -137,18 +146,18 @@ const createDocumentFromInput = async (content: string) => {
   creatingDocument = true;
 
   try {
-    const now = window.Date.now();
+    const now = Date.now();
     const document: HistoryDocument = {
-      id: window.crypto.randomUUID(),
+      id: window.crypto.getRandomValues(new Uint8Array(6)).toHex(),
       title: extractTitle(content, t('documents.untitled')),
-      created_at: now,
-      updated_at: now,
       content,
-      word_count: countDocumentStats(content).words,
+      word: countDocumentStats(content).words,
+      created: now,
+      updated: now,
     };
     await saveDocument(document);
     await router.replace({
-      name: 'Playground',
+      name: 'Document',
       params: { ...route.params, id: document.id },
     });
   } finally {
@@ -184,7 +193,7 @@ const loadRouteDocument = async () => {
     replaceSourceIfChanged('');
     isRouteLoading.value = false;
     await router.replace({
-      name: 'Playground',
+      name: 'Document',
       params: { ...route.params, id: undefined },
     });
     return;

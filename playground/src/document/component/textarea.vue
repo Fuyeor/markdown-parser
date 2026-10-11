@@ -1,4 +1,4 @@
-<!-- @/playground/component/textarea.vue -->
+<!-- @/document/component/textarea.vue -->
 <template>
   <article class="section textarea">
     <toolbar
@@ -60,15 +60,15 @@
 </template>
 
 <script setup lang="ts">
-import Toolbar from './toolbar.vue';
+import Toolbar from './toolbar/index.vue';
 import StatsBar from './stats-bar.vue';
 
 import { ref } from 'vue';
-import { useMarkdownEditor } from '@/playground/composable/useMarkdownEditor';
-import { usePlaygroundSource } from '@/playground/composable/usePlaygroundSource';
-import { useScrollSync } from '@/playground/composable/useScrollSync';
-import { useMarkdownHighlighter } from '@/playground/composable/useMarkdownHighlighter';
-import { useDocumentStats } from '@/playground/composable/useDocumentStats';
+import { useMarkdownEditor } from '@/document/composable/useMarkdownEditor';
+import { usePlaygroundSource } from '@/document/composable/usePlaygroundSource';
+import { useScrollSync } from '@/document/composable/useScrollSync';
+import { useMarkdownHighlighter } from '@/document/composable/useMarkdownHighlighter';
+import { useDocumentStats } from '@/document/composable/useDocumentStats';
 
 const props = withDefaults(
   defineProps<{

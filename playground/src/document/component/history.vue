@@ -1,4 +1,4 @@
-<!-- @/playground/component/history.vue -->
+<!-- @/document/component/history.vue -->
 <template>
   <!-- only shows when user created example doc -->
   <Foldable
@@ -57,7 +57,7 @@
         v-for="document in filteredDocuments"
         :key="document.id"
         :to="{
-          name: 'Playground',
+          name: 'Document',
           params: { ...route.params, id: document.id },
         }"
         class="document-item"
@@ -68,12 +68,12 @@
             document.title || t('documents.untitled')
           }}</span>
           <span class="document-time">
-            {{ formatTime(document.updated_at) }}
+            {{ formatTime(document.updated) }}
             <span
-              v-if="document.word_count !== undefined"
+              v-if="document.word !== undefined"
               class="document-word-count"
             >
-              {{ t('documents.stats.words', { count: document.word_count }) }}
+              {{ t('documents.stats.words', { count: document.word }) }}
             </span>
             <DropdownMenu
               :aria-label="`${t('delete')}: ${document.title}`"
@@ -101,7 +101,7 @@ import {
 import {
   useIndexedDb,
   type HistoryDocument,
-} from '@/playground/composable/useIndexedDb';
+} from '@/document/composable/useIndexedDb';
 
 const route = useRoute();
 const router = useRouter();
@@ -137,7 +137,7 @@ const handleDeleteDocument = async (document: HistoryDocument) => {
   if (currentDocumentId.value !== document.id) return;
 
   router.replace({
-    name: 'Playground',
+    name: 'Document',
     params: { ...route.params, id: undefined },
   });
 };
@@ -146,17 +146,17 @@ const handleDeleteDocument = async (document: HistoryDocument) => {
 const handleClearDocuments = async () => {
   await clearDocuments();
   isClearDocumentsModalOpen.value = false;
-  if (route.name !== 'Playground' || !currentDocumentId.value) return;
+  if (route.name !== 'Document' || !currentDocumentId.value) return;
 
   await router.replace({
-    name: 'Playground',
+    name: 'Document',
     params: { ...route.params, id: undefined },
   });
 };
 
 // Format relative timestamps in the active locale.
 const formatTime = (timestamp: number): string => {
-  const diff = Math.max(0, window.Date.now() - timestamp);
+  const diff = Math.max(0, Date.now() - timestamp);
   if (diff < 60000) return t('documents.justNow');
   if (diff < 3600000)
     return t('documents.minutesAgo', {
@@ -176,7 +176,7 @@ const formatTime = (timestamp: number): string => {
       value: Math.floor(diff / 604800000),
     });
 
-  return new window.Intl.DateTimeFormat(locale.value, {
+  return new Intl.DateTimeFormat(locale.value, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',

@@ -56,7 +56,7 @@ RUN echo 'server { \
     include mime.types; \
     types { text/ffm ffm; } \
     index index.html; \
-    location ^~ /assets/ { try_files $uri =404; } \
+    location ^~ /static/ { try_files $uri =404; } \
     location / { try_files $uri $uri/ /index.html; } \
 }' > /etc/nginx/conf.d/default.conf
 

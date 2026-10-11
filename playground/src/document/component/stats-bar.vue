@@ -1,4 +1,4 @@
-<!-- @/playground/component/stats-bar.vue -->
+<!-- @/document/component/stats-bar.vue -->
 <template>
   <footer class="document-stats-bar">
     <span
@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { useLocale } from '@fuyeor/locale';
 import { useDateFormatter } from '@fuyeor/commons';
-import type { DocumentStats } from '@/playground/composable/useDocumentStats';
+import type { DocumentStats } from '@/document/composable/useDocumentStats';
 
 const { createdAt = 0, updatedAt = 0 } = defineProps<{
   createdAt?: number;

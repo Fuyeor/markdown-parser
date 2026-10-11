@@ -1,4 +1,4 @@
-<!-- @/playground/component/copy-clipboard.vue -->
+<!-- @/document/component/toolbar/clipboard.vue -->
 <template>
   <div class="form-group copy-clipboard">
     <!-- Component Label -->

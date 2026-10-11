@@ -120,7 +120,7 @@ import {
 import {
   defaultOption,
   useFormatOption,
-} from '@/playground/composable/useFormatOption';
+} from '@/document/composable/useFormatOption';
 
 const { t } = useLocale();
 const state = useFormatOption();

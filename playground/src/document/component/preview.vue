@@ -1,4 +1,4 @@
-<!-- @/playground/component/preview.vue -->
+<!-- @/document/component/preview.vue -->
 <template>
   <article class="section preview">
     <Tabs
@@ -27,8 +27,8 @@ import {
   render as renderMarkdown,
 } from '@ffm/parser';
 import { renderToVue } from '@ffm/vue-renderer';
-import { usePlaygroundSource } from '@/playground/composable/usePlaygroundSource';
-import { useScrollSync } from '@/playground/composable/useScrollSync';
+import { usePlaygroundSource } from '@/document/composable/usePlaygroundSource';
+import { useScrollSync } from '@/document/composable/useScrollSync';
 
 const emit = defineEmits<{
   (event: 'scroll', percentage: number): void;

@@ -1,4 +1,4 @@
-// @/playground/api.ts
+// @/document/api.ts
 import apiClient from '@app/http';
 
 export async function get(locale: string): Promise<string> {

@@ -1,4 +1,4 @@
-<!-- @/editor/index.vue -->
+<!-- @/document/component/editor.vue -->
 <template>
   <div class="editor">
     <div class="editor-status">
@@ -14,21 +14,13 @@
 import { ref } from 'vue';
 import { useEditor } from '@ffm/vue-editor';
 
-const sample = `# Heading
-Paragraph with **bold** and \`code\`.
-
-- list item one
-- list item two
-
-> quote text
-
-\`\`\`js
-const a = 1
-\`\`\``;
+const { content } = defineProps<{
+  content: string;
+}>();
 
 const container = ref<HTMLElement | null>(null);
 const { blockArray, selection } = useEditor(container, {
-  text: sample,
+  text: content,
 });
 </script>
 

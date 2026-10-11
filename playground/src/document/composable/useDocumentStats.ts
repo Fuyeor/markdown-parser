@@ -1,4 +1,4 @@
-// @/playground/composable/useDocumentStats.ts
+// @/document/composable/useDocumentStats.ts
 import { computed, type Ref } from 'vue';
 
 export interface DocumentStats {
@@ -13,19 +13,19 @@ export function countDocumentStats(text: string): DocumentStats {
     return { words: 0, characters: 0, sentences: 0, paragraphs: 0 };
   }
 
-  const wordSegmenter = new window.Intl.Segmenter(undefined, {
+  const wordSegmenter = new Intl.Segmenter(undefined, {
     granularity: 'word',
   });
   const words = [...wordSegmenter.segment(text)].filter(
     ({ isWordLike }) => isWordLike,
   ).length;
 
-  const characterSegmenter = new window.Intl.Segmenter(undefined, {
+  const characterSegmenter = new Intl.Segmenter(undefined, {
     granularity: 'grapheme',
   });
   const characters = [...characterSegmenter.segment(text)].length;
 
-  const sentenceSegmenter = new window.Intl.Segmenter(undefined, {
+  const sentenceSegmenter = new Intl.Segmenter(undefined, {
     granularity: 'sentence',
   });
   const sentences = [...sentenceSegmenter.segment(text)].length;

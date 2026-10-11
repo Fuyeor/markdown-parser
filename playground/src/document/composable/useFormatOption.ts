@@ -1,4 +1,4 @@
-// @/playground/composable/useFormatOption.ts
+// @/document/composable/useFormatOption.ts
 import { ref, watch } from 'vue';
 import type { FormatOption, TextTransformer } from '@ffm/formatter';
 
@@ -45,7 +45,7 @@ export const defaultOption: FormatOptionState = {
 
 function load(): FormatOptionState {
   try {
-    const raw = localStorage.getItem(storageKey);
+    const raw = window.localStorage.getItem(storageKey);
     if (!raw) return structuredClone(defaultOption);
     const parsed = JSON.parse(raw) as Partial<FormatOptionState>;
     return {
@@ -71,7 +71,7 @@ watch(
   state,
   (value) => {
     try {
-      localStorage.setItem(storageKey, JSON.stringify(value));
+      window.localStorage.setItem(storageKey, JSON.stringify(value));
     } catch {
       // 存储失败（隐私模式 / 空间满）时静默忽略
     }

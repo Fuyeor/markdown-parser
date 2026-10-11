@@ -1,4 +1,4 @@
-// @/playground/composable/useMarkdownHighlighter.ts
+// @/document/composable/useMarkdownHighlighter.ts
 import { computed, nextTick, watch, type Ref } from 'vue';
 
 export function useMarkdownHighlighter(

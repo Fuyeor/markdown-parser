@@ -1,4 +1,4 @@
-// @/playground/composable/usePlaygroundLink.ts
+// @/document/composable/usePlaygroundLink.ts
 import { computed } from 'vue';
 import { useRoute, type RouteLocationRaw } from '@fuyeor/vue-router';
 
@@ -7,7 +7,7 @@ export function usePlaygroundLink() {
   const route = useRoute();
 
   return computed<RouteLocationRaw>(() => ({
-    name: 'Playground',
+    name: 'Document',
     params: { ...route.params, id: undefined },
   }));
 }

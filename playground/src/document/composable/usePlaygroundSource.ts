@@ -1,4 +1,4 @@
-// @/playground/composable/usePlaygroundSource.ts
+// @/document/composable/usePlaygroundSource.ts
 import { ref } from 'vue';
 
 const source = ref('');

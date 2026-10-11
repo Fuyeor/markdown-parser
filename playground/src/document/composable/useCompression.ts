@@ -1,4 +1,4 @@
-// @/playground/composable/useCompression.ts
+// @/document/composable/useCompression.ts
 
 /**
  * Encode a string to a base64url-encoded compressed format.
