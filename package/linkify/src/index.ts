@@ -1,5 +1,5 @@
 // @ffm/linkify/src/index.ts
-import { ccBitmap } from './cc-tld-bitmap.js';
+import { ccBitmap, linkRegex } from './constant';
 
 export interface LinkMatch {
   url: string;
@@ -8,47 +8,40 @@ export interface LinkMatch {
   lastIndex: number;
 }
 
-// 候选扫描只负责找出域名形状，实际两字母 TLD 合法性由位图校验。
-const linkifyRegex =
-  /(https?:\/\/[^\s]+|(?<![@\w])(?:[a-zA-Z0-9\-]+\.)+(?:app|biz|com|dev|edu|gov|int|mil|net|org|pro|web|xyz|рф|xn--p1ai|[a-zA-Z]{2})(?:\/[^\s]*)?(?![\p{L}\p{N}_\-]))/giv;
-
-const PUNYCODE_RU_TLD = 'xn--p1ai';
-const PUNYCODE_RU_SUFFIX = `.${PUNYCODE_RU_TLD}`;
+const punctuation = '.,:;?!';
 
 // Check a two-letter ASCII TLD against the generated 26×26 bitmap.
 function isCcTld(text: string, start: number): boolean {
-  const firstCode = text.charCodeAt(start) | 32;
-  const secondCode = text.charCodeAt(start + 1) | 32;
-  const bitIndex = (firstCode - 97) * 26 + secondCode - 97;
+  // 正则已经确保了字符在 a-zA-Z 范围内
+  const bitIndex =
+    ((text.charCodeAt(start) | 32) - 97) * 26 +
+    ((text.charCodeAt(start + 1) | 32) - 97);
 
   return (ccBitmap[bitIndex >> 5] & (1 << (bitIndex & 31))) !== 0;
 }
 
-// Validate only fuzzy two-letter TLDs; explicit URLs and hand-written TLDs are already gated.
+// Validate only fuzzy two-letter TLDs; gTLD is already verified by regex.
 function isSupportedFuzzyUrl(urlStr: string): boolean {
   const hostEnd = urlStr.indexOf('/');
   const hostnameEnd = hostEnd === -1 ? urlStr.length : hostEnd;
   const tldStart = urlStr.lastIndexOf('.', hostnameEnd - 1) + 1;
   const tldLength = hostnameEnd - tldStart;
 
-  return (
-    tldLength !== 2 ||
-    urlStr.startsWith('рф', tldStart) ||
-    isCcTld(urlStr, tldStart)
-  );
+  return tldLength !== 2 || isCcTld(urlStr, tldStart);
 }
 
-// Normalize the supported Russian IDN suffix while preserving the original span indexes.
-function normalizeMatchText(urlStr: string): string {
-  const hostEnd = urlStr.indexOf('/');
-  const hostnameEnd = hostEnd === -1 ? urlStr.length : hostEnd;
-  const suffixStart = hostnameEnd - PUNYCODE_RU_SUFFIX.length;
-
-  if (suffixStart <= 0 || !urlStr.startsWith(PUNYCODE_RU_SUFFIX, suffixStart)) {
-    return urlStr;
+// 统计未配对的多余右括号
+function countExcessCloseParen(text: string, end: number): number {
+  let open = 0;
+  let close = 0;
+  for (let i = 0; i < end; i++) {
+    const code = text.charCodeAt(i);
+    // '('
+    if (code === 40) open++;
+    // ')'
+    else if (code === 41) close++;
   }
-
-  return `${urlStr.slice(0, suffixStart)}.рф${urlStr.slice(hostnameEnd)}`;
+  return close > open ? close - open : 0;
 }
 
 /**
@@ -58,46 +51,55 @@ function normalizeMatchText(urlStr: string): string {
  */
 export function linkify(text: string): LinkMatch[] {
   const matches: LinkMatch[] = [];
-  const punctuation = '.,:;?!';
 
-  for (const match of text.matchAll(linkifyRegex)) {
+  linkRegex.lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = linkRegex.exec(text)) !== null) {
     let urlStr = match[0];
-    const matchIdx = match.index!;
+    const matchIdx = match.index;
     const isExplicitUrl =
       urlStr.startsWith('http://') || urlStr.startsWith('https://');
 
-    // Skip unsupported fuzzy TLDs while keeping explicit URLs permissive.
+    let end = urlStr.length;
+
+    // 只有当末尾确实含有右括号时，才单趟扫描括号平衡度
+    let excessParen =
+      urlStr[end - 1] === ')' ? countExcessCloseParen(urlStr, end) : 0;
+
+    // 快慢路徑分離：
+    while (end > 0) {
+      const lastChar = urlStr[end - 1];
+
+      // 常見標點快篩
+      if (punctuation.includes(lastChar)) {
+        end--;
+        continue;
+      }
+
+      // 只有末尾真的是 ) 時，才按需計算失衡右括號
+      if (lastChar === ')' && excessParen > 0) {
+        excessParen--;
+        end--;
+        continue;
+      }
+
+      break;
+    }
+
+    // 只有发生裁剪时才分配新字符串
+    if (end < urlStr.length) {
+      urlStr = urlStr.slice(0, end);
+    }
+
+    // 修剪完成后再校验域名
     if (!isExplicitUrl && !isSupportedFuzzyUrl(urlStr)) continue;
 
-    // 剔除末尾标点
-    while (
-      urlStr.length > 0 &&
-      punctuation.includes(urlStr[urlStr.length - 1])
-    ) {
-      urlStr = urlStr.slice(0, -1);
-    }
-
-    // 括号平衡处理：如果末尾是 ) 且闭括号多于开括号，则剔除
-    if (urlStr.endsWith(')')) {
-      let openCount = 0;
-      let closeCount = 0;
-      for (let i = 0; i < urlStr.length; i++) {
-        if (urlStr[i] === '(') openCount++;
-        else if (urlStr[i] === ')') closeCount++;
-      }
-      if (closeCount > openCount) {
-        urlStr = urlStr.slice(0, -1);
-      }
-    }
-
-    const normalizedUrlStr = normalizeMatchText(urlStr);
-    const fullUrl = isExplicitUrl
-      ? normalizedUrlStr
-      : `https://${normalizedUrlStr}`;
+    const fullUrl = isExplicitUrl ? urlStr : `https://${urlStr}`;
 
     matches.push({
       url: fullUrl,
-      text: normalizedUrlStr,
+      text: urlStr,
       index: matchIdx,
       lastIndex: matchIdx + urlStr.length,
     });

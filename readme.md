@@ -48,6 +48,12 @@ const resultHtml = render(ast);
 
 ## 🚧 Development
 
+### Build Linkify Bitmap:
+
+```bash
+pnpm --filter @ffm/linkify build:tld
+```
+
 ### Run Tests:
 
 ```bash
@@ -74,4 +80,7 @@ pnpm -F @ffm/benchmark bench:speed
 
 # test memory usage
 pnpm -F @ffm/benchmark bench:memory
+
+# test linkify speed
+pnpm -F @ffm/benchmark bench:linkify
 ```

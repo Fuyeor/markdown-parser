@@ -20,7 +20,7 @@ type FixtureFailure = {
 type FixtureChecks = {
   total: number;
   passed: number;
-  failures: FixtureFailure[];
+  failure: FixtureFailure[];
 };
 
 type FixtureReport = {
@@ -77,24 +77,24 @@ function evaluatePositiveFixtures(
   fixture: PositiveFixture[],
   matcher: (text: string) => string[],
 ): FixtureChecks {
-  const failures: FixtureFailure[] = [];
+  const failure: FixtureFailure[] = [];
   let passed = 0;
 
-  for (const fixture of fixture) {
-    const actual = matcher(fixture.text);
-    if (actual.includes(fixture.expected)) {
+  for (const item of fixture) {
+    const actual = matcher(item.text);
+    if (actual.includes(item.expected)) {
       passed++;
     } else {
-      failures.push({
-        line: fixture.line,
-        text: fixture.text,
-        expected: fixture.expected,
+      failure.push({
+        line: item.line,
+        text: item.text,
+        expected: item.expected,
         actual,
       });
     }
   }
 
-  return { total: fixture.length, passed, failures };
+  return { total: failure.length, passed, failure };
 }
 
 // Check one implementation against the official negative fixture.
@@ -102,7 +102,7 @@ function evaluateNegativeFixtures(
   source: string,
   matcher: (text: string) => string[],
 ): FixtureChecks {
-  const failures: FixtureFailure[] = [];
+  const failure: FixtureFailure[] = [];
   let total = 0;
   let passed = 0;
 
@@ -114,11 +114,11 @@ function evaluateNegativeFixtures(
     if (actual.length === 0) {
       passed++;
     } else {
-      failures.push({ line: index + 1, text, actual });
+      failure.push({ line: index + 1, text, actual });
     }
   }
 
-  return { total, passed, failures };
+  return { total, passed, failure };
 }
 
 // Evaluate both official fixture files without requiring behavioral parity.
@@ -139,13 +139,13 @@ function summarizeReport(report: FixtureReport) {
       total: report.positive.total,
       passed: report.positive.passed,
       failed: report.positive.total - report.positive.passed,
-      examples: report.positive.failures.slice(0, 8),
+      examples: report.positive.failure.slice(0, 8),
     },
     negative: {
       total: report.negative.total,
       passed: report.negative.passed,
       failed: report.negative.total - report.negative.passed,
-      examples: report.negative.failures.slice(0, 8),
+      examples: report.negative.failure.slice(0, 8),
     },
   };
 }

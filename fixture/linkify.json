@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "description": "Language-neutral linkify fixtures with visible text and normalized URLs.",
-  "cases": [
+  "case": [
     {
       "input": "Visit fuyeor.com.",
-      "links": [
+      "link": [
         {
           "text": "fuyeor.com",
           "url": "https://fuyeor.com"
@@ -13,7 +13,7 @@
     },
     {
       "input": "Visit fuyeor.com",
-      "links": [
+      "link": [
         {
           "text": "fuyeor.com",
           "url": "https://fuyeor.com"
@@ -22,7 +22,7 @@
     },
     {
       "input": "Visit fuyeor.com;",
-      "links": [
+      "link": [
         {
           "text": "fuyeor.com",
           "url": "https://fuyeor.com"
@@ -31,7 +31,7 @@
     },
     {
       "input": "(fuyeor.com)",
-      "links": [
+      "link": [
         {
           "text": "fuyeor.com",
           "url": "https://fuyeor.com"
@@ -40,7 +40,7 @@
     },
     {
       "input": "Visit fuyeor.cn.",
-      "links": [
+      "link": [
         {
           "text": "fuyeor.cn",
           "url": "https://fuyeor.cn"
@@ -49,7 +49,7 @@
     },
     {
       "input": "Visit fuyeor.co.uk.",
-      "links": [
+      "link": [
         {
           "text": "fuyeor.co.uk",
           "url": "https://fuyeor.co.uk"
@@ -58,7 +58,7 @@
     },
     {
       "input": "Visit web.dev.",
-      "links": [
+      "link": [
         {
           "text": "web.dev",
           "url": "https://web.dev"
@@ -67,7 +67,7 @@
     },
     {
       "input": "Visit vercel.app",
-      "links": [
+      "link": [
         {
           "text": "vercel.app",
           "url": "https://vercel.app"
@@ -75,26 +75,8 @@
       ]
     },
     {
-      "input": "Visit fuyeor.рф.",
-      "links": [
-        {
-          "text": "fuyeor.рф",
-          "url": "https://fuyeor.рф"
-        }
-      ]
-    },
-    {
-      "input": "Visit fuyeor.xn--p1ai.",
-      "links": [
-        {
-          "text": "fuyeor.рф",
-          "url": "https://fuyeor.рф"
-        }
-      ]
-    },
-    {
       "input": "Profile: https://fuyeor.com/@Fuyeor",
-      "links": [
+      "link": [
         {
           "text": "https://fuyeor.com/@Fuyeor",
           "url": "https://fuyeor.com/@Fuyeor"
@@ -103,7 +85,7 @@
     },
     {
       "input": "A link with parens: https://en.wikipedia.org/wiki/Link_(disambiguation)",
-      "links": [
+      "link": [
         {
           "text": "https://en.wikipedia.org/wiki/Link_(disambiguation)",
           "url": "https://en.wikipedia.org/wiki/Link_(disambiguation)"
@@ -112,35 +94,35 @@
     },
     {
       "input": "Visit fuyeor.123",
-      "links": []
+      "link": []
     },
     {
       "input": "Visit fuyeor.enterprise",
-      "links": []
+      "link": []
     },
     {
       "input": "Visit fuyeor.md",
-      "links": []
+      "link": []
     },
     {
       "input": "Visit fuyeor..com",
-      "links": []
+      "link": []
     },
     {
       "input": "Visit fuyeor,com",
-      "links": []
+      "link": []
     },
     {
       "input": "Visit fuyeor.com123",
-      "links": []
+      "link": []
     },
     {
       "input": "Visit fuyeor.comあ",
-      "links": []
+      "link": []
     },
     {
       "input": "fuyeor.com💜",
-      "links": [
+      "link": [
         {
           "text": "fuyeor.com",
           "url": "https://fuyeor.com"

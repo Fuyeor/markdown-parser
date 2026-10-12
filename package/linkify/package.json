@@ -1,14 +1,20 @@
 {
   "name": "@ffm/linkify",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "license": "MIT",
   "description": "High performance and minimal size linkifier",
+  "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "sideEffects": false,
   "scripts": {
-    "build": "node --experimental-strip-types build/generate-tlds.ts && tsc",
-    "generate:tlds": "node --experimental-strip-types build/generate-tlds.ts",
+    "build:tld": "node --experimental-strip-types src/build.ts",
     "test": "vitest run"
+  },
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
