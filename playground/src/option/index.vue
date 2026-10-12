@@ -8,10 +8,10 @@
     :model-value="true"
     @update:model-value="handleClose"
   >
-    <div :class="$style['option-hub-layout']">
+    <div class="option-hub-layout">
       <option-menu :menu="dashboardMenu" />
 
-      <div :class="$style['option-content']">
+      <div class="option-content">
         <RouterView />
       </div>
     </div>
@@ -19,7 +19,7 @@
 
   <!-- 移动端逻辑 -->
   <AsyncSheet v-else :model-value="true" @update:model-value="handleClose">
-    <div :class="$style['mobile-option-container']">
+    <div class="mobile-option-container">
       <!-- 移动端交互：首页显示菜单，点击后显示子页面内容 -->
       <option-menu v-if="isRootOptions" :menu="dashboardMenu" />
       <RouterView v-else />
@@ -30,17 +30,17 @@
 <script setup lang="ts">
 import OptionMenu from '@/option/component/menu.vue';
 
-import { computed, defineAsyncComponent } from 'vue';
+import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute, RouterView } from '@fuyeor/vue-router';
-import { useLocale } from '@fuyeor/locale';
 import { Modal, useMobileDetection } from '@fuyeor/interactify';
 import { dashboardMenu } from '@/option/dashboard-menu';
 
 const router = useRouter();
 const route = useRoute();
 
-const { t } = useLocale();
 const { isMobile } = useMobileDetection();
+
+const sheetOpen = ref(true);
 
 const AsyncSheet = defineAsyncComponent(() =>
   import('@fuyeor/interactify').then((m) => m.SheetMenu),
@@ -48,12 +48,19 @@ const AsyncSheet = defineAsyncComponent(() =>
 
 const isRootOptions = computed(() => route.name === 'Option');
 
-const handleClose = () => {
-  router.back();
+const handleClose = (open: boolean) => {
+  sheetOpen.value = open;
+  if (open) return;
+
+  if (window.navigation.canGoBack) {
+    router.back();
+  } else {
+    sheetOpen.value = false;
+  }
 };
 </script>
 
-<style module>
+<style scoped>
 /* 桌面端布局 */
 .option-hub-layout {
   display: flex;
@@ -61,6 +68,11 @@ const handleClose = () => {
   height: 100%; /* 填满大 Modal */
   width: 100%;
   overflow: hidden; /* 确保这一层绝对不产生多余滚动条 */
+
+  @media (width <= 900px) {
+    padding: 0;
+    scrollbar-width: none;
+  }
 }
 
 .option-content {
@@ -75,6 +87,7 @@ const handleClose = () => {
   min-height: 40vh;
   padding: 1rem 1rem 3rem;
   overflow-y: auto; /* 允许在抽屉内部滚动设置项 */
+  border-radius: var(--radius-lg);
 
   @media (width <= 900px) {
     padding: 0;

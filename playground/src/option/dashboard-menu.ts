@@ -3,7 +3,6 @@ import { getIconUrl } from '@fuyeor/commons';
 
 export const dashboardMenu = {
   title: '',
-  description: 'option.desc',
   groups: [
     {
       title: '',

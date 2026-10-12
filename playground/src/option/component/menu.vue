@@ -14,12 +14,10 @@
 
       <!-- 遍历组内的菜单项 -->
       <template v-for="item in group.items" :key="item.to">
-        <!-- 优化：使用 isItemVisible 函数进行判断，保持模板干净 -->
         <OptionMenuItem
-          v-if="isItemVisible(item)"
           :icon="item.icon"
           :title="t(item.title)"
-          :description="t(item.description)"
+          :description="item.description ? t(item.description) : undefined"
           :to="item.to"
         />
       </template>
@@ -31,7 +29,7 @@
 import OptionMenuItem from '@/option/component/item.vue';
 
 import { useLocale } from '@fuyeor/locale';
-import type { OptionMenu, MenuItem } from '@/option/type';
+import type { OptionMenu } from '@/option/type';
 
 // 接收菜单配置对象
 defineProps<{
@@ -39,12 +37,6 @@ defineProps<{
 }>();
 
 const { t } = useLocale();
-
-// 权限判断逻辑函数
-const isItemVisible = (item: MenuItem): boolean => {
-  // 其他所有情况都不可见
-  return true;
-};
 </script>
 
 <style module>
@@ -52,11 +44,18 @@ const isItemVisible = (item: MenuItem): boolean => {
   position: sticky;
   top: 0;
   width: 280px;
+  padding: 20px 0;
   height: 100%;
   border-right: var(--border-subtle);
 
   .menu-description {
     padding: 0.5rem 1rem;
+  }
+
+  @media (width <= 900px) {
+    width: 100%;
+    border: none;
+    padding: 0;
   }
 }
 </style>

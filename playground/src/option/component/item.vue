@@ -1,12 +1,19 @@
 <!-- @/option/component/item.vue -->
 <template>
-  <router-link :to="to" :class="$style['settings-item']" active-class="is-active" v-ripple>
+  <router-link
+    :to="to"
+    :class="$style['settings-item']"
+    active-class="is-active"
+    v-ripple
+  >
     <!-- 左侧区域：icon + content -->
     <div :class="$style['item-left']">
       <img v-if="icon" :class="$style['item-icon']" :src="icon" />
       <div :class="$style['item-content']">
         <span :class="$style['item-title']">{{ title }}</span>
-        <span :class="$style['item-description']">{{ description }}</span>
+        <span v-if="description" :class="$style['item-description']">{{
+          description
+        }}</span>
       </div>
     </div>
 
@@ -34,7 +41,7 @@ import type { RouteLocationRaw } from '@fuyeor/vue-router';
 defineProps<{
   icon?: string;
   title: string;
-  description: string;
+  description?: string;
   to: RouteLocationRaw;
 }>();
 </script>

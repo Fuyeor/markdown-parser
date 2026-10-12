@@ -7,7 +7,7 @@
         v-model="query"
         class="field"
         type="text"
-        :placeholder="t('editor.replacer.placeholder')"
+        :placeholder="t('editor.replacer.from')"
         @keydown.enter.prevent="onEnter"
         @keydown.escape.prevent="emit('close')"
       />
@@ -26,7 +26,7 @@
         v-model="replacement"
         class="field"
         type="text"
-        :placeholder="t('editor.replacer.replace')"
+        :placeholder="t('editor.replacer.to')"
       />
       <button type="button" :disabled="!total" @click="onReplaceOne">
         {{ t('editor.replacer.replaceOne') }}

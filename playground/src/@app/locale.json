@@ -395,6 +395,18 @@
     "ru": "Пользовательский словарь замены",
     "zh-hans": "自定义替换词表"
   },
+  "editor.format.groupAutoCase": {
+    "ar": "تكوين حالة الأحرف",
+    "de": "Groß-/Kleinschreibungskonfiguration",
+    "en": "Case Configuration",
+    "es": "Configuración de mayúsculas y minúsculas",
+    "fr": "Configuration de la casse",
+    "ja": "大文字/小文字の構成",
+    "ko": "대소문자 구성",
+    "pt": "Configuração de maiúsculas e minúsculas",
+    "ru": "Настройка регистра",
+    "zh-hans": "大小写配置"
+  },
   "editor.format.heading": {
     "ar": "تنسيق العناوين",
     "de": "Überschriftenformatierung",
@@ -599,7 +611,7 @@
     "ru": "Учитывать регистр",
     "zh-hans": "严格大小写"
   },
-  "editor.replacer.placeholder": {
+  "editor.replacer.from": {
     "ar": "بحث...",
     "de": "Suchen...",
     "en": "Search...",
@@ -613,27 +625,15 @@
   },
   "editor.replacer.regex": {
     "ar": "تعبير نمطي",
-    "de": "Regulärer Ausdruck",
-    "en": "Regular expression",
-    "es": "Expresión regular",
-    "fr": "Expression régulière",
+    "de": "RegExp",
+    "en": "RegExp",
+    "es": "RegExp",
+    "fr": "RegExp",
     "ja": "正規表現",
     "ko": "정규 표현식",
-    "pt": "Expressão regular",
-    "ru": "Регулярное выражение",
-    "zh-hans": "正则"
-  },
-  "editor.replacer.replace": {
-    "ar": "استبدال بـ...",
-    "de": "Ersetzen durch...",
-    "en": "Replace with...",
-    "es": "Reemplazar con...",
-    "fr": "Remplacer par...",
-    "ja": "置換...",
-    "ko": "바꾸기...",
-    "pt": "Substituir por...",
-    "ru": "Заменить на...",
-    "zh-hans": "替换为..."
+    "pt": "RegExp",
+    "ru": "RegExp",
+    "zh-hans": "正则匹配"
   },
   "editor.replacer.replaceAll": {
     "ar": "استبدال الكل",
@@ -658,6 +658,18 @@
     "pt": "Substituir",
     "ru": "Заменить",
     "zh-hans": "替换"
+  },
+  "editor.replacer.to": {
+    "ar": "استبدال بـ...",
+    "de": "Ersetzen durch...",
+    "en": "Replace with...",
+    "es": "Reemplazar con...",
+    "fr": "Remplacer par...",
+    "ja": "置換...",
+    "ko": "바꾸기...",
+    "pt": "Substituir por...",
+    "ru": "Заменить на...",
+    "zh-hans": "替换为..."
   },
   "editor.replacer.wholeWord": {
     "ar": "مطابقة الكلمة بالكامل",
@@ -1342,18 +1354,6 @@
     "pt": "tem seu ",
     "ru": "имеет своё ",
     "zh-hans": "都有它的"
-  },
-  "option.desc": {
-    "ar": "مركز الإعدادات",
-    "de": "Einstellungszentrum",
-    "en": "Settings Center",
-    "es": "Centro de configuración",
-    "fr": "Centre des paramètres",
-    "ja": "設定センター",
-    "ko": "설정 센터",
-    "pt": "Central de configurações",
-    "ru": "Центр настроек",
-    "zh-hans": "设置中心"
   },
   "option.editor": {
     "ar": "إعدادات المحرر",

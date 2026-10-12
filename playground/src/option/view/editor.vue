@@ -47,9 +47,12 @@
             :key="index"
             class="option-row"
           >
-            <input v-model="item.from" :placeholder="t('editor.format.from')" />
+            <input
+              v-model="item.from"
+              :placeholder="t('editor.replacer.from')"
+            />
             <span class="arrow">→</span>
-            <input v-model="item.to" :placeholder="t('editor.format.to')" />
+            <input v-model="item.to" :placeholder="t('editor.replacer.to')" />
             <button
               type="button"
               class="remove-btn"
@@ -74,13 +77,10 @@
           >
             <input
               v-model="rule.from"
-              :placeholder="t('editor.format.pattern')"
+              :placeholder="t('editor.replacer.from')"
             />
             <span class="arrow">→</span>
-            <input
-              v-model="rule.to"
-              :placeholder="t('editor.format.replacement')"
-            />
+            <input v-model="rule.to" :placeholder="t('editor.replacer.to')" />
             <label class="regex">
               <input v-model="rule.regex" type="checkbox" />
               RegExp

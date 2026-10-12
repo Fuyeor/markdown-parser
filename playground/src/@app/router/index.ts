@@ -33,12 +33,6 @@ const appRoutes: Array<RouteRecord> = [
     // flavored.fuyeor.com/option
     path: 'option',
     name: 'Option',
-    redirect: (to) => ({
-      name: 'Option.General',
-      // keep all includes locale
-      params: to.params,
-      replace: true,
-    }),
     component: () => import('@/option/index.vue'),
     meta: {
       isModal: true,

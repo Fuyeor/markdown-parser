@@ -43,7 +43,9 @@ import { usePlaygroundSource } from './composable/usePlaygroundSource';
 import { useIndexedDb, type HistoryDocument } from './composable/useIndexedDb';
 import { countDocumentStats } from './composable/useDocumentStats';
 
-defineProps<{ mode: 'rich' | 'code' }>();
+const { mode = 'code' } = defineProps<{
+  mode: 'rich' | 'code';
+}>();
 
 const route = useRoute();
 const router = useRouter();
