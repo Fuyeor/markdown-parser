@@ -1,5 +1,5 @@
 // @ffm/editor/src/parse/bridge.ts
-import { createFuyeorMarkdownParser } from '@ffm/parser';
+import { createMarkdownParser } from '@ffm/parser';
 import type { ASTNode } from '@ffm/parser';
 import { nextBlockId } from '#/state/id';
 import type {
@@ -11,7 +11,7 @@ import type {
   FormatType,
 } from '#/state/document';
 
-const parse = createFuyeorMarkdownParser();
+const parse = createMarkdownParser();
 
 type BlockContext = {
   listDepth: number;
@@ -273,7 +273,7 @@ function formatTypeFor(nodeType: string): FormatType | undefined {
       return 'strike';
     case 'link':
       return 'link';
-    case 'inline_code':
+    case 'code_inline':
       return 'code';
     case 'math_inline':
       return 'code';

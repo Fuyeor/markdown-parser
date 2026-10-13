@@ -81,7 +81,7 @@ export const italicRule: InlineRule = {
  * parse `inlineCode` syntax
  */
 export const inlineCodeRule: InlineRule = {
-  name: 'inline_code',
+  name: 'code_inline',
   marker: ['`'],
   parse(state: InlineState) {
     if (state.currentChar !== '`') return null;
@@ -131,7 +131,7 @@ export const inlineCodeRule: InlineRule = {
 
     return {
       node: {
-        type: isColor ? 'color_code' : 'inline_code',
+        type: isColor ? 'color_code' : 'code_inline',
         value: rawContent,
       },
       consumedChars: endIdx + markerLength - state.pos,

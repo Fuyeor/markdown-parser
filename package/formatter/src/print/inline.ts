@@ -50,7 +50,7 @@ export function printInlineNode(
     return `--${printInlineNodes(node.content, option, context)}--`;
   }
 
-  if (type === 'code_inline' || type === 'inline_code') {
+  if (type === 'code_inline' || type === 'code_inline') {
     const value = node.value ?? '';
     const fence = '`'.repeat(Math.max(1, longestBacktickRun(value) + 1));
     return `${fence}${value}${fence}`;

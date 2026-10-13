@@ -1,6 +1,7 @@
 // @ffm/parser/src/core/parser.ts
 import { linkify } from '@ffm/linkify';
 import { BlockState, InlineState } from './state';
+import { isSafeLinkUrl } from '#/core/url';
 import type {
   ASTNode,
   ASTTransform,
@@ -10,33 +11,35 @@ import type {
   MarkdownPlugin,
   MarkdownParserOption,
   ParserContext,
+  AsyncCapability,
 } from '#/type';
-import { isSafeLinkUrl } from '#/core/url';
 
-const LINKIFY_CANDIDATE_REGEX = /(?:https?:\/\/|[A-Za-z0-9-]+\.)/u;
+const linkRegex = /(?:https?:\/\/|[A-Za-z0-9-]+\.)/u;
 
 /** Skip linkify scans for text without a possible URL candidate. */
 function linkifyWithCandidateCheck(text: string): ReturnType<typeof linkify> {
-  if (!LINKIFY_CANDIDATE_REGEX.test(text)) return [];
+  if (!linkRegex.test(text)) return [];
   return linkify(text);
 }
 
 export class MarkdownParser {
-  #blockRuleMap = new Map<string, BlockRule[]>();
-  #inlineRuleMap = new Map<string, InlineRule[]>();
-  #astTransforms: ASTTransform[] = [];
-  #idSequence = 0;
-  #isPreflight = false;
   readonly #maxNestingDepth: number;
   readonly #linkifier: Linkifier;
 
-  constructor(options: MarkdownParserOption = {}) {
-    const maxNestingDepth = options.maxNestingDepth ?? 64;
+  #astTransforms: ASTTransform[] = [];
+  #idSequence = 0;
+  #isPreflight = false;
+  #blockRuleMap = new Map<string, BlockRule[]>();
+  #inlineRuleMap = new Map<string, InlineRule[]>();
+  #capability = new Set<AsyncCapability>();
+
+  constructor(option: MarkdownParserOption = {}) {
+    const maxNestingDepth = option.maxNestingDepth ?? 64;
     if (!Number.isInteger(maxNestingDepth) || maxNestingDepth < 1)
       throw new RangeError('maxNestingDepth must be a positive integer');
 
     this.#maxNestingDepth = maxNestingDepth;
-    this.#linkifier = options.linkifier ?? linkifyWithCandidateCheck;
+    this.#linkifier = option.linkifier ?? linkifyWithCandidateCheck;
   }
 
   // construct a context for recursive rule calls
@@ -79,14 +82,25 @@ export class MarkdownParser {
     return this;
   }
 
-  use(plugin: MarkdownPlugin): this {
-    plugin(this);
+  // Declare an external capability consumed by this parser's HTML output.
+  requireCapability(capability: AsyncCapability): this {
+    this.#capability.add(capability);
     return this;
+  }
+
+  // Expose declared capabilities so hosts can drive preload / hydration.
+  getRequiredCapability(): ReadonlySet<AsyncCapability> {
+    return this.#capability;
   }
 
   // Register a post-parse AST transform for extensions such as Twemoji.
   addAstTransform(transform: ASTTransform): this {
     this.#astTransforms.push(transform);
+    return this;
+  }
+
+  use(plugin: MarkdownPlugin): this {
+    plugin(this);
     return this;
   }
 

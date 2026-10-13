@@ -1,38 +1,87 @@
 // @ffm/vue-renderer/src/render.ts
-import { h, type VNode } from 'vue';
+import { Fragment, h, type VNode } from 'vue';
 import { isSafeColorValue, isSafeLinkUrl, type ASTNode } from '@ffm/parser';
 
-export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
-  return nodes.map((node) => {
+// 渲染子节点；缺省时返回空数组
+const content = (node: ASTNode): (VNode | string)[] =>
+  renderToVue(node.content ?? []);
+
+// 读取纯文本值；缺省时返回空串
+const raw = (node: ASTNode): string =>
+  typeof node.value === 'string' ? node.value : '';
+
+// 未知或降级节点的统一出口
+const passthrough = (node: ASTNode): VNode => h('span', content(node));
+
+// 表格单元格对齐：与 HTML renderer 的 align 属性保持一致
+const alignAttr = (cell: ASTNode): Record<string, unknown> => {
+  const align = cell.align;
+  return align === 'left' || align === 'center' || align === 'right'
+    ? { align }
+    : {};
+};
+
+const renderTableHead = (cells?: ASTNode[]) =>
+  cells?.length
+    ? h(
+        'tr',
+        null,
+        cells.map((cell) => renderTableCell('th', cell)),
+      )
+    : null;
+
+const renderTableRow = (rows?: ASTNode[]) =>
+  rows?.length
+    ? h(
+        'tbody',
+        null,
+        rows.map((row) =>
+          h(
+            'tr',
+            null,
+            (row.content ?? []).map((cell) => renderTableCell('td', cell)),
+          ),
+        ),
+      )
+    : null;
+
+const renderTableCell = (tag: 'th' | 'td', cell: ASTNode): VNode =>
+  h(tag, alignAttr(cell), content(cell));
+
+export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
+  return nodeArray.map((node) => {
     switch (node.type) {
-      case 'heading': {
-        const level =
-          typeof node.level === 'number' &&
-          Number.isInteger(node.level) &&
-          node.level >= 1 &&
-          node.level <= 6
-            ? node.level
-            : null;
-        return level === null
-          ? h('span', renderToVue(node.content || []))
-          : h(`h${level}`, renderToVue(node.content || []));
-      }
+      // Common Flavored Markdown
+      case 'heading':
+        return h(`h${node.level ?? 1}`, content(node));
       case 'paragraph':
-        return h('p', renderToVue(node.content || []));
+        return h('p', content(node));
       case 'text':
-        return node.value || ''; // Vue 天然防 XSS，直接返回字符串
+        return raw(node);
       case 'bold':
-        return h('strong', renderToVue(node.content || []));
+        return h('strong', content(node));
       case 'italic':
-        return h('em', renderToVue(node.content || []));
+        return h('em', content(node));
       case 'underline':
-        return h('u', renderToVue(node.content || []));
+        return h('u', content(node));
       case 'strike':
-        return h('del', renderToVue(node.content || []));
-      case 'inline_code':
-        return h('code', node.value || '');
+        return h('del', content(node));
+      case 'link': {
+        const url = raw(node).trim();
+        return isSafeLinkUrl(url)
+          ? h('a', { href: url }, content(node))
+          : passthrough(node);
+      }
+      case 'hr':
+        return h('hr');
+      case 'hardbreak':
+        return h('br');
+
+      case 'blockquote':
+        return h('blockquote', content(node));
+
       case 'color_code': {
-        const color = String(node.value ?? '');
+        const color = raw(node);
         if (!isSafeColorValue(color)) return color;
         return h('code', { class: 'ffm-color-code' }, [
           h('span', {
@@ -51,95 +100,54 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
           color,
         ]);
       }
-      case 'link': {
-        const url = String(node.url ?? '').trim();
-        return isSafeLinkUrl(url)
-          ? h(
-              'a',
-              { href: url, target: '_blank', rel: 'noopener noreferrer' },
-              renderToVue(node.content || []),
-            )
-          : h('span', renderToVue(node.content || []));
-      }
-      case 'code_block':
+      case 'code_inline':
+        return h('code', raw(node));
+      case 'code_block': {
+        const language = node.lang;
+        const code = raw(node);
         return h('div', { class: 'code-block-wrapper' }, [
-          node.lang ? h('div', { class: 'code-lang' }, node.lang) : null,
+          language ? h('div', { class: 'code-lang' }, language) : null,
           h(
             'pre',
-            null,
+            language
+              ? { 'data-language': language, 'data-async': 'hljs' }
+              : null,
             h(
               'code',
-              { class: node.lang ? `language-${node.lang}` : '' },
-              node.value || '',
+              { class: language ? `language-${language}` : 'hljs' },
+              code,
             ),
           ),
         ]);
+      }
+
       case 'list':
         return h(
           node.ordered ? 'ol' : 'ul',
-          node.ordered && node.start && node.start !== 1
-            ? { start: node.start }
-            : {},
-          renderToVue(node.content || []),
+          (node.start ?? 1) !== 1 ? { start: node.start } : null,
+          content(node),
         );
       case 'list_item':
-        return h('li', renderToVue(node.content || []));
+        return h('li', content(node));
+
       case 'table':
         return h('table', null, [
-          h(
-            'thead',
-            null,
-            h(
-              'tr',
-              null,
-              (node.header ?? []).map((cell) =>
-                h('th', renderToVue(cell.content || [])),
-              ),
-            ),
-          ),
-          node.content && node.content.length > 0
-            ? h(
-                'tbody',
-                null,
-                node.content.map((row) =>
-                  h(
-                    'tr',
-                    null,
-                    (row.content ?? []).map((cell) =>
-                      h('td', renderToVue(cell.content || [])),
-                    ),
-                  ),
-                ),
-              )
-            : null,
+          // @ts-ignore
+          node.header ? h('thead', null, renderTableHead(node.header)) : null,
+          renderTableRow(node.content),
         ]);
-      case 'hr':
-        return h('hr');
-      case 'blockquote':
-        return h('blockquote', renderToVue(node.content || []));
-      case 'hardbreak':
-        return h('br');
+
+      // Fuyeor Flavored Markdown
       case 'accordion':
-        return h(
-          'div',
-          { class: 'ffm-accordion' },
-          renderToVue(node.content || []),
-        );
+        return h('div', { class: 'ffm-accordion' }, content(node));
       case 'accordion_item':
         return h('details', { name: node.name }, [
-          h('summary', renderToVue(node.title || [])),
-          h(
-            'div',
-            { class: 'accordion-content' },
-            renderToVue(node.content || []),
-          ),
+          h('summary', renderToVue(node.title ?? [])),
+          h('div', { class: 'accordion-content' }, content(node)),
         ]);
+
       case 'chain':
-        return h(
-          'div',
-          { class: 'chain-container' },
-          renderToVue(node.content || []),
-        );
+        return h('div', { class: 'chain-container' }, content(node));
       case 'chain_item': {
         const statusClass = node.hasCheckbox
           ? node.isCompleted
@@ -152,26 +160,78 @@ export function renderToVue(nodes: ASTNode[]): (VNode | string)[] {
             node.title && node.title.length > 0
               ? h('div', { class: 'chain-title' }, renderToVue(node.title))
               : null,
-            h('div', { class: 'chain-body' }, renderToVue(node.content || [])),
+            h('div', { class: 'chain-body' }, content(node)),
           ]),
         ]);
       }
+
       case 'slide':
         return h('div', { class: 'slide-container-wrapper' }, [
-          h(
-            'div',
-            { class: 'slide-container' },
-            renderToVue(node.content || []),
-          ),
+          h('div', { class: 'slide-container' }, content(node)),
         ]);
       case 'slide_item':
+        return h('div', { class: 'slide-item' }, content(node));
+
+      // 异步节点：属性与 HTML renderer 输出完全对齐，供 hydrate() 扫描
+      case 'emoji':
+        return h('img', {
+          class: 'emoji',
+          draggable: 'false',
+          alt: String(node.alt ?? node.value ?? ''),
+          src: String(node.src ?? ''),
+        });
+
+      case 'math_inline':
+        return h(
+          'span',
+          { class: 'math-inline', 'data-async': 'latex' },
+          raw(node),
+        );
+      case 'math_block':
         return h(
           'div',
-          { class: 'slide-item' },
-          renderToVue(node.content || []),
+          { class: 'math-block', 'data-async': 'latex' },
+          raw(node),
         );
+
+      case 'mermaid':
+        return h(
+          'div',
+          { class: 'language-mermaid', 'data-async': 'mermaid' },
+          raw(node),
+        );
+
+      case 'smiles_inline':
+        return h('span', {
+          class: 'language-smiles smiles-inline',
+          'data-async': 'smiles',
+          'data-smiles': raw(node),
+        });
+      case 'smiles_block':
+        return h(
+          Fragment,
+          null,
+          raw(node)
+            .split('\n')
+            .filter((line) => line.trim().length > 0)
+            .map((line) =>
+              h('div', {
+                class: 'language-smiles smiles-block',
+                'data-async': 'smiles',
+                'data-smiles': line.trim(),
+              }),
+            ),
+        );
+
+      case 'abc':
+        return h(
+          'div',
+          { class: 'language-abc', 'data-async': 'abc' },
+          raw(node),
+        );
+
       default:
-        return h('span', renderToVue(node.content || []));
+        return passthrough(node);
     }
   });
 }

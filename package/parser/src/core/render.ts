@@ -1,19 +1,24 @@
 // @ffm/parser/src/core/render.ts
-import type { ASTNode } from '#/type';
 import { isSafeColorValue } from '#/core/color';
 import { isSafeLinkUrl } from '#/core/url';
+import type {
+  ASTNode,
+  NodeRenderer,
+  RenderContext,
+  RenderOption,
+} from '#/type';
 
-const escapeHtml = (str: string) =>
-  str.replace(
+export const escapeHtml = (value: string): string =>
+  value.replace(
     /[&<>"']/g,
-    (m) =>
+    (char) =>
       ({
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
         "'": '&#39;',
-      })[m]!,
+      })[char]!,
   );
 
 // Keep dynamic HTML tag names and CSS values within their supported grammar.
@@ -26,51 +31,46 @@ const getHeadingLevel = (level: unknown) =>
     : null;
 
 // Keep table alignment attributes within the supported HTML grammar.
-const getTableAlignment = (align: unknown) =>
+const getTableAlign = (align: unknown) =>
   align === 'left' || align === 'center' || align === 'right'
     ? ` align="${align}"`
     : '';
 
-const displayLanguageNames: Record<string, string> = {
-  javascript: 'JavaScript',
-  typescript: 'TypeScript',
-  cpp: 'C++',
-  csharp: 'C#',
-  xml: 'XML',
-  json: 'JSON',
-  yaml: 'YAML',
-  ffm: 'Fuyeor Flavored Markdown',
-  fon: 'FON',
-  fer: 'Fer',
-};
+// Render AST into HTML; custom renderers override built-in branches per node type.
+export function render(nodeArray?: ASTNode[], option?: RenderOption): string {
+  return renderNodes(nodeArray, option?.nodeRenderer);
+}
 
-// Render a stable fenced-code contract for asynchronous highlight.js processing.
-const getCodeLanguage = (lang: unknown): string => {
-  if (typeof lang !== 'string') return '';
-  return lang.trim().split(/\s+/u)[0] ?? '';
-};
+function renderNodes(
+  nodeArray: ASTNode[] | undefined,
+  custom: Record<string, NodeRenderer> | undefined,
+): string {
+  if (!nodeArray || nodeArray.length === 0) return '';
 
-const getDisplayLanguageName = (language: string): string =>
-  displayLanguageNames[language] ??
-  (language ? language.charAt(0).toUpperCase() + language.slice(1) : 'Text');
+  const ctx: RenderContext = {
+    escapeHtml,
+    render: (children) => renderNodes(children, custom),
+  };
 
-export function render(nodes?: ASTNode[]): string {
   let html = '';
+  for (const node of nodeArray) {
+    const renderer = custom?.[node.type];
+    if (renderer) {
+      html += renderer(node, ctx);
+      continue;
+    }
 
-  if (!nodes || nodes.length === 0) return '';
-
-  for (const node of nodes) {
     switch (node.type) {
       case 'heading': {
         const level = getHeadingLevel(node.level);
         html +=
           level === null
-            ? `<span>${render(node.content)}</span>`
-            : `<h${level}>${render(node.content)}</h${level}>\n`;
+            ? `<span>${ctx.render(node.content)}</span>`
+            : `<h${level}>${ctx.render(node.content)}</h${level}>\n`;
         break;
       }
       case 'paragraph':
-        html += `<p>${render(node.content)}</p>\n`;
+        html += `<p>${ctx.render(node.content)}</p>\n`;
         break;
       case 'text':
         html += node.value ? escapeHtml(node.value) : '';
@@ -83,24 +83,24 @@ export function render(nodes?: ASTNode[]): string {
         break;
       }
       case 'math_inline':
-        html += `<span class="math-inline">${escapeHtml(String(node.value ?? ''))}</span>`;
+        html += `<span class="math-inline" data-async="latex">${escapeHtml(String(node.value ?? ''))}</span>`;
         break;
       case 'math_block':
-        html += `<div class="math-block">${escapeHtml(String(node.value ?? ''))}</div>\n`;
+        html += `<div class="math-block" data-async="latex">${escapeHtml(String(node.value ?? ''))}</div>\n`;
         break;
       case 'bold':
-        html += `<strong>${render(node.content)}</strong>`;
+        html += `<strong>${ctx.render(node.content)}</strong>`;
         break;
       case 'italic':
-        html += `<em>${render(node.content)}</em>`;
+        html += `<em>${ctx.render(node.content)}</em>`;
         break;
       case 'underline':
-        html += `<u>${render(node.content)}</u>`;
+        html += `<u>${ctx.render(node.content)}</u>`;
         break;
       case 'strike':
-        html += `<del>${render(node.content)}</del>`;
+        html += `<del>${ctx.render(node.content)}</del>`;
         break;
-      case 'inline_code':
+      case 'code_inline':
         html += `<code>${node.value ? escapeHtml(node.value) : ''}</code>`;
         break;
       case 'color_code': {
@@ -115,21 +115,22 @@ export function render(nodes?: ASTNode[]): string {
       case 'link': {
         const url = String(node.url ?? '').trim();
         html += isSafeLinkUrl(url)
-          ? `<a href="${escapeHtml(url)}">${render(node.content)}</a>`
-          : render(node.content);
+          ? `<a href="${escapeHtml(url)}">${ctx.render(node.content)}</a>`
+          : ctx.render(node.content);
         break;
       }
       case 'code_block': {
-        const language = getCodeLanguage(node.lang);
-        const displayLanguage = getDisplayLanguageName(language);
-        const preAttributes = language
-          ? `class="hljs language-${escapeHtml(language)}" data-language="${escapeHtml(language)}"`
-          : 'class="hljs language-plaintext"';
-        html += `<div class="code-block-wrapper">`;
+        const language = node.lang;
+        const escapedValue = escapeHtml(String(node.value ?? ''));
+        html += '<div class="code-block-wrapper">';
         if (language) {
-          html += `<div class="code-lang">${escapeHtml(displayLanguage)}</div>`;
+          const escapedLanguage = escapeHtml(language);
+          html += `<div class="code-lang">${escapeHtml(language)}</div>`;
+          html += `<pre data-language="${escapedLanguage}" data-async="hljs"><code class="language-${escapedLanguage}">${escapedValue}\n</code></pre>`;
+        } else {
+          html += `<pre><code class="hljs">${escapedValue}\n</code></pre>`;
         }
-        html += `<pre ${preAttributes}><code>${escapeHtml(String(node.value ?? ''))}\n</code></pre></div>\n`;
+        html += '</div>\n';
         break;
       }
       case 'list': {
@@ -138,20 +139,20 @@ export function render(nodes?: ASTNode[]): string {
           node.ordered && node.start && node.start !== 1
             ? ` start="${node.start}"`
             : '';
-        html += `<${tag}${start}>\n${render(node.content)}</${tag}>\n`;
+        html += `<${tag}${start}>\n${ctx.render(node.content)}</${tag}>\n`;
         break;
       }
       case 'list_item':
-        html += `<li>${render(node.content)}</li>\n`;
+        html += `<li>${ctx.render(node.content)}</li>\n`;
         break;
       case 'mermaid':
-        html += `<div class="language-mermaid">${escapeHtml(String(node.value ?? ''))}</div>\n`;
+        html += `<div class="language-mermaid" data-async="mermaid">${escapeHtml(String(node.value ?? ''))}</div>\n`;
         break;
       case 'abc':
-        html += `<div class="language-abc">${escapeHtml(String(node.value ?? ''))}</div>\n`;
+        html += `<div class="language-abc" data-async="abc">${escapeHtml(String(node.value ?? ''))}</div>\n`;
         break;
       case 'smiles_inline':
-        html += `<span class="language-smiles smiles-inline" data-smiles="${escapeHtml(String(node.value ?? ''))}"></span>`;
+        html += `<span class="language-smiles smiles-inline" data-async="smiles" data-smiles="${escapeHtml(String(node.value ?? ''))}"></span>`;
         break;
       case 'smiles_block': {
         const blocks = String(node.value ?? '')
@@ -159,7 +160,7 @@ export function render(nodes?: ASTNode[]): string {
           .filter((line) => line.trim().length > 0)
           .map(
             (line) =>
-              `<div class="language-smiles smiles-block" data-smiles="${escapeHtml(line.trim())}"></div>`,
+              `<div class="language-smiles smiles-block" data-async="smiles" data-smiles="${escapeHtml(line.trim())}"></div>`,
           );
         html += blocks.length > 0 ? `${blocks.join('\n')}\n` : '';
         break;
@@ -169,7 +170,7 @@ export function render(nodes?: ASTNode[]): string {
         if (node.header) {
           html += '<thead>\n<tr>\n';
           node.header.forEach((cell) => {
-            html += `<th${getTableAlignment(cell.align)}>${render(cell.content)}</th>\n`;
+            html += `<th${getTableAlign(cell.align)}>${ctx.render(cell.content)}</th>\n`;
           });
           html += '</tr>\n</thead>\n';
         }
@@ -178,7 +179,7 @@ export function render(nodes?: ASTNode[]): string {
           node.content.forEach((row) => {
             html += '<tr>\n';
             row.content?.forEach((cell) => {
-              html += `<td${getTableAlignment(cell.align)}>${render(cell.content)}</td>\n`;
+              html += `<td${getTableAlign(cell.align)}>${ctx.render(cell.content)}</td>\n`;
             });
             html += '</tr>\n';
           });
@@ -191,16 +192,16 @@ export function render(nodes?: ASTNode[]): string {
         html += '<hr />\n';
         break;
       case 'blockquote':
-        html += `<blockquote>\n${render(node.content)}</blockquote>\n`;
+        html += `<blockquote>\n${ctx.render(node.content)}</blockquote>\n`;
         break;
       case 'accordion':
-        html += `<div class="ffm-accordion">${render(node.content)}</div>`;
+        html += `<div class="ffm-accordion">${ctx.render(node.content)}</div>`;
         break;
       case 'accordion_item':
-        html += `<details name="${escapeHtml(String(node.name ?? ''))}"><summary>${render(node.title)}</summary><div class="accordion-content">${render(node.content)}</div></details>`;
+        html += `<details name="${escapeHtml(String(node.name ?? ''))}"><summary>${ctx.render(node.title)}</summary><div class="accordion-content">${ctx.render(node.content)}</div></details>`;
         break;
       case 'chain':
-        html += `<div class="chain-container">${render(node.content)}</div>`;
+        html += `<div class="chain-container">${ctx.render(node.content)}</div>`;
         break;
       case 'chain_item': {
         const statusClass = node.hasCheckbox
@@ -210,25 +211,24 @@ export function render(nodes?: ASTNode[]): string {
           : '';
         const title =
           node.title && node.title.length > 0
-            ? `<div class="chain-title">${render(node.title)}</div>`
+            ? `<div class="chain-title">${ctx.render(node.title)}</div>`
             : '';
-        html += `<div class="chain-item ${statusClass}"><div class="chain-marker"></div><div class="chain-content-wrapper">${title}<div class="chain-body">${render(node.content)}</div></div></div>`;
+        html += `<div class="chain-item ${statusClass}"><div class="chain-marker"></div><div class="chain-content-wrapper">${title}<div class="chain-body">${ctx.render(node.content)}</div></div></div>`;
         break;
       }
       case 'slide':
-        html += `<div class="slide-container-wrapper"><div class="slide-container">${render(node.content)}</div></div>`;
+        html += `<div class="slide-container-wrapper"><div class="slide-container">${ctx.render(node.content)}</div></div>`;
         break;
       case 'slide_item':
-        html += `<div class="slide-item">${render(node.content)}</div>`;
+        html += `<div class="slide-item">${ctx.render(node.content)}</div>`;
         break;
       case 'hardbreak':
         html += '<br />\n';
         break;
       default:
-        html += `<span>${render(node.content)}</span>`;
+        html += `<span>${ctx.render(node.content)}</span>`;
         break;
     }
   }
-
   return html;
 }

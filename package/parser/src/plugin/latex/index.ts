@@ -1,6 +1,13 @@
-// @ffm/parser/src/plugin/latex.ts
+// @ffm/parser/src/plugin/latex/index.ts
 import { BlockState, InlineState } from '#/core/state';
-import type { BlockRule, InlineRule, MarkdownPlugin } from '#/type';
+import { loadScript } from '#/plugin/loader';
+import type {
+  BlockRule,
+  InlineRule,
+  AsyncRenderer,
+  MarkdownPlugin,
+} from '#/type';
+import type { Katex, KatexSource } from './type';
 
 const inlineMathMarker = '$';
 const blockMathMarker = '$$';
@@ -93,7 +100,24 @@ export const latexBlockRule: BlockRule = {
   },
 };
 
+// Build a KaTeX renderer; CDN URLs are supplied by the host.
+export const createLatex = (source: KatexSource): AsyncRenderer<Katex> => ({
+  name: 'latex',
+  selector: '[data-async="latex"]',
+  style: source.style,
+  // katex will finds `window.katex`
+  load: () => loadScript<Katex>(source.script, 'katex'),
+  render(element, latex) {
+    latex.render(element.textContent ?? '', element, {
+      throwOnError: false,
+      output: 'html',
+      displayMode: element.classList.contains('math-block'),
+    });
+  },
+});
+
 // Register LaTeX block and inline rules on a markdown-parser instance.
 export const latexPlugin: MarkdownPlugin = (parser) => {
   parser.addBlockRule(latexBlockRule).addInlineRule(latexInlineRule);
+  parser.requireCapability('latex');
 };

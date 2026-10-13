@@ -54,7 +54,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
           : html`${render(node.content)}`;
       }
 
-      case 'inline_code':
+      case 'code_inline':
         return html`<code>${node.value}</code>`;
 
       case 'color_code': {
@@ -84,9 +84,9 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
         return html`
           <div class="code-block-wrapper">
             ${node.lang ? html`<div class="code-lang">${node.lang}</div>` : ''}
-            <pre><code class="${node.lang
-              ? `language-${node.lang}`
-              : ''}">${node.value}</code></pre>
+            <pre><code class="${
+              node.lang ? `language-${node.lang}` : ''
+            }">${node.value}</code></pre>
           </div>
         `;
 
@@ -178,9 +178,11 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
           <div class="chain-item ${statusClass}">
             <div class="chain-marker"></div>
             <div class="chain-content-wrapper">
-              ${node.title && node.title.length > 0
-                ? html`<div class="chain-title">${render(node.title)}</div>`
-                : ''}
+              ${
+                node.title && node.title.length > 0
+                  ? html`<div class="chain-title">${render(node.title)}</div>`
+                  : ''
+              }
               <div class="chain-body">${render(node.content)}</div>
             </div>
           </div>

@@ -17,7 +17,8 @@
     "#/*": "./src/*"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./plugin": "./src/plugin/index.ts"
   },
   "dependencies": {
     "@ffm/linkify": "workspace:*"

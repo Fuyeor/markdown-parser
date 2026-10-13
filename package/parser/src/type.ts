@@ -3,31 +3,34 @@ import type { LinkMatch } from '@ffm/linkify';
 import type { MarkdownParser } from './core/parser';
 import type { BlockState, InlineState } from './core/state';
 
+export type { BlockState, InlineState } from './core/state';
+
 // built-in type; plugins can extend the string union type
 export type NodeType =
   | 'root'
   | 'paragraph'
   | 'text'
   | 'heading'
-  | 'code_block'
-  | 'blockquote'
-  | 'list'
-  | 'list_item'
-  | 'table'
-  | 'table_row'
-  | 'table_cell'
-  | 'math_inline'
-  | 'math_block'
-  | 'emoji'
-  | 'mermaid'
-  | 'abc'
-  | 'smiles_inline'
-  | 'smiles_block'
   | 'bold'
   | 'italic'
   | 'link'
   | 'hardbreak'
   | 'hr'
+  | 'blockquote'
+  | 'code_block'
+  | 'code_inline'
+  | 'list'
+  | 'list_item'
+  | 'table'
+  | 'table_row'
+  | 'table_cell'
+  | 'emoji'
+  | 'math_block'
+  | 'math_inline'
+  | 'mermaid'
+  | 'smiles_block'
+  | 'smiles_inline'
+  | 'abc'
   | string;
 
 export interface ASTNode {
@@ -89,3 +92,33 @@ export interface MarkdownParserOption {
 
 export type ASTTransform = (nodes: ASTNode[]) => ASTNode[];
 export type MarkdownPlugin = (parser: MarkdownParser) => void;
+
+// Render extension
+export interface RenderContext {
+  render(nodes?: ASTNode[]): string;
+  escapeHtml(value: string): string;
+}
+
+export type NodeRenderer = (node: ASTNode, ctx: RenderContext) => string;
+
+export interface RenderOption {
+  nodeRenderer?: Record<string, NodeRenderer>;
+}
+
+// Async capability contract
+/** Stable identifier shared between plugin declarations and async renderers. */
+export type AsyncCapability = string;
+
+export interface AsyncRenderer<Lib = unknown> {
+  readonly name: AsyncCapability;
+  readonly selector: string;
+  readonly style?: readonly string[];
+  load(): Promise<Lib>;
+  render(element: HTMLElement, lib: Lib): void | Promise<void>;
+}
+
+export interface HydrateOption {
+  /** Skip capabilities that the host has not declared. */
+  capability?: ReadonlySet<AsyncCapability>;
+  onError?: (name: AsyncCapability, error: unknown) => void;
+}

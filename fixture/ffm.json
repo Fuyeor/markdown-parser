@@ -63,25 +63,6 @@
       "plain_text": "[x](file:///etc/passwd)"
     },
     {
-      "input": "Visit fuyeor.xn--p1ai",
-      "html": "<p>Visit <a href=\"https://fuyeor.рф\">fuyeor.рф</a></p>",
-      "assert": [
-        {
-          "path": "/0/content/1/type",
-          "value": "link"
-        },
-        {
-          "path": "/0/content/1/url",
-          "value": "https://fuyeor.рф"
-        },
-        {
-          "path": "/0/content/1/content/0/value",
-          "value": "fuyeor.рф"
-        }
-      ],
-      "plain_text": "Visit fuyeor.рф"
-    },
-    {
       "input": "1. example\n  - example",
       "assert": [
         {

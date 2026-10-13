@@ -10,7 +10,7 @@ export function toPlainText(node: readonly ASTNode[]): string {
 function blockText(node: ASTNode): string {
   switch (node.type) {
     case 'text':
-    case 'inline_code':
+    case 'code_inline':
     case 'color_code':
       return node.value ?? '';
     case 'code_block':
