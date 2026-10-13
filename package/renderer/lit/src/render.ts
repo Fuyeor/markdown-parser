@@ -148,14 +148,14 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
         return html`
           <details name="${node.name}">
             <summary>${render(node.title)}</summary>
-            <div class="accordion-content">${render(node.content)}</div>
+            <div class="accordion-body">${render(node.content)}</div>
           </details>
         `;
 
       // FFM Slide
       case 'slide':
         return html`
-          <div class="slide-container-wrapper">
+          <div class="ffm-slide">
             <div class="slide-container">${render(node.content)}</div>
           </div>
         `;
@@ -165,7 +165,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
 
       // FFM Chain
       case 'chain':
-        return html`<div class="chain-container">${render(node.content)}</div>`;
+        return html`<div class="ffm-chain">${render(node.content)}</div>`;
 
       case 'chain_item': {
         const statusClass = node.hasCheckbox
@@ -177,7 +177,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
         return html`
           <div class="chain-item ${statusClass}">
             <div class="chain-marker"></div>
-            <div class="chain-content-wrapper">
+            <div class="chain-container">
               ${
                 node.title && node.title.length > 0
                   ? html`<div class="chain-title">${render(node.title)}</div>`
