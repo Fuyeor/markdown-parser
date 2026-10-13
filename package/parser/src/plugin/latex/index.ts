@@ -62,7 +62,7 @@ export const latexInlineRule: InlineRule = {
 
 // Parse a $$...$$ formula as one block, including formulas spanning lines.
 export const latexBlockRule: BlockRule = {
-  name: 'math_block',
+  name: 'math',
   marker: [inlineMathMarker],
   parse(state: BlockState) {
     const firstLine = state.currentLine;
@@ -92,7 +92,7 @@ export const latexBlockRule: BlockRule = {
 
     return {
       node: {
-        type: 'math_block',
+        type: 'math',
         value: contentLines.join('\n').trim(),
       },
       consumedLines,

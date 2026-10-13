@@ -126,12 +126,12 @@ export const inlineCodeRule: InlineRule = {
       rawContent = rawContent.slice(1, -1);
     }
 
-    // if it is a color, directly change it to a `color_code` node
+    // if it is a color, directly change it to a `code_color` node
     const isColor = isSafeColorValue(rawContent);
 
     return {
       node: {
-        type: isColor ? 'color_code' : 'code_inline',
+        type: isColor ? 'code_color' : 'code_inline',
         value: rawContent,
       },
       consumedChars: endIdx + markerLength - state.pos,

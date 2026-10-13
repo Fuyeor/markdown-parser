@@ -33,7 +33,7 @@ export const smilesInlineRule: InlineRule = {
 };
 
 // 块级规则
-export const smilesBlockTransform = createCodeBlockTransform('smiles_block');
+export const smilesBlockTransform = createCodeBlockTransform('smiles');
 
 // Build a SMILES renderer with per-code deduplication and bounded cache.
 export const createSmiles = (source: SmilesSource): AsyncRenderer => {

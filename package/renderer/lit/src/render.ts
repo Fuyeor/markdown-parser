@@ -57,7 +57,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
       case 'code_inline':
         return html`<code>${node.value}</code>`;
 
-      case 'color_code': {
+      case 'code_color': {
         const color = String(node.value ?? '');
         if (!isSafeColorValue(color)) return html`${color}`;
         return html`
@@ -80,7 +80,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
         `;
       }
 
-      case 'code_block':
+      case 'code':
         return html`
           <div class="code-block-wrapper">
             ${node.lang ? html`<div class="code-lang">${node.lang}</div>` : ''}

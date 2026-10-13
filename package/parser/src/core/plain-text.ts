@@ -11,9 +11,9 @@ function blockText(node: ASTNode): string {
   switch (node.type) {
     case 'text':
     case 'code_inline':
-    case 'color_code':
+    case 'code_color':
       return node.value ?? '';
-    case 'code_block':
+    case 'code':
       return node.value ?? '';
     case 'heading':
     case 'paragraph':

@@ -41,14 +41,14 @@ export const headingRule: BlockRule = {
  * parse ``` fenced code block
  */
 export const codeBlockRule: BlockRule = {
-  name: 'code_block',
+  name: 'code',
   marker: ['`', '~'],
   parse(state: BlockState) {
     const block = extractFencedBlock(state);
     if (!block) return null;
 
     return {
-      node: { type: 'code_block', lang: block.lang, value: block.content },
+      node: { type: 'code', lang: block.lang, value: block.content },
       consumedLines: block.consumedLines,
     };
   },

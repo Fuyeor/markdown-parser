@@ -80,7 +80,7 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
       case 'blockquote':
         return h('blockquote', content(node));
 
-      case 'color_code': {
+      case 'code_color': {
         const color = raw(node);
         if (!isSafeColorValue(color)) return color;
         return h('code', { class: 'ffm-color-code' }, [
@@ -102,7 +102,7 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
       }
       case 'code_inline':
         return h('code', raw(node));
-      case 'code_block': {
+      case 'code': {
         const language = node.lang;
         const code = raw(node);
         return h('div', { class: 'code-block-wrapper' }, [
@@ -187,7 +187,7 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
           { class: 'math-inline', 'data-async': 'latex' },
           raw(node),
         );
-      case 'math_block':
+      case 'math':
         return h(
           'div',
           { class: 'math-block', 'data-async': 'latex' },
@@ -207,7 +207,7 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
           'data-async': 'smiles',
           'data-smiles': raw(node),
         });
-      case 'smiles_block':
+      case 'smiles':
         return h(
           Fragment,
           null,

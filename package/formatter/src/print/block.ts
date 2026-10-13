@@ -160,11 +160,11 @@ export function printBlockNode(
     return lines.map((l) => (l ? `> ${l}` : '>')).join('\n');
   }
 
-  if (type === 'code_block' || type === 'code') {
+  if (type === 'code' || type === 'code') {
     return printCodeBlock(node);
   }
 
-  if (type === 'math_block') {
+  if (type === 'math') {
     return `$$\n${(node.value as string) ?? ''}\n$$`;
   }
 
@@ -180,7 +180,7 @@ export function printBlockNode(
     return '---';
   }
 
-  if (type === 'mermaid' || type === 'abc' || type === 'smiles_block') {
+  if (type === 'mermaid' || type === 'abc' || type === 'smiles') {
     const content = (node.value as string) ?? '';
     return `\`\`\`${type}\n${content.endsWith('\n') ? content : `${content}\n`}\`\`\``;
   }

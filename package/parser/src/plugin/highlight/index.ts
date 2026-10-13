@@ -15,7 +15,7 @@ declare global {
 
 export const highlightTransform: ASTTransform = (nodes) =>
   mapAstNode(nodes, (node) => {
-    if (node.type !== 'code_block') return node;
+    if (node.type !== 'code') return node;
 
     const language = getDisplayLanguageName(String(node.lang ?? ''));
     return language && language !== node.lang

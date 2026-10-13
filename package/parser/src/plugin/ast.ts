@@ -41,7 +41,7 @@ export const createCodeBlockTransform =
   (language: string, targetType = language): ASTTransform =>
   (nodeArray) =>
     mapAstNode(nodeArray, (node) =>
-      node.type === 'code_block' && node.lang === language
+      node.type === 'code' && node.lang === language
         ? { type: targetType, value: String(node.value ?? '') }
         : node,
     );

@@ -209,9 +209,9 @@ export class MarkdownParser {
                     'hr',
                     'blockquote',
                     'list',
-                    'code_block',
-                    'math_block',
-                    'ffm_blocks',
+                    'code',
+                    'math',
+                    'ffm',
                   ].includes(rule.name)
                 ) {
                   this.#isPreflight = true;

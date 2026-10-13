@@ -85,7 +85,7 @@ function renderNodes(
       case 'math_inline':
         html += `<span class="math-inline" data-async="latex">${escapeHtml(String(node.value ?? ''))}</span>`;
         break;
-      case 'math_block':
+      case 'math':
         html += `<div class="math-block" data-async="latex">${escapeHtml(String(node.value ?? ''))}</div>\n`;
         break;
       case 'bold':
@@ -103,7 +103,7 @@ function renderNodes(
       case 'code_inline':
         html += `<code>${node.value ? escapeHtml(node.value) : ''}</code>`;
         break;
-      case 'color_code': {
+      case 'code_color': {
         const color = String(node.value ?? '');
         if (!isSafeColorValue(color)) {
           html += escapeHtml(color);
@@ -119,7 +119,7 @@ function renderNodes(
           : ctx.render(node.content);
         break;
       }
-      case 'code_block': {
+      case 'code': {
         const language = node.lang;
         const escapedValue = escapeHtml(String(node.value ?? ''));
         html += '<div class="code-block-wrapper">';
@@ -154,7 +154,7 @@ function renderNodes(
       case 'smiles_inline':
         html += `<span class="language-smiles smiles-inline" data-async="smiles" data-smiles="${escapeHtml(String(node.value ?? ''))}"></span>`;
         break;
-      case 'smiles_block': {
+      case 'smiles': {
         const blocks = String(node.value ?? '')
           .split('\n')
           .filter((line) => line.trim().length > 0)
