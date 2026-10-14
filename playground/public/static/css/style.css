@@ -114,6 +114,24 @@ body {
 
 .right-sidebar {
   padding: 20px 0 30px 20px;
+  height: 100vh;
+  max-height: 100dvh;
+}
+
+/* 让中间的包裹层能撑满并允许内部收缩 */
+#sidebar-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* article.preview 成为纵向 flex 容器 */
+.right-sidebar article.section.preview {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (width >= 1000px) {

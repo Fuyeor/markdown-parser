@@ -35,6 +35,7 @@ import {
 import { renderToVue } from '@ffm/vue-renderer';
 import { usePlaygroundSource } from '@/document/composable/usePlaygroundSource';
 import { useScrollSync } from '@/document/composable/useScrollSync';
+import { formatHtml } from '@/document/util/formatter';
 
 const emit = defineEmits<{
   (event: 'scroll', percentage: number): void;
@@ -85,11 +86,16 @@ const activeView = computed(() => {
     case 'ast':
       return () => h('pre', json.value);
     case 'html':
-      return () => h('pre', html.value);
+      return () => h('pre', formattedHtml.value);
     default:
       return () =>
         h('div', { class: 'markdown-rendered' }, renderToVue(ast.value));
   }
+});
+
+const formattedHtml = computed(() => {
+  if (activeTab.value !== 'html') return '';
+  return formatHtml(html.value);
 });
 
 // ast 或 tab 变化后水合异步节点（KaTeX / Mermaid / ABC / SMILES / hljs）
@@ -148,6 +154,8 @@ defineExpose({ scrollToPercentage, html });
   z-index: 9;
   margin: 0;
   display: flex;
+  /* 不参与剩余高度分配 */
+  flex: 0 0 auto;
   position: sticky;
   border: none;
   top: 0;
@@ -188,9 +196,12 @@ defineExpose({ scrollToPercentage, html });
   }
 }
 
+/* 只在这一块滚动，高度由 flex 决定 */
 .output-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
   padding: 12px 12px;
-  height: 100vh;
   overflow-y: auto;
 
   pre {

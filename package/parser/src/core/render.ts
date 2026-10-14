@@ -208,8 +208,8 @@ function renderNodes(
           return (
             `<div class="chain-item ${status}">` +
             `<div class="chain-marker"></div>` +
-            `<div class="chain-container">${title}` +
-            `<div class="chain-body">${content(node, ctx)}</div>` +
+            `<div class="chain-body">${title}` +
+            `<div class="chain-content">${content(node, ctx)}</div>` +
             `</div></div>`
           );
         }

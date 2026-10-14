@@ -177,13 +177,13 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
         return html`
           <div class="chain-item ${statusClass}">
             <div class="chain-marker"></div>
-            <div class="chain-container">
+            <div class="chain-body">
               ${
                 node.title && node.title.length > 0
                   ? html`<div class="chain-title">${render(node.title)}</div>`
                   : ''
               }
-              <div class="chain-body">${render(node.content)}</div>
+              <div class="chain-content">${render(node.content)}</div>
             </div>
           </div>
         `;

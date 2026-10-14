@@ -145,11 +145,11 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
           : '';
         return h('div', { class: ['chain-item', statusClass] }, [
           h('div', { class: 'chain-marker' }),
-          h('div', { class: 'chain-container' }, [
+          h('div', { class: 'chain-body' }, [
             node.title?.length
               ? h('div', { class: 'chain-title' }, renderToVue(node.title))
               : null,
-            h('div', { class: 'chain-body' }, content(node)),
+            h('div', { class: 'chain-content' }, content(node)),
           ]),
         ]);
       }
