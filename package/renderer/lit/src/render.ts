@@ -112,7 +112,7 @@ export function render(node?: ASTNode[]): (TemplateResult | string | null)[] {
       case 'hr':
         return html`<hr />`;
 
-      case 'hardbreak':
+      case 'break':
         return html`<br />`;
 
       case 'table':

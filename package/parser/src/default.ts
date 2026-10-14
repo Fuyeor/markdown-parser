@@ -9,9 +9,9 @@ import {
   blockquoteRule,
 } from './rule/block';
 import {
-  hardBreakRule,
   inlineCodeRule,
   linkRule,
+  imageRule,
   boldRule,
   underlineRule,
   italicRule,
@@ -39,8 +39,8 @@ export function createMarkdownParser(option: MarkdownParserOption = {}) {
       .addBlockRule(hrRule)
       .addBlockRule(blockquoteRule)
       // inline order: Inline code -> Links -> Bold/Underline/Strikethrough
-      .addInlineRule(hardBreakRule)
       .addInlineRule(inlineCodeRule)
+      .addInlineRule(imageRule)
       .addInlineRule(linkRule)
       .addInlineRule(boldRule)
       .addInlineRule(underlineRule)
@@ -72,7 +72,6 @@ export function createCommonParser(option: MarkdownParserOption = {}) {
       .addBlockRule(blockquoteRule)
 
       // inline order: Inline code -> Links -> Bold/Underline/Strikethrough
-      .addInlineRule(hardBreakRule)
       .addInlineRule(inlineCodeRule)
       .addInlineRule(linkRule)
       .addInlineRule(boldRule)

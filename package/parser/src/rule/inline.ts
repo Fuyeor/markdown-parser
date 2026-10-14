@@ -1,25 +1,8 @@
 // @ffm/parser/src/rule/inline.ts
-import type { InlineRule } from '#/type';
 import { InlineState } from '#/core/state';
 import { isSafeColorValue } from '#/core/color';
 import { isSafeLinkUrl } from '#/core/url';
-
-/**
- * Support backslash at line end as <br />
- */
-export const hardBreakRule: InlineRule = {
-  name: 'hardbreak',
-  marker: ['\\', ' '],
-  parse(state: InlineState) {
-    if (state.currentChar === '\\' && state.content[state.pos + 1] === '\n') {
-      return {
-        node: { type: 'hardbreak' },
-        consumedChars: 2,
-      };
-    }
-    return null;
-  },
-};
+import type { ASTNode, InlineRule } from '#/type';
 
 /**
  * parse **bold** syntax
@@ -49,31 +32,25 @@ export const boldRule: InlineRule = {
 };
 
 /**
- * parse *italic* or _italic_ syntax
+ * parse *italic* syntax
  */
 export const italicRule: InlineRule = {
   name: 'italic',
   marker: ['*'],
   parse(state: InlineState, ctx) {
-    const char = state.currentChar;
-    //  only triggers when it starts with * and
-    // is not immediately followed by the same symbol
-    // (to prevent it from overriding the bold/underline).
-    if (char === '*' && state.content[state.pos + 1] !== char) {
-      // find the next matching closing symbol
-      const endIdx = state.findNextToken(char, state.pos + 1);
+    // 下一个字符也是 * 时让位给 boldRule
+    if (state.content[state.pos + 1] === '*') return null;
 
-      if (endIdx === -1 || endIdx === state.pos + 1) return null;
+    const endIdx = state.findNextToken('*', state.pos + 1);
+    if (endIdx === -1) return null;
 
-      return {
-        node: {
-          type: 'italic',
-          content: ctx.parseInline(state.content.slice(state.pos + 1, endIdx)),
-        },
-        consumedChars: endIdx - state.pos + 1,
-      };
-    }
-    return null;
+    return {
+      node: {
+        type: 'italic',
+        content: ctx.parseInline(state.content.slice(state.pos + 1, endIdx)),
+      },
+      consumedChars: endIdx - state.pos + 1,
+    };
   },
 };
 
@@ -215,6 +192,46 @@ export const strikeRule: InlineRule = {
         content: ctx.parseInline(state.content.slice(state.pos + 2, endIdx)),
       },
       consumedChars: endIdx - state.pos + 2,
+    };
+  },
+};
+
+/**
+ * parse ![alt](url "caption") syntax; opt-in via addInlineRule
+ */
+export const imageRule: InlineRule = {
+  name: 'image',
+  marker: ['!'],
+  parse(state: InlineState) {
+    if (state.currentChar !== '!') return null;
+    if (state.content[state.pos + 1] !== '[') return null;
+
+    const altEnd = state.findNextToken('](', state.pos + 2);
+    if (altEnd === -1) return null;
+
+    const urlEnd = state.findNextToken(')', altEnd + 2);
+    if (urlEnd === -1) return null;
+
+    const alt = state.content.slice(state.pos + 2, altEnd).trim();
+    const raw = state.content.slice(altEnd + 2, urlEnd).trim();
+
+    // 拆出可选的 caption 部分不含空白，title 由成对引号包裹
+    const match = raw.match(/^(\S+)(?:\s+(?:"([^"]*)"|'([^']*)'))?$/);
+    if (!match) return null;
+
+    const rawUrl = match[1];
+    const normalizedUrl = rawUrl.startsWith('www.')
+      ? `http://${rawUrl}`
+      : rawUrl;
+    if (!isSafeLinkUrl(normalizedUrl)) return null;
+
+    const node: ASTNode = { type: 'image', url: normalizedUrl, alt };
+    const caption = match[2] ?? match[3];
+    if (caption !== undefined) node.caption = caption;
+
+    return {
+      node,
+      consumedChars: urlEnd - state.pos + 1,
     };
   },
 };

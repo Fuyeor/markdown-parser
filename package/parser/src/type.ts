@@ -13,8 +13,11 @@ export type NodeType =
   | 'heading'
   | 'bold'
   | 'italic'
+  | 'strike'
+  | 'underline'
   | 'link'
-  | 'hardbreak'
+  | 'image'
+  | 'break'
   | 'hr'
   | 'blockquote'
   | 'code'
@@ -45,6 +48,9 @@ export interface ASTNode {
   header?: ASTNode[];
   name?: string;
   title?: ASTNode[];
+  // image description, like <img title="..." />
+  // it’s actually caption, not title
+  caption?: string;
   isCompleted?: boolean;
   hasCheckbox?: boolean;
   // allow plugins to attach arbitrary attributes

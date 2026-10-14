@@ -221,7 +221,7 @@ function flattenInline(nodeArray: ASTNode[]): {
       text += node.value ?? '';
       continue;
     }
-    if (node.type === 'hardbreak') {
+    if (node.type === 'break') {
       text += '\n';
       continue;
     }

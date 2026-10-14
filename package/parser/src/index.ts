@@ -13,10 +13,10 @@ export {
   blockquoteRule,
 } from './rule/block';
 export {
-  hardBreakRule,
   inlineCodeRule,
   boldRule,
   linkRule,
+  imageRule,
   underlineRule,
   strikeRule,
 } from './rule/inline';

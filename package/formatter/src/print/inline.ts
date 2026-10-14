@@ -46,11 +46,11 @@ export function printInlineNode(
     return `__${printInlineNodes(node.content, option, context)}__`;
   }
 
-  if (type === 'strike' || type === 'delete') {
+  if (type === 'strike') {
     return `--${printInlineNodes(node.content, option, context)}--`;
   }
 
-  if (type === 'code_inline' || type === 'code_inline') {
+  if (type === 'code_inline') {
     const value = node.value ?? '';
     const fence = '`'.repeat(Math.max(1, longestBacktickRun(value) + 1));
     return `${fence}${value}${fence}`;
@@ -70,7 +70,7 @@ export function printInlineNode(
     return `![${alt}](${node.url ?? ''})`;
   }
 
-  if (type === 'hardbreak') {
+  if (type === 'break') {
     return '\n';
   }
 

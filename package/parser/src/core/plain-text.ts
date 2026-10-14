@@ -47,7 +47,7 @@ function blockText(node: ASTNode): string {
     }
     case 'table_row':
       return joinNodes(node.content ?? []);
-    case 'hardbreak':
+    case 'break':
       return '\n';
     case 'hr':
       return '';

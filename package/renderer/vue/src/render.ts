@@ -69,9 +69,27 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
         const url = (node.url ?? '').trim();
         return h('a', { href: url }, content(node));
       }
+      case 'image': {
+        const url = (node.url ?? '').trim();
+        const img = h('img', { src: url, alt: node.alt ?? '' });
+
+        // caption 与 title 等价；缺省时退化为裸 <img>
+        const caption = node.caption ?? node.title;
+        if (!caption || (Array.isArray(caption) && caption.length === 0)) {
+          return img;
+        }
+
+        const figcaption =
+          typeof caption === 'string' ? caption : renderToVue(caption);
+
+        return h('figure', { class: 'ffm-image' }, [
+          img,
+          h('figcaption', null, figcaption),
+        ]);
+      }
       case 'hr':
         return h('hr');
-      case 'hardbreak':
+      case 'break':
         return h('br');
 
       case 'blockquote':

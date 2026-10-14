@@ -317,7 +317,7 @@ export class MarkdownParser {
       // normal characters without matching rules, just advance
       if (char === '\n') {
         flushText(state.pos);
-        nodes.push({ type: 'hardbreak' });
+        nodes.push({ type: 'break' });
         state.advance(1);
         textStart = state.pos;
         continue;

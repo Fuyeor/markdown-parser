@@ -109,6 +109,27 @@ const renderLink = (node: ASTNode, ctx: RenderContext): string => {
   return `<a href="${url}">${content(node, ctx)}</a>`;
 };
 
+// 渲染图片；url 由解析器过滤 scheme，alt / caption 为纯文本
+const renderImage = (node: ASTNode, ctx: RenderContext): string => {
+  const url = escapeHtml((node.url ?? '').trim());
+  const alt = escapeHtml(node.alt ?? '');
+  const img = `<img src="${url}" alt="${alt}" />`;
+
+  // caption 与 title 等价；缺省时退化为裸 <img>
+  const caption = node.caption ?? node.title;
+  if (!caption || (Array.isArray(caption) && caption.length === 0)) return img;
+
+  const figcaption =
+    typeof caption === 'string' ? escapeHtml(caption) : ctx.render(caption);
+
+  return (
+    `<figure class="ffm-image">` +
+    img +
+    `<figcaption>${figcaption}</figcaption>` +
+    `</figure>`
+  );
+};
+
 // 链节点状态类名；与 Vue renderer 保持一致
 const chainStatusClass = (node: ASTNode): string =>
   node.hasCheckbox ? (node.isCompleted ? 'is-completed' : 'is-pending') : '';
@@ -153,9 +174,11 @@ function renderNodes(
           return `<del>${content(node, ctx)}</del>`;
         case 'link':
           return renderLink(node, ctx);
+        case 'image':
+          return renderImage(node, ctx);
         case 'hr':
           return '<hr/>';
-        case 'hardbreak':
+        case 'break':
           return '<br/>';
         case 'blockquote':
           return `<blockquote>${content(node, ctx)}</blockquote>`;
