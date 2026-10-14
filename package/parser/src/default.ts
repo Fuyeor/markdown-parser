@@ -70,7 +70,6 @@ export function createCommonParser(option: MarkdownParserOption = {}) {
       .addBlockRule(tableRule)
       .addBlockRule(hrRule)
       .addBlockRule(blockquoteRule)
-
       // inline order: Inline code -> Links -> Bold/Underline/Strikethrough
       .addInlineRule(inlineCodeRule)
       .addInlineRule(linkRule)

@@ -13,17 +13,20 @@ export const boldRule: InlineRule = {
   parse(state: InlineState, ctx) {
     if (!state.content.startsWith('**', state.pos)) return null;
 
-    // find directly for the next **;
-    // if not found, treat it as plain text.
-    const endIdx = state.findNextToken('**', state.pos + 2);
+    const innerStart = state.pos + 2;
+    // 起始为 *** 时，内部以 * 开头（斜体标记）
+    const nested = state.content[innerStart] === '*';
+
+    let endIdx = state.findNextToken('**', innerStart);
     if (endIdx === -1) return null;
 
-    const innerContent = state.content.slice(state.pos + 2, endIdx);
+    // 结束也是 *** 时，跳过结束序列的首个 *，让内层 * 闭合斜体
+    if (nested && state.content[endIdx + 2] === '*') endIdx += 1;
+
     return {
       node: {
         type: 'bold',
-        // supports nested parsing
-        content: ctx.parseInline(innerContent),
+        content: ctx.parseInline(state.content.slice(innerStart, endIdx)),
       },
       // +2 is because the followed `**` was consumed
       consumedChars: endIdx - state.pos + 2,
