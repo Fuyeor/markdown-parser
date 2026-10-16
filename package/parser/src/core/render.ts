@@ -1,23 +1,11 @@
 // @ffm/parser/src/core/render.ts
+import { escapeHtml } from '@fuyeor/util';
 import type {
   ASTNode,
   NodeRenderer,
   RenderContext,
   RenderOption,
 } from '#/type';
-
-export const escapeHtml = (value: string): string =>
-  value.replace(
-    /[&<>"']/g,
-    (char) =>
-      ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-      })[char]!,
-  );
 
 // 渲染子节点；缺省时返回空串
 const content = (node: ASTNode, ctx: RenderContext): string =>
@@ -203,7 +191,7 @@ function renderNodes(
         case 'table': {
           const head = renderTableHead(node.header, ctx);
           const body = renderTableBody(node.content, ctx);
-          return `<table>${head}${body}</table>`;
+          return `<div class="table-container"><table>${head}${body}</table></div>`;
         }
 
         // Fuyeor Flavored Markdown
@@ -265,7 +253,7 @@ function renderNodes(
 
         case 'smiles': {
           const lines = raw(node)
-            .split('')
+            .split('\n')
             .map((line) => line.trim())
             .filter((line) => line.length > 0);
           if (lines.length === 0) return '';

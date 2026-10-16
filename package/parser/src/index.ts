@@ -1,6 +1,6 @@
 // @ffm/parser/src/index.ts
 export { MarkdownParser } from './core/parser';
-export { render, escapeHtml } from './core/render';
+export { render } from './core/render';
 export { toPlainText } from './core/plain-text';
 export { isSafeColorValue } from './core/color';
 export { isSafeLinkUrl } from './core/url';

@@ -46,6 +46,7 @@ const { source } = usePlaygroundSource();
 const { markScrollSource, isScrollFromOther } = useScrollSync();
 
 const activeTab = ref('preview');
+const renderVersion = ref(0);
 const outputContent = ref<HTMLElement | null>(null);
 
 const tab: TabItem[] = [
@@ -58,6 +59,8 @@ const tab: TabItem[] = [
 const asyncRenderer: readonly AsyncRenderer[] = [
   createHighlight({
     script: getCdnLibraryUrl('highlight.js/11.11.1/es/core.min.js'),
+    language: (lang) =>
+      getCdnLibraryUrl(`highlight.js/11.11.1/languages/${lang}.min.js`),
     style: ['https://deliver.fuyeor.net/@fu/styles/highlight.min.css'],
   }),
   createLatex({
@@ -81,6 +84,11 @@ const ast = computed(() => parser(source.value));
 const json = computed(() => JSON.stringify(ast.value, null, 2));
 const html = computed(() => render(ast.value));
 
+// 当输入内容改变、重新生成 AST 时，版本号 +1
+watch(ast, () => {
+  renderVersion.value++;
+});
+
 const activeView = computed(() => {
   switch (activeTab.value) {
     case 'ast':
@@ -89,7 +97,14 @@ const activeView = computed(() => {
       return () => h('pre', formattedHtml.value);
     default:
       return () =>
-        h('div', { class: 'markdown-rendered' }, renderToVue(ast.value));
+        h(
+          'div',
+          {
+            class: 'markdown-rendered',
+            key: renderVersion.value,
+          },
+          renderToVue(ast.value),
+        );
   }
 });
 

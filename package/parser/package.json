@@ -21,7 +21,8 @@
     "./plugin": "./src/plugin/index.ts"
   },
   "dependencies": {
-    "@ffm/linkify": "workspace:*"
+    "@ffm/linkify": "workspace:*",
+    "@fuyeor/util": "^0.1.2"
   },
   "devDependencies": {
     "typescript": "^7.0.2",

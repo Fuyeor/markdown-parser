@@ -17,4 +17,6 @@ export interface Mermaid {
 export interface MermaidSource {
   script: string;
   style?: readonly string[];
+  /** SVG 渲染成功后的回调钩子 (可在此注入灯箱预览、缩放逻辑) */
+  afterRender?: (element: HTMLElement, svg: string) => void;
 }

@@ -1,12 +1,12 @@
-// @ffm/parser/src/async/index.ts
+// @ffm/parser/src/plugin/index.ts
 export { hydrate } from './hydrate';
-export { loadStyle, loadModule, loadEffect, loadScript } from './loader';
-export {
-  twemojiPlugin,
-  twemojiTransform,
-  transformTwemojiNode,
-  getTwemojiUrl,
-} from './twemoji';
+
+export { createAbc } from './abc';
+export { highlightPlugin, createHighlight } from './highlight';
+export { default as fer } from './highlight/language/fer';
+export { default as ffm } from './highlight/language/ffm';
+export { default as fon } from './highlight/language/fon';
+export { getIdentifier, getDisplayName } from './highlight/util';
 export {
   latexInlineRule,
   latexBlockRule,
@@ -14,13 +14,7 @@ export {
   createLatex,
 } from './latex';
 export { createMermaid } from './mermaid';
-export { createAbc } from './abc';
 export { createSmiles } from './smiles';
-export {
-  highlightTransform,
-  highlightPlugin,
-  createHighlight,
-} from './highlight';
-export { highlightNameMap, getDisplayLanguageName } from './highlight/util';
+export { twemojiPlugin, transformTwemojiNode, getTwemojiUrl } from './twemoji';
 
 export type { AsyncCapability, AsyncRenderer, HydrateOption } from '#/type';

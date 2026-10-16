@@ -1,6 +1,6 @@
 // @ffm/parser/src/plugin/latex/index.ts
+import { loadScript } from '@fuyeor/util';
 import { BlockState, InlineState } from '#/core/state';
-import { loadScript } from '#/plugin/loader';
 import type {
   BlockRule,
   InlineRule,

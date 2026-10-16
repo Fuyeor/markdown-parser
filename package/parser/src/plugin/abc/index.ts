@@ -1,5 +1,5 @@
-// @ffm/parser/src/async/abc.ts
-import { loadScript } from '#/plugin/loader';
+// @ffm/parser/src/plugin/abc.ts
+import { loadScript } from '@fuyeor/util';
 import { createCodeBlockTransform } from '#/plugin/ast';
 import type { AsyncRenderer, MarkdownPlugin } from '#/type';
 import type { Abc, AbcSource } from './type';

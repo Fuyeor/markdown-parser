@@ -1,6 +1,6 @@
-// @ffm/parser/src/async/hydrate.ts
+// @ffm/parser/src/plugin/hydrate.ts
+import { loadStyleSheet } from '@fuyeor/util';
 import type { AsyncCapability, AsyncRenderer, HydrateOption } from '#/type';
-import { loadStyle } from './loader';
 
 // Walk a container and hydrate every declared async capability in parallel.
 export async function hydrate(
@@ -19,7 +19,7 @@ export async function hydrate(
     );
     if (elements.length === 0) continue;
 
-    renderer.style?.forEach(loadStyle);
+    renderer.style?.forEach(loadStyleSheet);
 
     tasks.push(
       run(renderer, elements, acquisition, option?.onError).catch((error) => {
@@ -40,7 +40,7 @@ async function run(
   let pending = acquisition.get(renderer.name);
   if (!pending) {
     pending = (async () => {
-      if (renderer.style) await Promise.all(renderer.style.map(loadStyle));
+      if (renderer.style) await Promise.all(renderer.style.map(loadStyleSheet));
       return renderer.load();
     })();
     acquisition.set(renderer.name, pending);

@@ -1,2 +1,249 @@
 // @ffm/vue-renderer/src/index.ts
-export { renderToVue } from './render';
+import { Fragment, h, type VNode } from 'vue';
+import type { ASTNode } from '@ffm/parser';
+
+// 渲染子节点；缺省时返回空数组
+const content = (node: ASTNode): (VNode | string)[] =>
+  renderToVue(node.content ?? []);
+
+// 读取纯文本值；缺省时返回空串
+const raw = (node: ASTNode): string => node.value ?? '';
+
+// 未知或降级节点的统一出口
+const passthrough = (node: ASTNode): VNode => h('span', content(node));
+
+// 表格单元格对齐：与 HTML renderer 的 align 属性保持一致
+const alignAttr = (cell: ASTNode): Record<string, unknown> => {
+  const align = cell.align;
+  return align === 'left' || align === 'center' || align === 'right'
+    ? { align }
+    : {};
+};
+
+const renderTableHead = (cells?: ASTNode[]) =>
+  cells?.length
+    ? h(
+        'tr',
+        null,
+        cells.map((cell) => renderTableCell('th', cell)),
+      )
+    : null;
+
+const renderTableBody = (rows?: ASTNode[]) =>
+  rows?.length
+    ? h(
+        'tbody',
+        null,
+        rows.map((row) =>
+          h(
+            'tr',
+            null,
+            (row.content ?? []).map((cell) => renderTableCell('td', cell)),
+          ),
+        ),
+      )
+    : null;
+
+const renderTableCell = (tag: 'th' | 'td', cell: ASTNode): VNode =>
+  h(tag, alignAttr(cell), content(cell));
+
+export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
+  return nodeArray.map((node) => {
+    switch (node.type) {
+      // Common Flavored Markdown
+      case 'heading':
+        return h(`h${node.level}`, content(node));
+      case 'paragraph':
+        return h('p', content(node));
+      case 'text':
+        return raw(node);
+      case 'bold':
+        return h('strong', content(node));
+      case 'italic':
+        return h('em', content(node));
+      case 'underline':
+        return h('u', content(node));
+      case 'strike':
+        return h('del', content(node));
+      case 'link': {
+        const url = (node.url ?? '').trim();
+        return h('a', { href: url }, content(node));
+      }
+      case 'image': {
+        const url = (node.url ?? '').trim();
+        const img = h('img', { src: url, alt: node.alt ?? '' });
+
+        // caption 与 title 等价；缺省时退化为裸 <img>
+        const caption = node.caption ?? node.title;
+        if (!caption || (Array.isArray(caption) && caption.length === 0)) {
+          return img;
+        }
+
+        const figcaption =
+          typeof caption === 'string' ? caption : renderToVue(caption);
+
+        return h('figure', { class: 'ffm-image' }, [
+          img,
+          h('figcaption', null, figcaption),
+        ]);
+      }
+      case 'hr':
+        return h('hr');
+      case 'break':
+        return h('br');
+
+      case 'blockquote':
+        return h('blockquote', content(node));
+
+      case 'code': {
+        const language = node.lang;
+        // 优先取人类展示名，没有就取原始规范名
+        const displayName = node.displayName || language;
+
+        return h('div', { class: 'code-block-wrapper' }, [
+          displayName ? h('div', { class: 'pre-language' }, displayName) : null,
+          h(
+            'pre',
+            language
+              ? { 'data-language': language, 'data-async': 'hljs' }
+              : null,
+            h('code', raw(node)),
+          ),
+        ]);
+      }
+      case 'code_inline':
+        return h('code', raw(node));
+      case 'code_color':
+        return h('code', { class: 'ffm-color-code' }, [
+          h('span', {
+            class: 'ffm-color-swatch',
+            style: {
+              display: 'inline-block',
+              width: '0.8em',
+              height: '0.8em',
+              borderRadius: '50%',
+              backgroundColor: raw(node),
+              verticalAlign: 'middle',
+              marginRight: '0.3em',
+              border: '1px solid #00000030',
+            },
+          }),
+          raw(node),
+        ]);
+
+      case 'list':
+        return h(
+          node.ordered ? 'ol' : 'ul',
+          (node.start ?? 1) !== 1 ? { start: node.start } : null,
+          content(node),
+        );
+      case 'list_item':
+        return h('li', content(node));
+
+      case 'table':
+        return h('div', { class: 'table-container' }, [
+          h('table', null, [
+            // @ts-ignore
+            node.header ? h('thead', null, renderTableHead(node.header)) : null,
+            renderTableBody(node.content),
+          ]),
+        ]);
+
+      // Fuyeor Flavored Markdown
+      case 'accordion':
+        return h('div', { class: 'ffm-accordion' }, content(node));
+      case 'accordion_item':
+        return h('details', { name: node.name }, [
+          h('summary', renderToVue(node.title ?? [])),
+          h('div', { class: 'accordion-body' }, content(node)),
+        ]);
+
+      case 'chain':
+        return h('div', { class: 'ffm-chain' }, content(node));
+      case 'chain_item': {
+        const statusClass = node.hasCheckbox
+          ? node.isCompleted
+            ? 'is-completed'
+            : 'is-pending'
+          : '';
+        return h('div', { class: ['chain-item', statusClass] }, [
+          h('div', { class: 'chain-marker' }),
+          h('div', { class: 'chain-body' }, [
+            node.title?.length
+              ? h('div', { class: 'chain-title' }, renderToVue(node.title))
+              : null,
+            h('div', { class: 'chain-content' }, content(node)),
+          ]),
+        ]);
+      }
+
+      case 'slide':
+        return h('div', { class: 'ffm-slide' }, [
+          h('div', { class: 'slide-container' }, content(node)),
+        ]);
+      case 'slide_item':
+        return h('div', { class: 'slide-item' }, content(node));
+
+      // 异步节点：属性与 HTML renderer 输出完全对齐，供 hydrate() 扫描
+      case 'emoji':
+        return h('img', {
+          class: 'emoji',
+          draggable: 'false',
+          alt: node.value ?? '',
+          src: node.src ?? '',
+        });
+
+      case 'math':
+        return h(
+          'div',
+          { class: 'math-block', 'data-async': 'latex' },
+          raw(node),
+        );
+      case 'math_inline':
+        return h(
+          'span',
+          { class: 'math-inline', 'data-async': 'latex' },
+          raw(node),
+        );
+
+      case 'mermaid':
+        return h(
+          'div',
+          { class: 'language-mermaid', 'data-async': 'mermaid' },
+          raw(node),
+        );
+
+      case 'smiles':
+        return h(
+          Fragment,
+          null,
+          raw(node)
+            .split('\n')
+            .filter((line) => line.trim().length > 0)
+            .map((line) =>
+              h('div', {
+                class: 'language-smiles smiles-block',
+                'data-async': 'smiles',
+                'data-smiles': line.trim(),
+              }),
+            ),
+        );
+      case 'smiles_inline':
+        return h('span', {
+          class: 'language-smiles smiles-inline',
+          'data-async': 'smiles',
+          'data-smiles': raw(node),
+        });
+
+      case 'abc':
+        return h(
+          'div',
+          { class: 'language-abc', 'data-async': 'abc' },
+          raw(node),
+        );
+
+      default:
+        return passthrough(node);
+    }
+  });
+}
