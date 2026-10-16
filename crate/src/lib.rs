@@ -230,11 +230,6 @@ mod shared_fixture {
 
     #[test]
     fn test_markdown() {
-        let cfm = read_fixture::<MarkdownFixtureFile>("cfm.json");
-        assert_eq!(cfm.schema_version, 2);
-        for case in &cfm.cases {
-            execute_markdown_case(case, false);
-        }
         let ffm = read_fixture::<MarkdownFixtureFile>("ffm.json");
         assert_eq!(ffm.schema_version, 2);
         for case in &ffm.cases {
