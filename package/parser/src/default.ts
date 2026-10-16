@@ -47,14 +47,12 @@ export function createMarkdownParser(option: MarkdownParserOption = {}) {
       .addInlineRule(italicRule)
       .addInlineRule(strikeRule)
       // plugin
+      .use(highlightPlugin)
       .use(twemojiPlugin)
       .use(latexPlugin)
       .use(mermaidPlugin)
       .use(smilesPlugin)
       .use(abcPlugin)
-      // NOTE: Must be last. It capitalizes lang
-      // breaking plugins that match lowercase names
-      .use(highlightPlugin)
       // generate AST node
       .build()
   );

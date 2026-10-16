@@ -4,10 +4,7 @@
 import { createMarkdownParser, render } from '@ffm/parser';
 import MarkdownIt from 'markdown-it';
 import { marked } from 'marked';
-import { social, article } from './samples';
-
-// Polyfill for window if needed by some specific logic
-global.window = globalThis;
+import { social, article } from './sample';
 
 const ffm = createMarkdownParser();
 const mdIt = new MarkdownIt({ linkify: true });
@@ -65,10 +62,10 @@ async function measure(name: string, content: string) {
   console.log(`📊 marked relative to @ffm/parser: ${mkRatio}x`);
 }
 
-const runTests = async () => {
+const run = async () => {
   console.log('🚀 Starting Memory Benchmark...');
   await measure('Social', social);
   await measure('Blog', article);
 };
 
-runTests();
+run();

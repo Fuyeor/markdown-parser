@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@ffm/linkify": "workspace:*",
-    "@fuyeor/util": "^0.1.2"
+    "@fuyeor/util": "^0.1.3"
   },
   "devDependencies": {
     "typescript": "^7.0.2",

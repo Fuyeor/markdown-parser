@@ -18,6 +18,8 @@ const linkRegex = /(?:https?:\/\/|[A-Za-z0-9-]+\.)/u;
 
 /** Skip linkify scans for text without a possible URL candidate. */
 function linkifyWithCandidateCheck(text: string): ReturnType<typeof linkify> {
+  // link must contains `.` or `:`（e.g. http://localhost）
+  if (text.indexOf('.') === -1 && text.indexOf(':') === -1) return [];
   if (!linkRegex.test(text)) return [];
   return linkify(text);
 }

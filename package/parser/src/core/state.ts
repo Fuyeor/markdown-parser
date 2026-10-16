@@ -6,10 +6,15 @@ export class BlockState {
 
   constructor(content: string) {
     // convert tab at the line beginning to 4 spaces
-    this.lines = content
-      .replace(/\r\n|\r/g, '\n')
-      .replace(/^[ \t]*\t/gm, '    ')
-      .split('\n');
+    // 仅在真实存在 \r 时才做换行归一化；绝大多数输入无 \r
+    if (content.indexOf('\r') !== -1) {
+      content = content.replace(/\r\n|\r/g, '\n');
+    }
+    // 仅在真实存在 \t 时才做缩进替换
+    if (content.indexOf('\t') !== -1) {
+      content = content.replace(/^[ \t]*\t/gm, '    ');
+    }
+    this.lines = content.split('\n');
     this.lineCount = this.lines.length;
   }
 
