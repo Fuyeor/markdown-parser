@@ -100,7 +100,7 @@ const renderLink = (node: ASTNode, ctx: RenderContext): string => {
 // 渲染图片；url 由解析器过滤 scheme，alt / caption 为纯文本
 const renderImage = (node: ASTNode, ctx: RenderContext): string => {
   const url = escapeHtml((node.url ?? '').trim());
-  const img = `<img src="${url}" alt="${node.alt}" />`;
+  const img = `<img src="${url}" alt="${node.alt}">`;
 
   // caption 与 title 等价；缺省时退化为裸 <img>
   const caption = node.caption ?? node.title;
@@ -164,9 +164,9 @@ function renderNodes(
         case 'image':
           return renderImage(node, ctx);
         case 'hr':
-          return '<hr/>';
+          return '<hr>';
         case 'break':
-          return '<br/>';
+          return '<br>';
         case 'blockquote':
           return `<blockquote>${content(node, ctx)}</blockquote>`;
 

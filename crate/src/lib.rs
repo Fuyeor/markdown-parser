@@ -190,7 +190,7 @@ mod shared_fixture {
         }
     }
 
-    // Execute one standard or FFM Markdown case against the Rust parser.
+    // Execute one cfm or FFM Markdown case against the Rust parser.
     fn execute_markdown_case(case: &MarkdownCase, ffm: bool) {
         let option = parser_option(case);
         if case.error.as_deref() == Some("invalid_nesting_depth") {
@@ -230,9 +230,9 @@ mod shared_fixture {
 
     #[test]
     fn test_markdown() {
-        let standard = read_fixture::<MarkdownFixtureFile>("markdown.json");
-        assert_eq!(standard.schema_version, 2);
-        for case in &standard.cases {
+        let cfm = read_fixture::<MarkdownFixtureFile>("cfm.json");
+        assert_eq!(cfm.schema_version, 2);
+        for case in &cfm.cases {
             execute_markdown_case(case, false);
         }
         let ffm = read_fixture::<MarkdownFixtureFile>("ffm.json");

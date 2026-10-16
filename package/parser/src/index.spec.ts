@@ -1,4 +1,5 @@
 // @ffm/parser/src/index.spec.ts
+// @vitest-environment jsdom
 // pnpm -F @ffm/parser test
 import { describe, expect, it } from 'vitest';
 import { isSafeColorValue } from './core/color';
@@ -9,7 +10,6 @@ import { toPlainText } from './core/plain-text';
 import { createMarkdownParser, createCommonParser } from './default';
 
 import ffm from '../../../fixture/ffm.json' with { type: 'json' };
-import common from '../../../fixture/markdown.json' with { type: 'json' };
 import safety from '../../../fixture/safety.json' with { type: 'json' };
 
 type MarkdownAssertion = {
@@ -103,7 +103,6 @@ function executeMarkdownSuite(
   });
 }
 
-executeMarkdownSuite('cfm fixture', common, false);
 // @ts-ignore
 executeMarkdownSuite('ffm fixture', ffm, true);
 

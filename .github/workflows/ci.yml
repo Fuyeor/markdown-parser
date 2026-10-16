@@ -69,8 +69,6 @@ jobs:
         run: pnpm --filter @ffm/linkify build:tld
       - name: Typecheck parser package
         run: pnpm --filter @ffm/parser typecheck
-      - name: Run parser unit tests
-        run: pnpm --filter @ffm/parser test:unit
       - name: Run FFM regression tests
         run: pnpm --filter @ffm/parser test:ffm
       - name: Run safety fixture

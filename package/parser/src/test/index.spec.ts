@@ -65,7 +65,8 @@ function assertMarkdown(
 ) {
   const ast = parse(markdown);
   const resultHtml = render(ast).trim();
-  const targetHtml = expectedHtml.trim();
+  // nomalize legacy CFM `<br />\n`、`<br />` or `<br/>` to `<br>`
+  const targetHtml = expectedHtml.replaceAll(/<br\s*\/?>\n?/g, '<br>').trim();
 
   if (resultHtml !== targetHtml) {
     failures.push({

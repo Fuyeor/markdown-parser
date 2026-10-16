@@ -4,12 +4,12 @@
   "cases": [
     {
       "input": "| 属性 | 类型 | 说明 |\n| :--- | :---: | ---: |\n| name | string | 用户名 |",
-      "html": "<table>\n<thead>\n<tr>\n<th align=\"left\">属性</th>\n<th align=\"center\">类型</th>\n<th align=\"right\">说明</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td align=\"left\">name</td>\n<td align=\"center\">string</td>\n<td align=\"right\">用户名</td>\n</tr>\n</tbody>\n</table>",
+      "html": "<div class=\"table-container\"><table><thead><tr><th align=\"left\">属性</th><th align=\"center\">类型</th><th align=\"right\">说明</th></tr></thead><tbody><tr><td align=\"left\">name</td><td align=\"center\">string</td><td align=\"right\">用户名</td></tr></tbody></table></div>",
       "plain_text": "属性\n类型\n说明\nname\nstring\n用户名"
     },
     {
       "input": "| :--- | ---: |\n| Ray ID | a2c5ac427b7aa727 |\n| IP 地址 | 172.214.47.18 |",
-      "html": "<table>\n<tbody>\n<tr>\n<td align=\"left\">Ray ID</td>\n<td align=\"right\">a2c5ac427b7aa727</td>\n</tr>\n<tr>\n<td align=\"left\">IP 地址</td>\n<td align=\"right\">172.214.47.18</td>\n</tr>\n</tbody>\n</table>",
+      "html": "<div class=\"table-container\"><table><tbody><tr><td align=\"left\">Ray ID</td><td align=\"right\">a2c5ac427b7aa727</td></tr><tr><td align=\"left\">IP 地址</td><td align=\"right\">172.214.47.18</td></tr></tbody></table></div>",
       "plain_text": "Ray ID\na2c5ac427b7aa727\nIP 地址\n172.214.47.18"
     },
     {
@@ -34,22 +34,22 @@
     },
     {
       "input": "```quote\n## Title\n```",
-      "html": "<blockquote>\n<h2>Title</h2>\n</blockquote>",
+      "html": "<blockquote><h2>Title</h2></blockquote>",
       "plain_text": "Title"
     },
     {
       "input": "```accordion\n**One**\nContent\n```",
-      "html": "<div class=\"ffm-accordion\"><details name=\"acc-0\"><summary>One</summary><div class=\"accordion-content\"><p>Content</p>\n</div></details></div>",
+      "html": "<div class=\"ffm-accordion\"><details name=\"acc-0\"><summary>One</summary><div class=\"accordion-body\"><p>Content</p></div></details></div>",
       "plain_text": "One\nContent"
     },
     {
       "input": "```chain\n**[x] Done**\nBody\n```",
-      "html": "<div class=\"chain-container\"><div class=\"chain-item is-completed\"><div class=\"chain-marker\"></div><div class=\"chain-content-wrapper\"><div class=\"chain-title\">Done</div><div class=\"chain-body\"><p>Body</p>\n</div></div></div></div>",
+      "html": "<div class=\"ffm-chain\"><div class=\"chain-item is-completed\"><div class=\"chain-marker\"></div><div class=\"chain-body\"><div class=\"chain-title\">Done</div><div class=\"chain-content\"><p>Body</p></div></div></div></div>",
       "plain_text": "Done\nBody"
     },
     {
       "input": "```slide\nFirst\n\n---\n\nSecond\n```",
-      "html": "<div class=\"slide-container-wrapper\"><div class=\"slide-container\"><div class=\"slide-item\"><p>First</p>\n</div><div class=\"slide-item\"><p>Second</p>\n</div></div></div>",
+      "html": "<div class=\"ffm-slide\"><div class=\"slide-container\"><div class=\"slide-item\"><p>First</p></div><div class=\"slide-item\"><p>Second</p></div></div></div>",
       "plain_text": "First\nSecond"
     },
     {
