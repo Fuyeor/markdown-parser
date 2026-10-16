@@ -10,10 +10,10 @@ export function toPlainText(node: readonly ASTNode[]): string {
 function blockText(node: ASTNode): string {
   switch (node.type) {
     case 'text':
-    case 'inline_code':
-    case 'color_code':
+    case 'code_inline':
+    case 'code_color':
       return node.value ?? '';
-    case 'code_block':
+    case 'code':
       return node.value ?? '';
     case 'heading':
     case 'paragraph':
@@ -47,7 +47,7 @@ function blockText(node: ASTNode): string {
     }
     case 'table_row':
       return joinNodes(node.content ?? []);
-    case 'hardbreak':
+    case 'break':
       return '\n';
     case 'hr':
       return '';

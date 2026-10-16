@@ -1,234 +1,279 @@
 // @ffm/parser/src/core/render.ts
-import type { ASTNode } from '#/type';
-import { isSafeColorValue } from '#/core/color';
-import { isSafeLinkUrl } from '#/core/url';
+import { escapeHtml } from '@fuyeor/util';
+import type {
+  ASTNode,
+  NodeRenderer,
+  RenderContext,
+  RenderOption,
+} from '#/type';
 
-const escapeHtml = (str: string) =>
-  str.replace(
-    /[&<>"']/g,
-    (m) =>
-      ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-      })[m]!,
-  );
+// 渲染子节点；缺省时返回空串
+const content = (node: ASTNode, ctx: RenderContext): string =>
+  ctx.render(node.content ?? []);
 
-// Keep dynamic HTML tag names and CSS values within their supported grammar.
-const getHeadingLevel = (level: unknown) =>
-  typeof level === 'number' &&
-  Number.isInteger(level) &&
-  level >= 1 &&
-  level <= 6
-    ? level
-    : null;
+// 读取纯文本值；解析器保证 value 为 string
+const raw = (node: ASTNode): string => node.value ?? '';
 
-// Keep table alignment attributes within the supported HTML grammar.
-const getTableAlignment = (align: unknown) =>
-  align === 'left' || align === 'center' || align === 'right'
+// 读取并转义的纯文本值
+const rawText = (node: ASTNode): string => escapeHtml(raw(node));
+
+// 未知或降级节点的统一出口
+const passthrough = (node: ASTNode, ctx: RenderContext): string =>
+  `<span>${content(node, ctx)}</span>`;
+
+// 表格单元格对齐：与 Vue renderer 的 align 属性保持一致
+const alignAttr = (cell: ASTNode): string => {
+  const align = cell.align;
+  return align === 'left' || align === 'center' || align === 'right'
     ? ` align="${align}"`
     : '';
-
-const displayLanguageNames: Record<string, string> = {
-  javascript: 'JavaScript',
-  typescript: 'TypeScript',
-  cpp: 'C++',
-  csharp: 'C#',
-  xml: 'XML',
-  json: 'JSON',
-  yaml: 'YAML',
-  ffm: 'Fuyeor Flavored Markdown',
-  fon: 'FON',
-  fer: 'Fer',
 };
 
-// Render a stable fenced-code contract for asynchronous highlight.js processing.
-const getCodeLanguage = (lang: unknown): string => {
-  if (typeof lang !== 'string') return '';
-  return lang.trim().split(/\s+/u)[0] ?? '';
+const renderTableCell = (
+  tag: 'th' | 'td',
+  cell: ASTNode,
+  ctx: RenderContext,
+): string => `<${tag}${alignAttr(cell)}>${content(cell, ctx)}</${tag}>`;
+
+const renderTableHead = (
+  cells: ASTNode[] | undefined,
+  ctx: RenderContext,
+): string => {
+  if (!cells?.length) return '';
+  const rows = cells.map((cell) => renderTableCell('th', cell, ctx)).join('');
+  return `<thead><tr>${rows}</tr></thead>`;
 };
 
-const getDisplayLanguageName = (language: string): string =>
-  displayLanguageNames[language] ??
-  (language ? language.charAt(0).toUpperCase() + language.slice(1) : 'Text');
+const renderTableBody = (
+  rows: ASTNode[] | undefined,
+  ctx: RenderContext,
+): string => {
+  if (!rows?.length) return '';
+  const body = rows
+    .map((row) => {
+      const cells = (row.content ?? [])
+        .map((cell) => renderTableCell('td', cell, ctx))
+        .join('');
+      return `<tr>${cells}</tr>`;
+    })
+    .join('');
+  return `<tbody>${body}</tbody>`;
+};
 
-export function render(nodes?: ASTNode[]): string {
-  let html = '';
+// 渲染标题；level 由解析器保证为 1..6
+const renderHeading = (node: ASTNode, ctx: RenderContext): string => {
+  const level = node.level;
+  return `<h${level}>${content(node, ctx)}</h${level}>`;
+};
 
-  if (!nodes || nodes.length === 0) return '';
+// 渲染代码块：结构与 Vue renderer 输出对齐
+const renderCodeBlock = (node: ASTNode): string => {
+  const language = node.lang ?? '';
+  const value = rawText(node);
+  const body = language
+    ? `<div class="pre-language">${escapeHtml(language)}</div>` +
+      `<pre data-language="${escapeHtml(language)}" data-async="hljs"><code>${value}</code></pre>`
+    : `<pre><code>${value}</code></pre>`;
+  return `<div class="code-block-wrapper">${body}</div>`;
+};
 
-  for (const node of nodes) {
-    switch (node.type) {
-      case 'heading': {
-        const level = getHeadingLevel(node.level);
-        html +=
-          level === null
-            ? `<span>${render(node.content)}</span>`
-            : `<h${level}>${render(node.content)}</h${level}>\n`;
-        break;
-      }
-      case 'paragraph':
-        html += `<p>${render(node.content)}</p>\n`;
-        break;
-      case 'text':
-        html += node.value ? escapeHtml(node.value) : '';
-        break;
-      case 'emoji': {
-        const emoji = String(node.value ?? '');
-        const alt = String(node.alt ?? emoji);
-        const src = String(node.src ?? '');
-        html += `<img class="emoji" draggable="false" alt="${escapeHtml(alt)}" src="${escapeHtml(src)}"/>`;
-        break;
-      }
-      case 'math_inline':
-        html += `<span class="math-inline">${escapeHtml(String(node.value ?? ''))}</span>`;
-        break;
-      case 'math_block':
-        html += `<div class="math-block">${escapeHtml(String(node.value ?? ''))}</div>\n`;
-        break;
-      case 'bold':
-        html += `<strong>${render(node.content)}</strong>`;
-        break;
-      case 'italic':
-        html += `<em>${render(node.content)}</em>`;
-        break;
-      case 'underline':
-        html += `<u>${render(node.content)}</u>`;
-        break;
-      case 'strike':
-        html += `<del>${render(node.content)}</del>`;
-        break;
-      case 'inline_code':
-        html += `<code>${node.value ? escapeHtml(node.value) : ''}</code>`;
-        break;
-      case 'color_code': {
-        const color = String(node.value ?? '');
-        if (!isSafeColorValue(color)) {
-          html += escapeHtml(color);
-          break;
+// 渲染颜色代码块；color_code 由 inlineCodeRule 生成，value 已通过颜色语法校验
+const renderCodeColor = (node: ASTNode): string => {
+  const color = escapeHtml(raw(node));
+  const style =
+    'display:inline-block;width:0.8em;height:0.8em;border-radius:50%;' +
+    `background-color:${color};vertical-align:middle;margin-right:0.3em;` +
+    'border:1px solid #00000030;';
+  return (
+    `<code class="ffm-color-code">` +
+    `<span class="ffm-color-swatch" style="${style}"></span>${color}` +
+    `</code>`
+  );
+};
+
+// 渲染链接；linkRule / linkify 已过滤 URL scheme
+const renderLink = (node: ASTNode, ctx: RenderContext): string => {
+  const url = escapeHtml((node.url ?? '').trim());
+  return `<a href="${url}">${content(node, ctx)}</a>`;
+};
+
+// 渲染图片；url 由解析器过滤 scheme，alt / caption 为纯文本
+const renderImage = (node: ASTNode, ctx: RenderContext): string => {
+  const url = escapeHtml((node.url ?? '').trim());
+  const img = `<img src="${url}" alt="${node.alt}">`;
+
+  // caption 与 title 等价；缺省时退化为裸 <img>
+  const caption = node.caption ?? node.title;
+  if (!caption || (Array.isArray(caption) && caption.length === 0)) return img;
+
+  const figcaption =
+    typeof caption === 'string' ? escapeHtml(caption) : ctx.render(caption);
+
+  return (
+    `<figure class="ffm-image">` +
+    img +
+    `<figcaption>${figcaption}</figcaption>` +
+    `</figure>`
+  );
+};
+
+// 链节点状态类名；与 Vue renderer 保持一致
+const chainStatusClass = (node: ASTNode): string =>
+  node.hasCheckbox ? (node.isCompleted ? 'is-completed' : 'is-pending') : '';
+
+// 渲染 AST 为 HTML；custom 渲染器按节点类型覆盖内置分支
+export function render(nodeArray?: ASTNode[], option?: RenderOption): string {
+  const custom = option?.nodeRenderer;
+  const ctx: RenderContext = {
+    escapeHtml,
+    render: (children) => renderNodes(children, custom, ctx),
+  };
+  return renderNodes(nodeArray, custom, ctx);
+}
+
+function renderNodes(
+  nodeArray: ASTNode[] | undefined,
+  custom: Record<string, NodeRenderer> | undefined,
+  ctx: RenderContext,
+): string {
+  if (!nodeArray?.length) return '';
+
+  return nodeArray
+    .map((node) => {
+      const renderer = custom?.[node.type];
+      if (renderer) return renderer(node, ctx);
+
+      switch (node.type) {
+        // Common Flavored Markdown
+        case 'heading':
+          return renderHeading(node, ctx);
+        case 'paragraph':
+          return `<p>${content(node, ctx)}</p>`;
+        case 'text':
+          return rawText(node);
+        case 'bold':
+          return `<strong>${content(node, ctx)}</strong>`;
+        case 'italic':
+          return `<em>${content(node, ctx)}</em>`;
+        case 'underline':
+          return `<u>${content(node, ctx)}</u>`;
+        case 'strike':
+          return `<del>${content(node, ctx)}</del>`;
+        case 'link':
+          return renderLink(node, ctx);
+        case 'image':
+          return renderImage(node, ctx);
+        case 'hr':
+          return '<hr>';
+        case 'break':
+          return '<br>';
+        case 'blockquote':
+          return `<blockquote>${content(node, ctx)}</blockquote>`;
+
+        case 'code':
+          return renderCodeBlock(node);
+        case 'code_inline':
+          return `<code>${rawText(node)}</code>`;
+        case 'code_color':
+          return renderCodeColor(node);
+
+        case 'list': {
+          const tag = node.ordered ? 'ol' : 'ul';
+          const start =
+            node.ordered && node.start && node.start !== 1
+              ? ` start="${node.start}"`
+              : '';
+          return `<${tag}${start}>${content(node, ctx)}</${tag}>`;
         }
-        html += `<code class="ffm-color-code"><span class="ffm-color-swatch" style="display:inline-block;width:0.8em;height:0.8em;border-radius:50%;background-color:${escapeHtml(color)};vertical-align:middle;margin-right:0.3em;border:1px solid #00000030;"></span>${escapeHtml(color)}</code>`;
-        break;
-      }
-      case 'link': {
-        const url = String(node.url ?? '').trim();
-        html += isSafeLinkUrl(url)
-          ? `<a href="${escapeHtml(url)}">${render(node.content)}</a>`
-          : render(node.content);
-        break;
-      }
-      case 'code_block': {
-        const language = getCodeLanguage(node.lang);
-        const displayLanguage = getDisplayLanguageName(language);
-        const preAttributes = language
-          ? `class="hljs language-${escapeHtml(language)}" data-language="${escapeHtml(language)}"`
-          : 'class="hljs language-plaintext"';
-        html += `<div class="code-block-wrapper">`;
-        if (language) {
-          html += `<div class="code-lang">${escapeHtml(displayLanguage)}</div>`;
+        case 'list_item':
+          return `<li>${content(node, ctx)}</li>`;
+
+        case 'table': {
+          const head = renderTableHead(node.header, ctx);
+          const body = renderTableBody(node.content, ctx);
+          return `<div class="table-container"><table>${head}${body}</table></div>`;
         }
-        html += `<pre ${preAttributes}><code>${escapeHtml(String(node.value ?? ''))}\n</code></pre></div>\n`;
-        break;
-      }
-      case 'list': {
-        const tag = node.ordered ? 'ol' : 'ul';
-        const start =
-          node.ordered && node.start && node.start !== 1
-            ? ` start="${node.start}"`
-            : '';
-        html += `<${tag}${start}>\n${render(node.content)}</${tag}>\n`;
-        break;
-      }
-      case 'list_item':
-        html += `<li>${render(node.content)}</li>\n`;
-        break;
-      case 'mermaid':
-        html += `<div class="language-mermaid">${escapeHtml(String(node.value ?? ''))}</div>\n`;
-        break;
-      case 'abc':
-        html += `<div class="language-abc">${escapeHtml(String(node.value ?? ''))}</div>\n`;
-        break;
-      case 'smiles_inline':
-        html += `<span class="language-smiles smiles-inline" data-smiles="${escapeHtml(String(node.value ?? ''))}"></span>`;
-        break;
-      case 'smiles_block': {
-        const blocks = String(node.value ?? '')
-          .split('\n')
-          .filter((line) => line.trim().length > 0)
-          .map(
-            (line) =>
-              `<div class="language-smiles smiles-block" data-smiles="${escapeHtml(line.trim())}"></div>`,
+
+        // Fuyeor Flavored Markdown
+        case 'accordion':
+          return `<div class="ffm-accordion">${content(node, ctx)}</div>`;
+        case 'accordion_item': {
+          const name = node.name ? ` name="${escapeHtml(node.name)}"` : '';
+          return (
+            `<details${name}>` +
+            `<summary>${ctx.render(node.title ?? [])}</summary>` +
+            `<div class="accordion-body">${content(node, ctx)}</div>` +
+            `</details>`
           );
-        html += blocks.length > 0 ? `${blocks.join('\n')}\n` : '';
-        break;
-      }
-      case 'table': {
-        html += '<table>\n';
-        if (node.header) {
-          html += '<thead>\n<tr>\n';
-          node.header.forEach((cell) => {
-            html += `<th${getTableAlignment(cell.align)}>${render(cell.content)}</th>\n`;
-          });
-          html += '</tr>\n</thead>\n';
         }
-        if (node.content && node.content.length > 0) {
-          html += '<tbody>\n';
-          node.content.forEach((row) => {
-            html += '<tr>\n';
-            row.content?.forEach((cell) => {
-              html += `<td${getTableAlignment(cell.align)}>${render(cell.content)}</td>\n`;
-            });
-            html += '</tr>\n';
-          });
-          html += '</tbody>\n';
-        }
-        html += '</table>\n';
-        break;
-      }
-      case 'hr':
-        html += '<hr />\n';
-        break;
-      case 'blockquote':
-        html += `<blockquote>\n${render(node.content)}</blockquote>\n`;
-        break;
-      case 'accordion':
-        html += `<div class="ffm-accordion">${render(node.content)}</div>`;
-        break;
-      case 'accordion_item':
-        html += `<details name="${escapeHtml(String(node.name ?? ''))}"><summary>${render(node.title)}</summary><div class="accordion-content">${render(node.content)}</div></details>`;
-        break;
-      case 'chain':
-        html += `<div class="chain-container">${render(node.content)}</div>`;
-        break;
-      case 'chain_item': {
-        const statusClass = node.hasCheckbox
-          ? node.isCompleted
-            ? 'is-completed'
-            : 'is-pending'
-          : '';
-        const title =
-          node.title && node.title.length > 0
-            ? `<div class="chain-title">${render(node.title)}</div>`
-            : '';
-        html += `<div class="chain-item ${statusClass}"><div class="chain-marker"></div><div class="chain-content-wrapper">${title}<div class="chain-body">${render(node.content)}</div></div></div>`;
-        break;
-      }
-      case 'slide':
-        html += `<div class="slide-container-wrapper"><div class="slide-container">${render(node.content)}</div></div>`;
-        break;
-      case 'slide_item':
-        html += `<div class="slide-item">${render(node.content)}</div>`;
-        break;
-      case 'hardbreak':
-        html += '<br />\n';
-        break;
-      default:
-        html += `<span>${render(node.content)}</span>`;
-        break;
-    }
-  }
 
-  return html;
+        case 'chain':
+          return `<div class="ffm-chain">${content(node, ctx)}</div>`;
+        case 'chain_item': {
+          const status = chainStatusClass(node);
+          const titleNodes = node.title;
+          const title = titleNodes?.length
+            ? `<div class="chain-title">${ctx.render(titleNodes)}</div>`
+            : '';
+          return (
+            `<div class="chain-item ${status}">` +
+            `<div class="chain-marker"></div>` +
+            `<div class="chain-body">${title}` +
+            `<div class="chain-content">${content(node, ctx)}</div>` +
+            `</div></div>`
+          );
+        }
+
+        case 'slide':
+          return (
+            `<div class="ffm-slide">` +
+            `<div class="slide-container">${content(node, ctx)}</div>` +
+            `</div>`
+          );
+        case 'slide_item':
+          return `<div class="slide-item">${content(node, ctx)}</div>`;
+
+        // 异步节点：属性与 Vue renderer 输出完全对齐，供 hydrate() 扫描
+        case 'emoji': {
+          const alt = node.value ?? '';
+          const src = String(node.src ?? '');
+          return (
+            `<img class="emoji" draggable="false"` +
+            ` alt="${escapeHtml(alt)}" src="${escapeHtml(src)}" />`
+          );
+        }
+
+        case 'math':
+          return `<div class="math-block" data-async="latex">${rawText(node)}</div>`;
+        case 'math_inline':
+          return `<span class="math-inline" data-async="latex">${rawText(node)}</span>`;
+
+        case 'mermaid':
+          return `<div class="language-mermaid" data-async="mermaid">${rawText(node)}</div>`;
+
+        case 'smiles': {
+          const lines = raw(node)
+            .split('\n')
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0);
+          if (lines.length === 0) return '';
+          const blocks = lines
+            .map(
+              (line) =>
+                `<div class="language-smiles smiles-block" data-async="smiles" data-smiles="${escapeHtml(line)}"></div>`,
+            )
+            .join('');
+          return `${blocks}`;
+        }
+        case 'smiles_inline':
+          return `<span class="language-smiles smiles-inline" data-async="smiles" data-smiles="${rawText(node)}"></span>`;
+
+        case 'abc':
+          return `<div class="language-abc" data-async="abc">${rawText(node)}</div>`;
+
+        default:
+          return passthrough(node, ctx);
+      }
+    })
+    .join('');
 }

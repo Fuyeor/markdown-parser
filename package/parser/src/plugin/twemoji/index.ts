@@ -1,6 +1,6 @@
-// @ffm/parser/src/plugin/twemoji.ts
+// @ffm/parser/src/plugin/twemoji/index.ts
 import type { ASTNode, ASTTransform, MarkdownPlugin } from '#/type';
-import { mapAstNodes } from './ast';
+import { mapAstNode } from '#/plugin/ast';
 
 const r = String.raw;
 const baseEmojiPattern = r`\p{Emoji}(?:\p{EMod}|[\u{E0020}-\u{E007E}]+\u{E007F}|\uFE0F?\u20E3?)`;
@@ -54,7 +54,7 @@ export const transformTwemojiNode = (node: ASTNode): ASTNode[] => {
 };
 
 export const twemojiTransform: ASTTransform = (nodes) =>
-  mapAstNodes(nodes, (node) =>
+  mapAstNode(nodes, (node) =>
     node.type === 'text' ? transformTwemojiNode(node) : node,
   );
 
@@ -62,6 +62,3 @@ export const twemojiTransform: ASTTransform = (nodes) =>
 export const twemojiPlugin: MarkdownPlugin = (parser) => {
   parser.addAstTransform(twemojiTransform);
 };
-
-// Keep the name used by the existing Interactify markdown-it integration.
-export const nativeEmojiPlugin = twemojiPlugin;

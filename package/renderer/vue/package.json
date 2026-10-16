@@ -1,5 +1,6 @@
 {
   "name": "@ffm/vue-renderer",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Fuyeor <https://www.fuyeor.com/@Fuyeor>",
   "type": "module",

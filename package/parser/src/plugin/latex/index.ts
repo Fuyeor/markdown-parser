@@ -1,6 +1,13 @@
-// @ffm/parser/src/plugin/latex.ts
+// @ffm/parser/src/plugin/latex/index.ts
+import { loadScript } from '@fuyeor/util';
 import { BlockState, InlineState } from '#/core/state';
-import type { BlockRule, InlineRule, MarkdownPlugin } from '#/type';
+import type {
+  BlockRule,
+  InlineRule,
+  AsyncRenderer,
+  MarkdownPlugin,
+} from '#/type';
+import type { Katex, KatexSource } from './type';
 
 const inlineMathMarker = '$';
 const blockMathMarker = '$$';
@@ -55,7 +62,7 @@ export const latexInlineRule: InlineRule = {
 
 // Parse a $$...$$ formula as one block, including formulas spanning lines.
 export const latexBlockRule: BlockRule = {
-  name: 'math_block',
+  name: 'math',
   marker: [inlineMathMarker],
   parse(state: BlockState) {
     const firstLine = state.currentLine;
@@ -85,7 +92,7 @@ export const latexBlockRule: BlockRule = {
 
     return {
       node: {
-        type: 'math_block',
+        type: 'math',
         value: contentLines.join('\n').trim(),
       },
       consumedLines,
@@ -93,7 +100,24 @@ export const latexBlockRule: BlockRule = {
   },
 };
 
+// Build a KaTeX renderer; CDN URLs are supplied by the host.
+export const createLatex = (source: KatexSource): AsyncRenderer<Katex> => ({
+  name: 'latex',
+  selector: '[data-async="latex"]',
+  style: source.style,
+  // katex will finds `window.katex`
+  load: () => loadScript<Katex>(source.script, 'katex'),
+  render(element, latex) {
+    latex.render(element.textContent ?? '', element, {
+      throwOnError: false,
+      output: 'html',
+      displayMode: element.classList.contains('math-block'),
+    });
+  },
+});
+
 // Register LaTeX block and inline rules on a markdown-parser instance.
 export const latexPlugin: MarkdownPlugin = (parser) => {
   parser.addBlockRule(latexBlockRule).addInlineRule(latexInlineRule);
+  parser.requireCapability('latex');
 };

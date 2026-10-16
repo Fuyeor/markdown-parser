@@ -16,7 +16,7 @@ const nodeTitleRegex = /^\s*\*\*(?:\[([ xX])\]\s*)?(.+?)\*\*\s*$/;
  * intercept special fuyeor flavored markdown blocks (accordion, slide, chain, quote)
  */
 export const ffmBlockRule: BlockRule = {
-  name: 'ffm_blocks',
+  name: 'ffm',
   // same as code block to leverage fenced block parsing
   marker: ['`', '~'],
   parse(state: BlockState, ctx) {
@@ -128,7 +128,7 @@ export const ffmBlockRule: BlockRule = {
 
     // fallback
     return {
-      node: { type: 'code_block', lang: type, value: rawContent },
+      node: { type: 'code', lang: type, value: rawContent },
       consumedLines,
     };
   },

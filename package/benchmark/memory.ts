@@ -1,15 +1,15 @@
 // @ffm/benchmark/memory.ts
 // pnpm -F @ffm/benchmark bench:memory
 // @ts-nocheck
-import { createFuyeorMarkdownParser, render } from '@ffm/parser';
+import { createMarkdownParser, render } from '@ffm/parser';
 import MarkdownIt from 'markdown-it';
 import { marked } from 'marked';
 import { social, article } from './samples';
 
 // Polyfill for window if needed by some specific logic
-if (typeof window === 'undefined') global.window = globalThis;
+global.window = globalThis;
 
-const ffm = createFuyeorMarkdownParser();
+const ffm = createMarkdownParser();
 const mdIt = new MarkdownIt({ linkify: true });
 
 const ffmIt = (content: string) => {

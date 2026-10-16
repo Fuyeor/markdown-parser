@@ -1,23 +1,19 @@
 // @ffm/parser/test/index.spec.ts
-// pnpm test
-import { readFileSync, writeFileSync } from 'node:fs';
+// pnpm -F @ffm/parser test
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it, expect, afterAll } from 'vitest';
-import { createFuyeorMarkdownParser } from '#/default';
+import { createMarkdownParser } from '#/default';
 import { render } from '#/core/render';
 
-const parse = createFuyeorMarkdownParser();
+// commonMark: 0.13.2 edition
+import commonMark from './spec/commonMark.json' with { type: 'json' };
+// githubMark: 0.29 edition
+import githubMark from './spec/githubMark.json' with { type: 'json' };
+
+const parse = createMarkdownParser();
 const failures: any[] = [];
 
-// load test JSON
-const commonMark = JSON.parse(
-  // commonMark: 0.13.2 edition
-  readFileSync(resolve(__dirname, './spec/commonMark.json'), 'utf-8'),
-);
-const githubMark = JSON.parse(
-  // githubMark: 0.29 edition
-  readFileSync(resolve(__dirname, './spec/githubMark.json'), 'utf-8'),
-);
 /**
  * skip unimplemented test cases
  */
@@ -69,7 +65,8 @@ function assertMarkdown(
 ) {
   const ast = parse(markdown);
   const resultHtml = render(ast).trim();
-  const targetHtml = expectedHtml.trim();
+  // nomalize legacy CFM `<br />\n`、`<br />` or `<br/>` to `<br>`
+  const targetHtml = expectedHtml.replaceAll(/<br\s*\/?>\n?/g, '<br>').trim();
 
   if (resultHtml !== targetHtml) {
     failures.push({

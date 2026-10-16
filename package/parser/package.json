@@ -7,7 +7,6 @@
   "sideEffects": false,
   "scripts": {
     "test": "vitest run src/index.spec.ts",
-    "test:unit": "vitest run src/index.spec.ts -t \"cfm fixture\"",
     "test:ffm": "vitest run src/index.spec.ts -t \"ffm fixture\"",
     "test:safety": "vitest run src/index.spec.ts -t \"safety fixture\"",
     "test:compat": "vitest run src/test/index.spec.ts",
@@ -17,10 +16,12 @@
     "#/*": "./src/*"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./plugin": "./src/plugin/index.ts"
   },
   "dependencies": {
-    "@ffm/linkify": "workspace:*"
+    "@ffm/linkify": "workspace:*",
+    "@fuyeor/util": "^0.1.2"
   },
   "devDependencies": {
     "typescript": "^7.0.2",

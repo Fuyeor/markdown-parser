@@ -1,5 +1,5 @@
 // @ffm/editor/src/parse/bridge.ts
-import { createFuyeorMarkdownParser } from '@ffm/parser';
+import { createMarkdownParser } from '@ffm/parser';
 import type { ASTNode } from '@ffm/parser';
 import { nextBlockId } from '#/state/id';
 import type {
@@ -11,7 +11,7 @@ import type {
   FormatType,
 } from '#/state/document';
 
-const parse = createFuyeorMarkdownParser();
+const parse = createMarkdownParser();
 
 type BlockContext = {
   listDepth: number;
@@ -42,11 +42,11 @@ function collectBlock(nodeArray: ASTNode[], context: BlockContext): Block[] {
     switch (node.type) {
       case 'paragraph':
       case 'heading':
-      case 'code_block':
-      case 'math_block':
+      case 'code':
+      case 'math':
       case 'mermaid':
       case 'abc':
-      case 'smiles_block':
+      case 'smiles':
       case 'hr':
         blockArray.push(createLeafBlock(node, context));
         break;
@@ -101,12 +101,12 @@ function createLeafBlock(node: ASTNode, context: BlockContext): Block {
   const attr: BlockAttr = {};
   if (node.type === 'heading')
     attr.level = typeof node.level === 'number' ? node.level : 1;
-  if (node.type === 'code_block' && typeof node.lang === 'string')
+  if (node.type === 'code' && typeof node.lang === 'string')
     attr.language = node.lang;
   if (node.type === 'mermaid') attr.language = 'mermaid';
-  if (node.type === 'math_block') attr.language = 'math';
+  if (node.type === 'math') attr.language = 'math';
   if (node.type === 'abc') attr.language = 'abc';
-  if (node.type === 'smiles_block') attr.language = 'smiles';
+  if (node.type === 'smiles') attr.language = 'smiles';
   if (context.quoteDepth > 0) attr.quoteDepth = context.quoteDepth;
 
   return { id, type: blockTypeFor(node.type), text, formatArray, attr };
@@ -126,7 +126,7 @@ function blockTypeFor(nodeType: string): BlockType {
   switch (nodeType) {
     case 'heading':
       return 'heading';
-    case 'code_block':
+    case 'code':
       return 'code-block';
     case 'blockquote':
       return 'quote';
@@ -221,7 +221,7 @@ function flattenInline(nodeArray: ASTNode[]): {
       text += node.value ?? '';
       continue;
     }
-    if (node.type === 'hardbreak') {
+    if (node.type === 'break') {
       text += '\n';
       continue;
     }
@@ -273,7 +273,7 @@ function formatTypeFor(nodeType: string): FormatType | undefined {
       return 'strike';
     case 'link':
       return 'link';
-    case 'inline_code':
+    case 'code_inline':
       return 'code';
     case 'math_inline':
       return 'code';

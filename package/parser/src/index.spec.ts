@@ -1,13 +1,16 @@
 // @ffm/parser/src/index.spec.ts
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+// @vitest-environment jsdom
+// pnpm -F @ffm/parser test
 import { describe, expect, it } from 'vitest';
 import { isSafeColorValue } from './core/color';
 import { MarkdownParser } from './core/parser';
 import { isSafeLinkUrl } from './core/url';
 import { render } from './core/render';
 import { toPlainText } from './core/plain-text';
-import { createFuyeorMarkdownParser, createMarkdownParser } from './default';
+import { createMarkdownParser, createCommonParser } from './default';
+
+import ffm from '../../../fixture/ffm.json' with { type: 'json' };
+import safety from '../../../fixture/safety.json' with { type: 'json' };
 
 type MarkdownAssertion = {
   path: string;
@@ -30,26 +33,6 @@ type MarkdownFixtureFile = {
   description: string;
   cases: MarkdownCase[];
 };
-
-type SafetyCase = { input: string; valid: boolean };
-type SafetyFixtureFile = {
-  schema_version: number;
-  description: string;
-  links: SafetyCase[];
-  colors: SafetyCase[];
-};
-
-const loadJson = <T>(name: string): T =>
-  JSON.parse(
-    readFileSync(
-      resolve(import.meta.dirname, `../../../fixture/${name}`),
-      'utf8',
-    ),
-  ) as T;
-
-const cfmFixture = loadJson<MarkdownFixtureFile>('markdown.json');
-const ffmFixture = loadJson<MarkdownFixtureFile>('ffm.json');
-const safetyFixtures = loadJson<SafetyFixtureFile>('safety.json');
 
 // Read a portable JSON Pointer path from a TypeScript AST value.
 function readJsonPointer(root: unknown, pointer: string): unknown {
@@ -85,8 +68,8 @@ function executeMarkdownCase(fixture: MarkdownCase, ffm: boolean): void {
   }
 
   const parser = ffm
-    ? createFuyeorMarkdownParser(option)
-    : createMarkdownParser(option);
+    ? createMarkdownParser(option)
+    : createCommonParser(option);
   const ast = parser(fixture.input ?? '');
   if (fixture.html !== undefined) expect(render(ast).trim()).toBe(fixture.html);
   if (fixture.plain_text !== undefined)
@@ -120,8 +103,8 @@ function executeMarkdownSuite(
   });
 }
 
-executeMarkdownSuite('cfm fixture', cfmFixture, false);
-executeMarkdownSuite('ffm fixture', ffmFixture, true);
+// @ts-ignore
+executeMarkdownSuite('ffm fixture', ffm, true);
 
 // Verify the public AST shape uses the modern scalar and structural field names.
 describe('AST field names', () => {
@@ -160,11 +143,11 @@ describe('AST field names', () => {
 });
 
 describe('safety fixture', () => {
-  expect(safetyFixtures.schema_version).toBe(1);
-  for (const fixture of safetyFixtures.links)
+  expect(safety.schema_version).toBe(1);
+  for (const fixture of safety.links)
     it(`link: ${fixture.input}`, () =>
       expect(isSafeLinkUrl(fixture.input)).toBe(fixture.valid));
-  for (const fixture of safetyFixtures.colors)
+  for (const fixture of safety.colors)
     it(`color: ${fixture.input}`, () =>
       expect(isSafeColorValue(fixture.input)).toBe(fixture.valid));
 });
