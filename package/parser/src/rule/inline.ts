@@ -148,7 +148,7 @@ export const linkRule: InlineRule = {
       node: {
         type: 'link',
         url,
-        content: ctx.parseInline(innerText),
+        content: ctx.parseInlineNoLinkify(innerText),
       },
       consumedChars: urlEnd - state.pos + 1,
     };

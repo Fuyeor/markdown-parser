@@ -15,7 +15,7 @@ Further, I'm working to __create content scenarios__ like [social](https://fuyeo
 `.repeat(50); // Simulating a long feed
 
 /**
- * Blog Post Scenario
+ * Article Scenario
  * Focus: Structured headers, nested lists, code blocks, and tables.
  */
 export const article = `

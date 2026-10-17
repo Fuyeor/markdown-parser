@@ -31,6 +31,7 @@ export class MarkdownParser {
   #astTransforms: ASTTransform[] = [];
   #idSequence = 0;
   #isPreflight = false;
+  #nestingDepth = 0;
   #blockRuleMap = new Map<string, BlockRule[]>();
   #inlineRuleMap = new Map<string, InlineRule[]>();
   #capability = new Set<AsyncCapability>();
@@ -45,20 +46,35 @@ export class MarkdownParser {
   }
 
   // construct a context for recursive rule calls
-  readonly #context: ParserContext = this.#createContext(0);
-
-  #createContext(depth: number): ParserContext {
-    return {
-      parseInline: (content: string) =>
-        this.#parseInline(new InlineState(content), depth + 1),
-      parseBlocks: (content: string) =>
-        this.#parseBlocks(new BlockState(content), depth + 1),
-      createId: (prefix: string) =>
-        this.#isPreflight
-          ? `${prefix}-probe`
-          : `${prefix}-${this.#idSequence++}`,
-    };
-  }
+  // singleton context: constructed only once, and the closure is also created only once
+  readonly #context: ParserContext = {
+    parseInline: (content: string) => {
+      this.#nestingDepth++;
+      try {
+        return this.#parseInline(new InlineState(content));
+      } finally {
+        this.#nestingDepth--;
+      }
+    },
+    parseInlineNoLinkify: (content: string) => {
+      this.#nestingDepth++;
+      try {
+        return this.#parseInline(new InlineState(content), false);
+      } finally {
+        this.#nestingDepth--;
+      }
+    },
+    parseBlocks: (content: string) => {
+      this.#nestingDepth++;
+      try {
+        return this.#parseBlocks(new BlockState(content));
+      } finally {
+        this.#nestingDepth--;
+      }
+    },
+    createId: (prefix: string) =>
+      this.#isPreflight ? `${prefix}-probe` : `${prefix}-${this.#idSequence++}`,
+  };
 
   // register block rule
   // By default, it inserts at the end, or before/after a specified rule.
@@ -118,8 +134,8 @@ export class MarkdownParser {
     };
   }
 
-  #parseBlocks(state: BlockState, depth = 0): ASTNode[] {
-    if (depth > this.#maxNestingDepth) {
+  #parseBlocks(state: BlockState): ASTNode[] {
+    if (this.#nestingDepth > this.#maxNestingDepth) {
       return [
         {
           type: 'paragraph',
@@ -133,7 +149,7 @@ export class MarkdownParser {
       ];
     }
 
-    const context = depth === 0 ? this.#context : this.#createContext(depth);
+    const context = this.#context;
     const nodes: ASTNode[] = [];
     while (state.lineIndex < state.lineCount) {
       const line = state.currentLine;
@@ -241,7 +257,6 @@ export class MarkdownParser {
             type: 'paragraph',
             content: this.#parseInline(
               new InlineState(paragraphLines.join('\n')),
-              depth,
             ),
           });
         }
@@ -250,12 +265,12 @@ export class MarkdownParser {
     return nodes;
   }
 
-  #parseInline(state: InlineState, depth = 0): ASTNode[] {
-    if (depth > this.#maxNestingDepth) {
+  #parseInline(state: InlineState, linkify = true): ASTNode[] {
+    if (this.#nestingDepth > this.#maxNestingDepth) {
       return [{ type: 'text', value: state.content.slice(state.pos) }];
     }
 
-    const context = depth === 0 ? this.#context : this.#createContext(depth);
+    const context = this.#context;
     const nodes: ASTNode[] = [];
 
     // record the start position of plain text
@@ -265,6 +280,13 @@ export class MarkdownParser {
     const flushText = (endPos: number) => {
       if (endPos > textStart) {
         const textBuffer = state.content.slice(textStart, endPos);
+
+        // Do not linkify within the linked text to avoid nesting
+        if (!linkify) {
+          nodes.push({ type: 'text', value: textBuffer });
+          return;
+        }
+
         let lastIdx = 0;
 
         for (const match of this.#linkifier(textBuffer)) {

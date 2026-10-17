@@ -60,6 +60,11 @@ export interface ASTNode {
 // inject context into rules allows them to recursively call the parser
 export interface ParserContext {
   parseInline: (content: string) => ASTNode[];
+  /**
+   * similar to parseInline, but skips URL linkify
+   * used for scenarios such as linking text
+   */
+  parseInlineNoLinkify: (content: string) => ASTNode[];
   parseBlocks: (content: string) => ASTNode[];
   createId: (prefix: string) => string;
 }

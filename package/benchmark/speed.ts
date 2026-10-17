@@ -32,7 +32,7 @@ group('50 Social Post (Small/Frequent)', () => {
 });
 
 // Benchmarking Blog scenario
-group('20 Blog Post (Structured/Nested)', () => {
+group('20 Article (Structured/Nested)', () => {
   bench('@ffm/parser (AST, No Extension)', () => ffm2(article));
   bench('@ffm/parser (AST, Full)', () => ffm(article));
   bench('@ffm/parser (HTML, No Extension)', () => ffmIt2(article));
