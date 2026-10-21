@@ -1,0 +1,229 @@
+# Bem-vindo ao Playground do Markdown
+
+Este é um documento de exemplo para testar e mostrar a sintaxe do Fuyeor Flavored Markdown. Você pode editá-lo e visualizar o resultado em tempo real aqui.
+
+## Sintaxe básica
+
+### Títulos
+
+```ffm
+# Título de nível 1
+
+## Título de nível 2
+
+### Título de nível 3
+
+#### Título de nível 4
+
+##### Título de nível 5
+
+###### Título de nível 6
+```
+
+### Ênfase
+
+- *Texto em itálico*: use `*texto*`
+- **Texto em negrito**: use `**texto**`
+- --Texto riscado--: use `--texto--`
+- __Sublinhado__: use `__texto__`
+
+### Parágrafos e quebras de linha
+
+Este é o primeiro parágrafo.
+Uma única quebra de linha permanece na mesma linha.
+
+Este é o segundo parágrafo. Duas quebras de linha criam um novo parágrafo.
+
+## Listas
+
+As sublistas de listas não ordenadas e ordenadas devem ser indentadas com __2 espaços__:
+
+### Lista não ordenada
+
+- Maçã
+- Banana
+  - Banana-anã
+  - Banana Cavendish
+- Laranja
+
+### Lista ordenada
+
+1. Abra qualquer editor:
+  1. Playground online
+  2. Bloco de notas
+  3. VS Code
+2. Escreva Markdown
+3. Pré-visualize o resultado:
+  - Modo código-fonte
+  - Modo WYSIWYG
+
+## Links e imagens
+
+### Links
+
+- [Exemplo de link com texto](https://fuyeor.com)
+- Link reconhecido automaticamente: Fuyeor.com
+
+### Imagens
+
+![](https://fuyeor.gallerycdn.vsassets.io/extensions/fuyeor/ffm/0.1.0/1787332024048/Microsoft.VisualStudio.Services.Icons.Default)
+
+## Citações
+
+### Citação de uma linha
+
+> Não existe design eterno, apenas razões para continuar existindo.
+
+### Citação de várias linhas
+
+```quote
+A small syntax can make a large pause.
+
+- Format in one breath
+- Preview as you write
+- Keep every idea close
+```
+
+## Código
+
+### Código em linha
+
+Em Python, use `print("Hello, Markdown!")` para exibir texto.
+
+### Blocos de código
+
+```fon
+{
+  identifier = `reference.fuyeor.com`
+  params = {
+    locale = .en
+    module = `ffm`
+    slug = [`tutorials`, `overview`]
+  }
+}
+```
+
+Se precisar aninhar blocos de código, use __mais crases no bloco externo__.
+
+## Tabelas
+
+### Tabela com cabeçalho
+
+| Alinhado à esquerda | Centralizado | Alinhado à direita |
+| :--- | :---: | ---: |
+| Conteúdo | Conteúdo | Conteúdo |
+| Conteúdo longo | Conteúdo longo | Conteúdo longo |
+
+### Tabela sem cabeçalho
+
+| --- | --- |
+| **Nome** | Fuyeor |
+| **Profissão** | Designer |
+
+## Linha divisória
+
+---
+
+## Componentes interativos
+
+### Slides
+
+```slide
+**Ф social**
+- Limite de caracteres: 3000 - 5000 (caracteres)
+- Formato do conteúdo: Fuyeor Flavored Markdown
+
+---
+
+**Bluesky**
+- Limite de caracteres: 300 (caracteres)
+- Formato do conteúdo: Texto simples
+
+---
+
+**Mastodon**
+- Limite de caracteres: Varia conforme a instância, mas a maioria tem 500 por padrão
+- Formato do conteúdo: Texto simples
+```
+
+### Cadeia de pensamento
+
+```chain
+**[x] Reservar o local da festa**
+A loja de jogos de tabuleiro que todos concordaram já foi reservada, e o depósito foi pago.
+
+**[x] Confirmar o número de participantes**
+Todos responderam no chat do grupo; no total, __8 pessoas vão comparecer__.
+
+**[ ] Comprar salgadinhos e bebidas**
+Lista de compras pronta; planejo comprar no sábado de manhã e levar direto para a loja.
+
+**[ ] Preparar o presente de aniversário surpresa**
+O presente comprado online está a caminho; previsão de chegada na sexta-feira à tarde.
+
+**Publicar nas redes sociais**
+Não esqueça de compartilhar as fotos da festa nas redes sociais depois~
+```
+
+### Acordeão
+
+```accordion
+**Como posso entrar na equipe de voluntários?**
+Clique em "Junte-se a nós" no canto superior direito da página inicial e preencha um breve formulário. Nossos coordenadores entrarão em contato em até três dias úteis.
+
+**Preciso levar minhas próprias ferramentas para os eventos?**
+De jeito nenhum! Todos os materiais e ferramentas necessários são fornecidos gratuitamente no local.
+
+**E se eu não puder mais comparecer?**
+Sem problemas. Basta acessar seu perfil e clicar em "Cancelar reserva" pelo menos 24 horas antes do evento.
+```
+
+## Extensões acadêmicas
+
+### Fórmulas matemáticas
+
+Fórmula em linha: $E = mc^2$
+
+Fórmula em bloco:
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+
+### Diagramas e fluxogramas
+
+```mermaid
+graph TD
+    A[Nó de início] --> C{Decisão}
+    C -- Aprovar --> D[Nó de fim]
+    C -- Rejeitar --> E[Voltar para modificação]
+
+    %% Definição de estilo para todas as cores e curvas arredondadas
+    classDef default fill:#F2F4F7,stroke:#D0D5DD,stroke-width:2px,color:#344054,rx:10px,ry:10px
+    linkStyle default stroke:#98A2B3,stroke-width:2px,curve:basis
+```
+
+### Fórmulas químicas
+
+Quando se trata de alívio da dor, a conhecida fórmula estrutural da aspirina é #[smiles = `CC(=O)OC1=CC=CC=C1C(=O)O`]; sua contraparte, o ibuprofeno, tem a fórmula molecular #[smiles = `CC(C)CC1=CC=C(C=C1)C(C)C(=O)O`].
+
+### Partitura musical
+
+```abc
+X: 1
+T: Exemplo de escala (Scale Example)
+M: 4/4
+L: 1/4
+K: C
+C D E F | G A B c |
+```
+
+## Conclusão
+
+Parabéns por concluir o tutorial do Playground do Markdown! Agora você está pronto para criar seus próprios documentos Markdown:
+
+- [Clique aqui para criar um novo documento](./?mode=code)
+- Alterne entre documentos na barra lateral esquerda (ou no menu do canto superior esquerdo em dispositivos móveis).
+- Todos os documentos são salvos localmente e somente você pode vê-los.
+
+Boa escrita 💜

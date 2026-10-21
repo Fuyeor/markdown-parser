@@ -1,4 +1,4 @@
-# Welcome to the Markdown Playground
+# Welcome to the Playground
 
 This is a sample document designed to showcase and test the syntax of Fuyeor Flavored Markdown. Feel free to edit and preview your changes in real time.
 
@@ -22,19 +22,21 @@ This is a sample document designed to showcase and test the syntax of Fuyeor Fla
 
 ### Emphasis
 
-- **Bold text**: use `**text**`
 - *Italic text*: use `*text*`
+- **Bold text**: use `**text**`
 - --Strikethrough--: use `--text--`
-- `Inline code`: use backticks `` `code` ``
+- __Underline__: use `__text__`
 
 ### Paragraphs & Line Breaks
 
 This is the first paragraph.
-In Markdown, consecutive lines without a blank line are merged into a single paragraph.
+A single line break stays on the same line.
 
 This is the second paragraph. An empty line creates a new paragraph.
 
 ## Lists
+
+Both unordered and ordered sublists should be indented with __2 spaces__:
 
 ### Unordered List
 
@@ -46,23 +48,33 @@ This is the second paragraph. An empty line creates a new paragraph.
 
 ### Ordered List
 
-1. Step 1: Open the editor
-2. Step 2: Write your Markdown
-3. Step 3: Preview the rendered output
-  1. Live preview
-  2. Export HTML
+1. Open any editor:
+  1. Online Playground
+  2. Notepad
+  3. VS Code
+2. Write Markdown
+3. Preview the result:
+  - Source mode
+  - WYSIWYG mode
 
 ## Links & Images
 
 ### Links
 
-[Example link with text](https://www.example.com) and an autolink: https://www.example.com
+- [Example link with text](https://fuyeor.com)
+- Autolink: Fuyeor.com
 
 ### Images
 
-![](/favicon.svg)
+![](https://fuyeor.gallerycdn.vsassets.io/extensions/fuyeor/ffm/0.1.0/1787332024048/Microsoft.VisualStudio.Services.Icons.Default)
 
 ## Quotes
+
+### Single-line Quote
+
+> No design is eternal; only reasons for its continued existence.
+
+### Multi-line Quote
 
 ```quote
 A small syntax can make a large pause.
@@ -91,12 +103,22 @@ In Python, use `print("Hello, Markdown!")` to print text.
 }
 ```
 
+If you need to nest code blocks, use __more backticks on the outer block__.
+
 ## Tables
+
+### Table with Header
 
 | Left-aligned | Center-aligned | Right-aligned |
 | :--- | :---: | ---: |
 | Content | Content | Content |
 | Longer content | Longer content | Longer content |
+
+### Table without Header
+
+| --- | --- |
+| **Name** | Fuyeor |
+| **Occupation** | Designer |
 
 ## Horizontal Rule
 
@@ -131,7 +153,7 @@ In Python, use `print("Hello, Markdown!")` to print text.
 Reserved the board game café everyone agreed on; the deposit has been paid.
 
 **[x] Confirm attendance**
-Everyone responded in the group chat; 8 people confirmed in total.
+Everyone responded in the group chat; in total, __8 people are attending__.
 
 **[ ] Buy snacks and drinks**
 Shopping list ready; planning to pick them up Saturday morning before heading over.
@@ -172,10 +194,13 @@ $$
 
 ```mermaid
 graph TD
-    A[Start] --> B(Processing)
-    B --> C{Decision}
-    C -- Approve --> D[End]
+    A[Start Node] --> C{Decision}
+    C -- Approve --> D[End Node]
     C -- Reject --> E[Revise]
+
+    %% Style definitions for all colors and rounded curves
+    classDef default fill:#F2F4F7,stroke:#D0D5DD,stroke-width:2px,color:#344054,rx:10px,ry:10px
+    linkStyle default stroke:#98A2B3,stroke-width:2px,curve:basis
 ```
 
 ### Chemical Formulas
@@ -197,7 +222,8 @@ C D E F | G A B c |
 
 Congratulations on completing the Markdown Playground tutorial! You are now ready to craft your own Markdown documents:
 
+- [Click here to create a new document](./?mode=code)
 - Switch documents from the left sidebar (or the menu in the top-left corner on mobile).
 - All documents are saved locally and accessible only to you.
 
-Happy writing!
+Happy writing 💜

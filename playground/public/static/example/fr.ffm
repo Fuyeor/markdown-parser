@@ -1,6 +1,6 @@
 # Bienvenue sur l'Espace Markdown
 
-Ce document est un exemple conçu pour tester et découvrir la syntaxe du Fuyeor Flavored Markdown. Vous pouvez le modifier et prévisualiser le rendu en temps réel.
+Ce document est un exemple conçu pour tester et présenter la syntaxe du Fuyeor Flavored Markdown. Vous pouvez le modifier et prévisualiser le rendu en temps réel.
 
 ## Syntaxe de base
 
@@ -22,19 +22,21 @@ Ce document est un exemple conçu pour tester et découvrir la syntaxe du Fuyeor
 
 ### Emphase
 
-- **Texte en gras** : utilisez `**texte**`
 - *Texte en italique* : utilisez `*texte*`
+- **Texte en gras** : utilisez `**texte**`
 - --Texte barré-- : utilisez `--texte--`
-- `Code en ligne` : utilisez les accents graves `` `code` ``
+- __Souligné__ : utilisez `__texte__`
 
 ### Paragraphes et retours à la ligne
 
 Ceci est le premier paragraphe.
-En Markdown, deux lignes consécutives sans ligne vide sont fusionnées dans le même paragraphe.
+Un simple retour à la ligne reste collé à la ligne précédente.
 
-Ceci est le second paragraphe. Une ligne vide crée un nouveau paragraphe.
+Ceci est le second paragraphe. Deux retours à la ligne créent un nouveau paragraphe.
 
 ## Listes
+
+Les sous-listes des listes à puces et des listes numérotées doivent être indentées de __2 espaces__ :
 
 ### Liste à puces
 
@@ -46,23 +48,33 @@ Ceci est le second paragraphe. Une ligne vide crée un nouveau paragraphe.
 
 ### Liste numérotée
 
-1. Étape 1 : Ouvrez l'éditeur
-2. Étape 2 : Rédigez votre Markdown
-3. Étape 3 : Prévisualisez le résultat
-  1. Aperçu en temps réel
-  2. Exporter en HTML
+1. Ouvrez n'importe quel éditeur :
+  1. Espace de jeu en ligne
+  2. Bloc-notes
+  3. VS Code
+2. Rédigez du Markdown
+3. Prévisualisez le rendu :
+  - Mode source
+  - Mode WYSIWYG
 
 ## Liens et images
 
 ### Liens
 
-[Exemple de lien avec texte](https://www.example.com) et lien brut : https://www.example.com
+- [Exemple de lien avec texte](https://fuyeor.com)
+- Lien reconnu automatiquement : Fuyeor.com
 
 ### Images
 
-![](/favicon.svg)
+![](https://fuyeor.gallerycdn.vsassets.io/extensions/fuyeor/ffm/0.1.0/1787332024048/Microsoft.VisualStudio.Services.Icons.Default)
 
 ## Citations
+
+### Citation sur une ligne
+
+> Aucun design n'est éternel ; il n'existe que des raisons de perdurer.
+
+### Citation multi-ligne
 
 ```quote
 A small syntax can make a large pause.
@@ -91,12 +103,22 @@ En Python, utilisez `print("Hello, Markdown!")` pour afficher du texte.
 }
 ```
 
+Si vous devez imbriquer des blocs de code, utilisez __plus d'accents graves pour le bloc externe__.
+
 ## Tableaux
+
+### Tableau avec en-tête
 
 | Aligné à gauche | Centré | Aligné à droite |
 | :--- | :---: | ---: |
 | Contenu | Contenu | Contenu |
 | Contenu plus long | Contenu plus long | Contenu plus long |
+
+### Tableau sans en-tête
+
+| --- | --- |
+| **Nom** | Fuyeor |
+| **Profession** | Designer |
 
 ## Ligne de séparation
 
@@ -131,9 +153,9 @@ En Python, utilisez `print("Hello, Markdown!")` pour afficher du texte.
 Le bar à jeux choisi à l'unanimité est réservé, et l'acompte est versé.
 
 **[x] Confirmer le nombre de participants**
-Tout le monde a répondu sur le groupe de discussion ; 8 personnes confirmées au total.
+Tout le monde a répondu sur le groupe de discussion ; au total, __8 personnes participent__.
 
-**[ ] Acheter les boissons et les collations**
+**[ ] Acheter les collations et les boissons**
 Liste de courses prête ; prévu de faire les achats samedi matin avant de s'y rendre.
 
 **[ ] Préparer le cadeau d'anniversaire surprise**
@@ -158,7 +180,7 @@ Aucun problème. Il vous suffit de vous rendre dans votre espace personnel et de
 
 ## Extensions académiques
 
-### Formules mathématiques
+### LaTeX
 
 Formule en ligne : $E = mc^2$
 
@@ -172,10 +194,13 @@ $$
 
 ```mermaid
 graph TD
-    A[Début] --> B(Traitement)
-    B --> C{Condition}
-    C -- Approuvé --> D[Fin]
-    C -- Refusé --> E[À modifier]
+    A[Nœud de départ] --> C{Condition}
+    C -- Approuver --> D[Nœud de fin]
+    C -- Refuser --> E[Retour pour modification]
+
+    %% Définition de style pour toutes les couleurs et courbes arrondies
+    classDef default fill:#F2F4F7,stroke:#D0D5DD,stroke-width:2px,color:#344054,rx:10px,ry:10px
+    linkStyle default stroke:#98A2B3,stroke-width:2px,curve:basis
 ```
 
 ### Formules chimiques
@@ -195,9 +220,10 @@ C D E F | G A B c |
 
 ## Conclusion
 
-Félicitations pour avoir terminé le guide de l'espace Markdown ! Vous êtes maintenant prêt(e) à rédiger vos propres documents :
+Félicitations, vous avez terminé le tutoriel de l'espace de jeu Markdown ! Vous pouvez maintenant créer vos propres documents Markdown :
 
+- [Cliquez ici pour créer un nouveau document](./?mode=code)
 - Changez de document depuis la barre latérale gauche (ou le menu en haut à gauche sur mobile).
 - Tous vos documents sont enregistrés localement et vous êtes la seule personne à pouvoir y accéder.
 
-Bonne rédaction !
+Bonne rédaction 💜

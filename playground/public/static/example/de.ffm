@@ -1,0 +1,229 @@
+# Willkommen auf der Spielwiese
+
+Dies ist ein Beispieldokument zum Testen und Präsentieren der Syntax von Fuyeor Flavored Markdown. Du kannst hier nach Belieben Änderungen vornehmen und die Vorschau ansehen.
+
+## Grundlegende Syntax
+
+### Überschriften
+
+```ffm
+# Überschrift 1
+
+## Überschrift 2
+
+### Überschrift 3
+
+#### Überschrift 4
+
+##### Überschrift 5
+
+###### Überschrift 6
+```
+
+### Hervorhebungen
+
+- *Kursivtext*: mit `*Text*`
+- **Fetter Text**: mit `**Text**`
+- --Durchgestrichener Text--: mit `--Text--`
+- __Unterstrichener Text__: mit `__Text__`
+
+### Absätze und Zeilenumbrüche
+
+Dies ist der erste Absatz:
+Ein einzelner Zeilenumbruch bleibt direkt an die vorherige Zeile angeschlossen.
+
+Dies ist der zweite Absatz: Zwei Zeilenumbrüche erzeugen einen neuen Absatz.
+
+## Listen
+
+Bei Unterlisten von ungeordneten und geordneten Listen werden __2 Leerzeichen__ verwendet:
+
+### Ungeordnete Liste
+
+- Äpfel
+- Bananen
+  - Mini-Bananen
+  - Sesam-Bananen
+- Orangen
+
+### Geordnete Liste
+
+1. Einen beliebigen Editor öffnen:
+  1. Online-Spielwiese
+  2. Notepad
+  3. VS Code
+2. Markdown schreiben
+3. Vorschau anzeigen:
+  - Quelltextmodus
+  - WYSIWYG-Modus
+
+## Links und Bilder
+
+### Links
+
+- [Text zu einem Link hinzufügen](https://fuyeor.com)
+- Automatisch erkannter Link: Fuyeor.com
+
+### Bilder
+
+![](https://fuyeor.gallerycdn.vsassets.io/extensions/fuyeor/ffm/0.1.0/1787332024048/Microsoft.VisualStudio.Services.Icons.Default)
+
+## Zitate
+
+### Einzeiliges Zitat
+
+> Es gibt kein ewiges Design, nur Gründe, weiterhin zu bestehen.
+
+### Mehrzeiliges Zitat
+
+```quote
+Eine kleine Syntax kann eine große Pause bewirken.
+
+- Formatieren in einem Atemzug
+- Vorschau beim Schreiben
+- Jede Idee nah bei sich behalten
+```
+
+## Code
+
+### Inline-Code
+
+In Python gibst du mit `print("Hello, Markdown!")` Text aus.
+
+### Codeblock
+
+```fon
+{
+  identifier = `reference.fuyeor.com`
+  params = {
+    locale = .en
+    module = `ffm`
+    slug = [`tutorials`, `overview`]
+  }
+}
+```
+
+Wenn du Codeblöcke verschachteln musst, verwende __in der äußeren Ebene mehr Backticks__.
+
+## Tabellen
+
+### Tabelle mit Kopfzeile
+
+| Linksbündig | Zentriert | Rechtsbündig |
+| :--- | --- | ---: |
+| Inhalt | Inhalt | Inhalt |
+| Längerer Inhalt | Längerer Inhalt | Längerer Inhalt |
+
+### Tabelle ohne Kopfzeile
+
+| --- | --- |
+| **Name** | Fuyeor |
+| **Beruf** | Designerin |
+
+## Trennlinie
+
+---
+
+## Layout-Blöcke
+
+### Slider
+
+```slide
+**Ф social**
+- Zeichenlimit: 3000–5000 (Zeichen)
+- Inhaltsformat: Fuyeor Flavored Markdown
+
+---
+
+**Bluesky**
+- Zeichenlimit: 300 (Zeichen)
+- Inhaltsformat: reiner Text
+
+---
+
+**Mastodon**
+- Zeichenlimit: je nach Instanz unterschiedlich, bei den meisten Instanzen jedoch standardmäßig 500
+- Inhaltsformat: reiner Text
+```
+
+### Gedankenkette
+
+```chain
+**[x] Veranstaltungsort für das Treffen festlegen**
+Der von allen einvernehmlich gewählte Brettspiel-Laden ist bereits reserviert, und die Anzahlung wurde auch schon geleistet.
+
+**[x] Teilnehmerzahl für den Tag ermitteln**
+In der Gruppenchat-Kette haben alle abgeschlossen; insgesamt __nehmen 8 Personen teil__.
+
+**[ ] Snacks und Getränke besorgen**
+Die Einkaufsliste ist fertig; ich habe vor, am Samstagmorgen alles zu kaufen und direkt zum Laden zu bringen.
+
+**[ ] Geheimnisvolles Geburtstagsgeschenk vorbereiten**
+Das online bestellte Geschenk ist noch unterwegs und soll am Freitagnachmittag ankommen.
+
+**In sozialen Medien veröffentlichen**
+Denk am Ende daran, die Fotos vom Treffen in den sozialen Medien zu posten〜
+```
+
+### Akkordeon
+
+```accordion
+**Wie kann ich unserem Freiwilligenteam beitreten?**
+Klicke oben rechts auf der Startseite auf „Mach mit“ und fülle ein einfaches Anmeldeformular aus. Unser Administrator wird sich innerhalb von drei Werktagen bei dir melden.
+
+**Muss ich bei Aktivitäten eigene Werkzeuge mitbringen?**
+Nein, alle Materialien und Werkzeuge, die für jede Aktivität benötigt werden, stellen wir dir vor Ort kostenlos zur Verfügung.
+
+**Was tun, wenn ich kurzfristig verhindert bin?**
+Kein Problem: Klicke einfach bis 24 Stunden vor Beginn der Aktivität im persönlichen Bereich auf „Reservierung stornieren“.
+```
+
+## Akademische Erweiterungen
+
+### Mathematische Formeln
+
+Inline-Formel: $E = mc^2$
+
+Blockformel:
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+
+### Flussdiagramme und Diagramme
+
+```mermaid
+graph TD
+    A[Startknoten] --> C{Bedingungsprüfung}
+    C -- Zustimmen --> D[Endknoten]
+    C -- Ablehnen --> E[Zurück zur Bearbeitung]
+
+    %% Stildefinition für alle Farben und abgerundeten Kurven
+    classDef default fill:#F2F4F7,stroke:#D0D5DD,stroke-width:2px,color:#344054,rx:10px,ry:10px
+    linkStyle default stroke:#98A2B3,stroke-width:2px,curve:basis
+```
+
+### Chemische Strukturformeln
+
+Wenn man an Schmerzlinderung denkt, ist die jedem vertraute Aspirin-Strukturformel #[smiles = `CC(=O)OC1=CC=CC=C1C(=O)O`]. Ihr Erzrivale Ibuprofen hat dagegen die Molekülformel #[smiles = `CC(C)CC1=CC=C(C=C1)C(C)C(=O)O`].
+
+### Notenschrift
+
+```abc
+X: 1
+T: Beispielmelodie (Tonleiterbeispiel)
+M: 4/4
+L: 1/4
+K: C
+C D E F | G A B c |
+```
+
+## Zusammenfassung
+
+Herzlichen Glückwunsch, du hast das Tutorial der Markdown-Spielwiese abgeschlossen! Jetzt kannst du deine eigenen Markdown-Dokumente erstellen:
+
+- [Hier klicken, um ein neues Dokument zu erstellen](./?mode=code)
+- Klicke in der linken Seitenleiste (auf Mobilgeräten oben links im Menü), um zwischen Dokumenten zu wechseln.
+- Alle Dokumente werden lokal gespeichert und sind nur für dich selbst sichtbar.
+
+Viel Freude beim Schreiben 💜
