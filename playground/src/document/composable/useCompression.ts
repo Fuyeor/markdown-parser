@@ -12,7 +12,7 @@ export async function encodeSnippet(content: string): Promise<string> {
     const response = new window.Response(stream);
     const buffer = await response.arrayBuffer();
 
-    return new window.Uint8Array(buffer).toBase64({
+    return new Uint8Array(buffer).toBase64({
       alphabet: 'base64url',
       omitPadding: true,
     });
@@ -28,7 +28,7 @@ export async function encodeSnippet(content: string): Promise<string> {
 export async function decodeSnippet(snippet: string): Promise<string> {
   if (!snippet) return '';
   try {
-    const byte = window.Uint8Array.fromBase64(snippet, {
+    const byte = Uint8Array.fromBase64(snippet, {
       alphabet: 'base64url',
     });
     const stream = new window.Blob([byte])

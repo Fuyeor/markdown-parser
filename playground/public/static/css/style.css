@@ -6,6 +6,11 @@
 }
 
 :root {
+  --surface: #fbfbf9;
+  --surface-top: #fff;
+}
+
+:root {
   --punctuation: #a0aec0;
   --heading: #d73a49;
   --quote: #718096;
@@ -65,6 +70,10 @@ html {
 body {
   margin: 0;
   overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 
 .left-sidebar {
@@ -139,6 +148,8 @@ body {
     margin: 20px 0;
     border-radius: var(--radius-lg);
     overflow: clip;
+    /* 弥补滚动条 */
+    padding-right: 10px;
   }
 
   .header {

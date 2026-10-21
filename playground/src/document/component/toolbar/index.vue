@@ -214,10 +214,6 @@ const formatTool = computed<ToolbarItem[]>(() => [
     height: 20px;
   }
 
-  img.monochrome {
-    filter: brightness(1.6);
-  }
-
   &.is-active {
     background-color: var(--surface-top-hover);
   }
@@ -246,6 +242,14 @@ const formatTool = computed<ToolbarItem[]>(() => [
   .editor-toolbar button {
     min-width: 34px;
     height: 34px;
+  }
+}
+
+:root[data-theme='dark'],
+:root[data-theme='black'],
+:root[data-theme='contrast'] {
+  img.monochrome {
+    filter: brightness(1.6);
   }
 }
 </style>

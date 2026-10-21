@@ -1,6 +1,6 @@
 // @/document/composable/useIndexedDb.ts
 import { onMounted, ref } from 'vue';
-import { countDocumentStats } from '@/document/composable/useDocumentStats';
+import { statText } from '@fuyeor/util';
 
 export interface HistoryDocument {
   id: string;
@@ -13,7 +13,7 @@ export interface HistoryDocument {
 
 type SyncMessage =
   | { type: 'SAVE'; document: HistoryDocument }
-  | { type: 'DELETE'; id: string }
+  | { type: 'DELETE'; idArray: string[] }
   | { type: 'CLEAR' };
 
 const db = {
@@ -50,22 +50,25 @@ const initBroadcastChannel = () => {
   broadcastChannel.onmessage = (event: MessageEvent<SyncMessage>) => {
     const message = event.data;
     if (message.type === 'SAVE') upsertDocumentState(message.document);
-    else if (message.type === 'DELETE') removeDocumentState(message.id);
+    else if (message.type === 'DELETE')
+      for (const id of message.idArray) removeDocumentState(id);
     else if (message.type === 'CLEAR') documents.value = [];
   };
 };
 
 const executeStore = (
   mode: IDBTransactionMode,
-  action: (store: IDBObjectStore) => IDBRequest,
+  action: (store: IDBObjectStore) => IDBRequest | void, // 🔧 批量场景无单一请求
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!database) return reject(new Error('IndexedDB is not initialized'));
     const transaction = database.transaction(db.table.name, mode);
     const request = action(transaction.objectStore(db.table.name));
 
-    request.onerror = () =>
-      reject(request.error ?? new Error('IndexedDB request failed'));
+    if (request) {
+      request.onerror = () =>
+        reject(request.error ?? new Error('IndexedDB request failed'));
+    }
     transaction.onabort = () =>
       reject(transaction.error ?? new Error('IndexedDB transaction aborted'));
     transaction.oncomplete = () => resolve();
@@ -98,7 +101,7 @@ const loadAllDocuments = (): Promise<void> => {
         document.word === undefined
           ? {
               ...document,
-              word: countDocumentStats(document.content).words,
+              word: statText(document.content).word,
             }
           : document;
       result.push(normalizedDocument);
@@ -170,14 +173,30 @@ export function useIndexedDb() {
     broadcastChannel?.postMessage({ type: 'SAVE', document });
   };
 
-  const deleteDocument = async (id: string): Promise<void> => {
+  // Delete every document without words (word === 0 or undefined) in one transaction.
+  const deleteEmpty = async (): Promise<string[]> => {
+    const idArray = documents.value
+      .filter((document) => !document.word)
+      .map((document) => document.id);
+    if (idArray.length === 0) return [];
+
+    await requireDatabase();
+    await executeStore('readwrite', (store) => {
+      for (const id of idArray) store.delete(id);
+    });
+    for (const id of idArray) removeDocumentState(id);
+    broadcastChannel?.postMessage({ type: 'DELETE', idArray });
+    return idArray;
+  };
+
+  const deleteOne = async (id: string): Promise<void> => {
     await requireDatabase();
     await executeStore('readwrite', (store) => store.delete(id));
     removeDocumentState(id);
-    broadcastChannel?.postMessage({ type: 'DELETE', id });
+    broadcastChannel?.postMessage({ type: 'DELETE', idArray: [id] });
   };
 
-  const clearDocuments = async (): Promise<void> => {
+  const deleteAll = async (): Promise<void> => {
     await requireDatabase();
     await executeStore('readwrite', (store) => store.clear());
     documents.value = [];
@@ -194,8 +213,9 @@ export function useIndexedDb() {
     isReady,
     error,
     saveDocument,
-    deleteDocument,
-    clearDocuments,
+    deleteOne,
+    deleteEmpty,
+    deleteAll,
     loadAllDocuments,
   };
 }

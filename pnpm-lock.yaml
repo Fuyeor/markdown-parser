@@ -159,8 +159,8 @@ importers:
         specifier: workspace:*
         version: link:../linkify
       '@fuyeor/util':
-        specifier: ^0.1.3
-        version: 0.1.3
+        specifier: ^0.1.5
+        version: 0.1.5
     devDependencies:
       typescript:
         specifier: ^7.0.2
@@ -221,6 +221,9 @@ importers:
       '@fuyeor/locale':
         specifier: ^0.1.0
         version: 0.1.0(vue@3.5.43(typescript@7.0.2))
+      '@fuyeor/util':
+        specifier: ^0.1.5
+        version: 0.1.5
       '@fuyeor/vue-router':
         specifier: ^0.1.2
         version: 0.1.2(vue@3.5.43(typescript@7.0.2))
@@ -705,8 +708,8 @@ packages:
   '@fuyeor/util@0.1.0':
     resolution: {integrity: sha256-TNwyjmaTp0gGp5AriBfdtXGGNyJ2O6I2zyW6etpYLvs=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/util/0.1.0.tgz}
 
-  '@fuyeor/util@0.1.3':
-    resolution: {integrity: sha256-VYVapsIADbpHAFpD4a/KvexATcHMqpYFpRLdV6wRzDc=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/util/0.1.3.tgz}
+  '@fuyeor/util@0.1.5':
+    resolution: {integrity: sha256-6FR8gYVdD/deCGAYWmahnRiecLNiKk/ctIL6BnQhKmk=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/util/0.1.5.tgz}
 
   '@fuyeor/vue-router@0.1.2':
     resolution: {integrity: sha256-JLng7dhUMvEMjb9DuUj1wPhPuuNUAV+UpNHxEkFvpU8=, tarball: https://fpm.fuyeor.net/packages/@fuyeor/vue-router/0.1.2.tgz}
@@ -2063,7 +2066,7 @@ snapshots:
 
   '@fuyeor/util@0.1.0': {}
 
-  '@fuyeor/util@0.1.3': {}
+  '@fuyeor/util@0.1.5': {}
 
   '@fuyeor/vue-router@0.1.2(vue@3.5.43(typescript@7.0.2))':
     dependencies:

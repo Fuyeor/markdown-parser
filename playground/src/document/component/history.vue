@@ -3,7 +3,7 @@
   <!-- only shows when user created example doc -->
   <Foldable
     v-if="documents.length !== 0"
-    :title="t('documents')"
+    :title="t('document')"
     :model-value="true"
     :icon-url="getIconUrl('learn')"
     class="document-history"
@@ -13,38 +13,35 @@
         v-model="searchQuery"
         type="search"
         class="document-search-input"
-        :placeholder="t('documents.search')"
-        :aria-label="t('documents.search')"
+        :placeholder="t('document.search')"
+        :aria-label="t('document.search')"
       />
 
-      <button
-        type="button"
-        class="remove-btn"
-        v-tooltip="t('documents.clear')"
-        @click="isClearDocumentsModalOpen = true"
-      >
-        ✕
-      </button>
+      <DropdownMenu
+        class="menu-btn"
+        :aria-label="t('document.actions')"
+        :items="menu"
+      />
     </div>
 
-    <Modal v-model="isClearDocumentsModalOpen" size="small">
+    <Modal v-model="isDeleteAllModalOpen" size="small">
       <template #header>
-        <h3>{{ t('documents.clear') }}</h3>
+        <h3>{{ t('document.deleteAll') }}</h3>
       </template>
-      {{ t('documents.clearConfirm') }}
+      {{ t('document.deleteAll.confirm') }}
       <template #footer>
         <div class="confirm-dialog-actions">
           <button
             type="button"
             class="action-btn secondary"
-            @click="isClearDocumentsModalOpen = false"
+            @click="isDeleteAllModalOpen = false"
           >
             {{ t('cancel') }}
           </button>
           <button
             type="button"
             class="action-btn danger"
-            @click="handleClearDocuments"
+            @click="handleDeleteAll"
           >
             {{ t('confirm') }}
           </button>
@@ -65,7 +62,7 @@
       >
         <span class="document-info">
           <span class="document-title">{{
-            document.title || t('documents.untitled')
+            document.title || t('document.untitled')
           }}</span>
           <span class="document-time">
             {{ formatTime(document.updated) }}
@@ -73,11 +70,11 @@
               v-if="document.word !== undefined"
               class="document-word-count"
             >
-              {{ t('documents.stats.words', { count: document.word }) }}
+              {{ t('document.stat.word', { count: document.word }) }}
             </span>
             <DropdownMenu
               :aria-label="`${t('delete')}: ${document.title}`"
-              :items="documentMenuItems(document)"
+              :items="docMenu(document)"
               @click.stop.prevent
             />
           </span>
@@ -93,9 +90,10 @@ import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { useLocale } from '@fuyeor/locale';
 import { getIconUrl } from '@fuyeor/commons';
 import {
-  DropdownMenu,
-  Foldable,
+  useToast,
   Modal,
+  Foldable,
+  DropdownMenu,
   type DropdownItem,
 } from '@fuyeor/interactify';
 import {
@@ -105,17 +103,44 @@ import {
 
 const route = useRoute();
 const router = useRouter();
-const { t, locale } = useLocale();
-const { documents, deleteDocument, clearDocuments } = useIndexedDb();
-const searchQuery = ref('');
-const isClearDocumentsModalOpen = ref(false);
 
+const { t, locale } = useLocale();
+const { showToast } = useToast();
+const { documents, deleteOne, deleteEmpty, deleteAll } = useIndexedDb();
+
+const searchQuery = ref('');
+const isDeleteAllModalOpen = ref(false);
 const currentDocumentId = computed(() => String(route.params.id ?? ''));
 
-const documentMenuItems = (document: HistoryDocument): DropdownItem[] => [
+const emptyCount = computed(
+  () => documents.value.filter((document) => !document.word).length,
+);
+
+const menu = computed<DropdownItem[]>(() => {
+  const item: DropdownItem[] = [];
+
+  if (emptyCount.value > 0) {
+    item.push({
+      label: t('document.deleteEmpty'),
+      action: () => void handleDeleteEmpty(),
+    });
+  }
+
+  item.push({
+    label: t('document.deleteAll'),
+    action: () => {
+      isDeleteAllModalOpen.value = true;
+    },
+    class: 'text-danger',
+  });
+
+  return item;
+});
+
+const docMenu = (document: HistoryDocument): DropdownItem[] => [
   {
     label: t('delete'),
-    action: () => handleDeleteDocument(document),
+    action: () => handleDeleteOne(document),
     class: 'text-danger',
   },
 ];
@@ -132,8 +157,8 @@ const filteredDocuments = computed(() => {
 });
 
 // Delete the local document and clear the current route when needed.
-const handleDeleteDocument = async (document: HistoryDocument) => {
-  await deleteDocument(document.id);
+const handleDeleteOne = async (document: HistoryDocument) => {
+  await deleteOne(document.id);
   if (currentDocumentId.value !== document.id) return;
 
   router.replace({
@@ -143,9 +168,23 @@ const handleDeleteDocument = async (document: HistoryDocument) => {
 };
 
 // Clear all local documents and leave the active document route when necessary.
-const handleClearDocuments = async () => {
-  await clearDocuments();
-  isClearDocumentsModalOpen.value = false;
+const handleDeleteEmpty = async () => {
+  const idArray = await deleteEmpty();
+  if (idArray.length > 0)
+    showToast(t('document.deleteEmpty.count', { count: idArray.length }), {
+      type: 'success',
+    });
+  if (!idArray.includes(currentDocumentId.value)) return;
+
+  await router.replace({
+    name: 'Document',
+    params: { ...route.params, id: undefined },
+  });
+};
+
+const handleDeleteAll = async () => {
+  await deleteAll();
+  isDeleteAllModalOpen.value = false;
   if (route.name !== 'Document' || !currentDocumentId.value) return;
 
   await router.replace({
@@ -157,22 +196,22 @@ const handleClearDocuments = async () => {
 // Format relative timestamps in the active locale.
 const formatTime = (timestamp: number): string => {
   const diff = Math.max(0, Date.now() - timestamp);
-  if (diff < 60000) return t('documents.justNow');
+  if (diff < 60000) return t('document.justNow');
   if (diff < 3600000)
-    return t('documents.minutesAgo', {
+    return t('document.minutesAgo', {
       value: Math.floor(diff / 60000),
     });
   if (diff < 86400000)
-    return t('documents.hoursAgo', {
+    return t('document.hoursAgo', {
       value: Math.floor(diff / 3600000),
     });
-  if (diff < 172800000) return t('documents.yesterday');
+  if (diff < 172800000) return t('document.yesterday');
   if (diff < 604800000)
-    return t('documents.daysAgo', {
+    return t('document.daysAgo', {
       value: Math.floor(diff / 86400000),
     });
   if (diff < 2592000000)
-    return t('documents.weeksAgo', {
+    return t('document.weeksAgo', {
       value: Math.floor(diff / 604800000),
     });
 
@@ -219,15 +258,6 @@ const formatTime = (timestamp: number): string => {
 
   &:focus {
     box-shadow: var(--input-border-shadow);
-  }
-}
-
-.remove-btn {
-  flex: 0 0 32px;
-
-  &:hover,
-  &:focus-visible {
-    color: var(--color-danger);
   }
 }
 

@@ -2,35 +2,29 @@
 <template>
   <footer class="document-stats-bar">
     <span
-      >{{ t('documents.createdAt') }}:
+      >{{ t('document.createdAt') }}:
       {{ formatDate(createdAt, { preset: 'relative', short: true }) }}</span
     >
     <span
-      >{{ t('documents.updatedAt') }}:
+      >{{ t('document.updatedAt') }}:
       {{ formatDate(updatedAt, { preset: 'relative', short: true }) }}</span
     >
-    <span>{{ t('documents.stats.words', { count: stats.words }) }}</span>
-    <span>{{
-      t('documents.stats.characters', { count: stats.characters })
-    }}</span>
-    <span>{{
-      t('documents.stats.sentences', { count: stats.sentences })
-    }}</span>
-    <span>{{
-      t('documents.stats.paragraphs', { count: stats.paragraphs })
-    }}</span>
+    <span>{{ t('document.stat.word', { count: stats.word }) }}</span>
+    <span>{{ t('document.stat.character', { count: stats.character }) }}</span>
+    <span>{{ t('document.stat.sentence', { count: stats.sentence }) }}</span>
+    <span>{{ t('document.stat.paragraph', { count: stats.paragraph }) }}</span>
   </footer>
 </template>
 
 <script setup lang="ts">
 import { useLocale } from '@fuyeor/locale';
 import { useDateFormatter } from '@fuyeor/commons';
-import type { DocumentStats } from '@/document/composable/useDocumentStats';
+import type { TextStat } from '@fuyeor/util';
 
 const { createdAt = 0, updatedAt = 0 } = defineProps<{
   createdAt?: number;
   updatedAt?: number;
-  stats: DocumentStats;
+  stats: TextStat;
 }>();
 
 const { t } = useLocale();
