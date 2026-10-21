@@ -28,34 +28,52 @@ import { smilesPlugin } from './plugin/smiles';
 import { abcPlugin } from './plugin/abc';
 
 export function createMarkdownParser(option: MarkdownParserOption = {}) {
-  return (
-    new MarkdownParser(option)
-      // block order: Code block -> List -> Title -> Table -> Delete line -> Quote
-      .addBlockRule(ffmBlockRule)
-      .addBlockRule(codeBlockRule)
-      .addBlockRule(listRule)
-      .addBlockRule(headingRule)
-      .addBlockRule(tableRule)
-      .addBlockRule(hrRule)
-      .addBlockRule(blockquoteRule)
-      // inline order: Inline code -> Links -> Bold/Underline/Strikethrough
-      .addInlineRule(inlineCodeRule)
-      .addInlineRule(imageRule)
-      .addInlineRule(linkRule)
-      .addInlineRule(boldRule)
-      .addInlineRule(underlineRule)
-      .addInlineRule(italicRule)
-      .addInlineRule(strikeRule)
-      // plugin
-      .use(highlightPlugin)
-      .use(twemojiPlugin)
-      .use(latexPlugin)
-      .use(mermaidPlugin)
-      .use(smilesPlugin)
-      .use(abcPlugin)
-      // generate AST node
-      .build()
-  );
+  const parser = new MarkdownParser(option)
+    // block order: Code block -> List -> Title -> Table -> Delete line -> Quote
+    .addBlockRule(ffmBlockRule)
+    .addBlockRule(codeBlockRule)
+    .addBlockRule(listRule)
+    .addBlockRule(headingRule)
+    .addBlockRule(tableRule)
+    .addBlockRule(hrRule)
+    .addBlockRule(blockquoteRule);
+
+  // attach user custom block rule
+  if (option.blockRule) {
+    for (const rule of option.blockRule) parser.addBlockRule(rule);
+  }
+
+  parser
+    // inline order: Inline code -> Links -> Bold/Underline/Strikethrough
+    .addInlineRule(inlineCodeRule)
+    .addInlineRule(imageRule)
+    .addInlineRule(linkRule)
+    .addInlineRule(boldRule)
+    .addInlineRule(underlineRule)
+    .addInlineRule(italicRule)
+    .addInlineRule(strikeRule);
+
+  // attach user custom inline rule
+  if (option.inlineRule) {
+    for (const rule of option.inlineRule) parser.addInlineRule(rule);
+  }
+
+  parser
+    // plugin
+    .use(highlightPlugin)
+    .use(twemojiPlugin)
+    .use(latexPlugin)
+    .use(mermaidPlugin)
+    .use(smilesPlugin)
+    .use(abcPlugin);
+
+  // attach user custom plugin
+  if (option.plugin) {
+    for (const plugin of option.plugin) parser.use(plugin);
+  }
+
+  // generate AST node
+  return parser.build();
 }
 
 export function createCommonParser(option: MarkdownParserOption = {}) {

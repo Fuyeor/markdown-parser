@@ -42,14 +42,18 @@ export interface ASTNode {
   content?: ASTNode[];
   level?: number;
   lang?: string;
+  displayName?: string;
   url?: string;
   ordered?: boolean;
   start?: number;
   header?: ASTNode[];
   name?: string;
+  /** node title in chain and accordion */
   title?: ASTNode[];
-  // image description, like <img title="..." />
-  // it’s actually caption, not title
+  /**
+   * image description, like <img title="..." />
+   * it’s actually caption, not title
+   */
   caption?: string;
   isCompleted?: boolean;
   hasCheckbox?: boolean;
@@ -97,8 +101,11 @@ export interface InlineRule {
 export type Linkifier = (text: string) => readonly LinkMatch[];
 
 export interface MarkdownParserOption {
-  maxNestingDepth?: number;
   linkifier?: Linkifier;
+  maxNestingDepth?: number;
+  blockRule?: BlockRule[];
+  inlineRule?: InlineRule[];
+  plugin?: MarkdownPlugin[];
 }
 
 export type ASTTransform = (nodes: ASTNode[]) => ASTNode[];

@@ -68,12 +68,18 @@ const renderHeading = (node: ASTNode, ctx: RenderContext): string => {
 
 // 渲染代码块：结构与 Vue renderer 输出对齐
 const renderCodeBlock = (node: ASTNode): string => {
-  const language = node.lang ?? '';
+  const language = node.lang;
+  const displayName = node.displayName || language;
   const value = rawText(node);
+
   const body = language
-    ? `<div class="pre-language">${escapeHtml(language)}</div>` +
-      `<pre data-language="${escapeHtml(language)}" data-async="hljs"><code>${value}</code></pre>`
+    ? // @ts-ignore
+      `<div class="pre-language">${escapeHtml(displayName)}</div>` +
+      `<pre data-language="${escapeHtml(language)}" data-async="hljs">` +
+      `<code class="language-${escapeHtml(language)}">${value}</code>` +
+      `</pre>`
     : `<pre><code>${value}</code></pre>`;
+
   return `<div class="code-block-wrapper">${body}</div>`;
 };
 

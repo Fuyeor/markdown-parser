@@ -51,7 +51,7 @@ export const createHighlight = (
     if (!window.hljs) window.hljs = highlight;
 
     // 配置已在全局加载的 highlight 实例
-    if (highlight?.isInitialized) {
+    if (!highlight.isInitialized) {
       highlight.configure({ ignoreUnescapedHTML: true }); // 忽略未转义HTML的安全警告
       highlight.isInitialized = true; // 添加标记防止重复配置
     }

@@ -2,53 +2,84 @@
 import { Fragment, h, type VNode } from 'vue';
 import type { ASTNode } from '@ffm/parser';
 
-// 渲染子节点；缺省时返回空数组
-const content = (node: ASTNode): (VNode | string)[] =>
-  renderToVue(node.content ?? []);
+export type VueNodeRenderer = (
+  node: ASTNode,
+  render: (nodeArray: ASTNode[]) => (VNode | string)[],
+) => VNode | string;
 
-// 读取纯文本值；缺省时返回空串
-const raw = (node: ASTNode): string => node.value ?? '';
+export interface VueRendererOption {
+  /** 按 node.type 注册自定义渲染器；优先于内置渲染 */
+  custom?: Record<string, VueNodeRenderer>;
+}
 
-// 未知或降级节点的统一出口
-const passthrough = (node: ASTNode): VNode => h('span', content(node));
+// 默认渲染器：无自定义，预创建一次避免重复分配闭包组
+const defaultRender = createVueRenderer();
 
-// 表格单元格对齐：与 HTML renderer 的 align 属性保持一致
-const alignAttr = (cell: ASTNode): Record<string, unknown> => {
-  const align = cell.align;
-  return align === 'left' || align === 'center' || align === 'right'
-    ? { align }
-    : {};
-};
+export function renderToVue(
+  nodeArray: ASTNode[],
+  option?: VueRendererOption,
+): (VNode | string)[] {
+  if (!option) return defaultRender(nodeArray);
+  return createVueRenderer(option)(nodeArray);
+}
 
-const renderTableHead = (cells?: ASTNode[]) =>
-  cells?.length
-    ? h(
-        'tr',
-        null,
-        cells.map((cell) => renderTableCell('th', cell)),
-      )
-    : null;
+export function createVueRenderer(
+  option?: VueRendererOption,
+): (nodeArray: ASTNode[]) => (VNode | string)[] {
+  const custom = option?.custom;
 
-const renderTableBody = (rows?: ASTNode[]) =>
-  rows?.length
-    ? h(
-        'tbody',
-        null,
-        rows.map((row) =>
-          h(
-            'tr',
-            null,
-            (row.content ?? []).map((cell) => renderTableCell('td', cell)),
+  const render = (nodeArray: ASTNode[]): (VNode | string)[] =>
+    nodeArray.map(renderNode);
+
+  // 渲染子节点；缺省时返回空数组
+  const content = (node: ASTNode) => render(node.content ?? []);
+
+  // 读取纯文本值；缺省时返回空串
+  const raw = (node: ASTNode) => node.value ?? '';
+
+  // 未知或降级节点的统一出口
+  const passthrough = (node: ASTNode) => h('span', content(node));
+
+  // 表格单元格对齐：与 HTML renderer 的 align 属性保持一致
+  const alignAttr = (cell: ASTNode): Record<string, unknown> => {
+    const align = cell.align;
+    return align === 'left' || align === 'center' || align === 'right'
+      ? { align }
+      : {};
+  };
+
+  const renderTableCell = (tag: 'th' | 'td', cell: ASTNode) =>
+    h(tag, alignAttr(cell), content(cell));
+
+  const renderTableHead = (cells?: ASTNode[]) =>
+    cells?.length
+      ? h(
+          'tr',
+          null,
+          cells.map((c) => renderTableCell('th', c)),
+        )
+      : null;
+
+  const renderTableBody = (rows?: ASTNode[]) =>
+    rows?.length
+      ? h(
+          'tbody',
+          null,
+          rows.map((row) =>
+            h(
+              'tr',
+              null,
+              (row.content ?? []).map((c) => renderTableCell('td', c)),
+            ),
           ),
-        ),
-      )
-    : null;
+        )
+      : null;
 
-const renderTableCell = (tag: 'th' | 'td', cell: ASTNode): VNode =>
-  h(tag, alignAttr(cell), content(cell));
+  const renderNode = (node: ASTNode): VNode | string => {
+    // 自定义优先：插件可以在不改内置 switch 的情况下接管某个 type
+    const customRenderer = custom?.[node.type];
+    if (customRenderer) return customRenderer(node, render);
 
-export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
-  return nodeArray.map((node) => {
     switch (node.type) {
       // Common Flavored Markdown
       case 'heading':
@@ -72,7 +103,6 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
       case 'image': {
         const url = (node.url ?? '').trim();
         const img = h('img', { src: url, alt: node.alt ?? '' });
-
         // caption 与 title 等价；缺省时退化为裸 <img>
         const caption = node.caption ?? node.title;
         if (!caption || (Array.isArray(caption) && caption.length === 0)) {
@@ -80,7 +110,7 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
         }
 
         const figcaption =
-          typeof caption === 'string' ? caption : renderToVue(caption);
+          typeof caption === 'string' ? caption : render(caption);
 
         return h('figure', { class: 'ffm-image' }, [
           img,
@@ -107,7 +137,11 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
             language
               ? { 'data-language': language, 'data-async': 'hljs' }
               : null,
-            h('code', raw(node)),
+            h(
+              'code',
+              language ? { class: `language-${language}` } : null,
+              raw(node),
+            ),
           ),
         ]);
       }
@@ -154,7 +188,7 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
         return h('div', { class: 'ffm-accordion' }, content(node));
       case 'accordion_item':
         return h('details', { name: node.name }, [
-          h('summary', renderToVue(node.title ?? [])),
+          h('summary', render(node.title ?? [])),
           h('div', { class: 'accordion-body' }, content(node)),
         ]);
 
@@ -170,7 +204,7 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
           h('div', { class: 'chain-marker' }),
           h('div', { class: 'chain-body' }, [
             node.title?.length
-              ? h('div', { class: 'chain-title' }, renderToVue(node.title))
+              ? h('div', { class: 'chain-title' }, render(node.title))
               : null,
             h('div', { class: 'chain-content' }, content(node)),
           ]),
@@ -245,5 +279,7 @@ export function renderToVue(nodeArray: ASTNode[]): (VNode | string)[] {
       default:
         return passthrough(node);
     }
-  });
+  };
+
+  return render;
 }
