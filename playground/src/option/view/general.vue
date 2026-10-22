@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import {
   HeaderBar,
   FormField,
@@ -47,6 +47,4 @@ import {
 import { useAppearanceState } from '@app/state/appearance';
 
 const appearanceState = useAppearanceState();
-
-const { t } = useLocale();
 </script>

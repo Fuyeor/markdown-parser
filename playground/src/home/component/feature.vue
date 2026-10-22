@@ -43,11 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import HomeImagePlaceholder from './image-placehoder.vue';
 import HomeSectionLabel from './section-label.vue';
-
-const { t } = useLocale();
 
 const features = [
   {

@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { useDateFormatter } from '@fuyeor/commons';
 import type { TextStat } from '@fuyeor/util';
 
@@ -27,7 +27,6 @@ const { createdAt = 0, updatedAt = 0 } = defineProps<{
   stats: TextStat;
 }>();
 
-const { t } = useLocale();
 const { formatDate } = useDateFormatter();
 </script>
 

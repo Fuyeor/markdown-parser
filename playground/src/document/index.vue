@@ -33,8 +33,8 @@ import Preview from './component/preview.vue';
 import ShareModal from './component/toolbar/share.vue';
 
 import { computed, ref, watch } from 'vue';
-import { useLocale } from '@fuyeor/locale';
-import { useToast, useCopy, LayoutAnchor } from '@fuyeor/interactify';
+import { t, locale } from '@fuyeor/vue-locale';
+import { toast, copyText, LayoutAnchor } from '@fuyeor/interactify';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { debounce } from '@fuyeor/commons';
 import { statText } from '@fuyeor/util';
@@ -50,9 +50,6 @@ const { mode = 'code' } = defineProps<{
 const route = useRoute();
 const router = useRouter();
 
-const { t, locale } = useLocale();
-const { copyText } = useCopy();
-const { showToast } = useToast();
 const { source } = usePlaygroundSource();
 
 const {
@@ -92,7 +89,7 @@ const handleCopyHtml = async () => {
     'text/plain': new window.Blob([source.value], { type: 'text/plain' }),
   });
   await window.navigator.clipboard.write([clipboardItem]);
-  showToast(t('copy.success'), { type: 'success' });
+  toast.show(t('copy.success'), { type: 'success' });
 };
 
 const handleEditorScroll = (percentage: number) => {

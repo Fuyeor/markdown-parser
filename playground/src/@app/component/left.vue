@@ -39,15 +39,13 @@
 <script setup lang="ts">
 import DocumentHistory from '@/document/component/history.vue';
 
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { getIconUrl } from '@fuyeor/commons';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { LeftSidebar } from '@fuyeor/interactify';
 
 const route = useRoute();
 const router = useRouter();
-
-const { t } = useLocale();
 </script>
 
 <style>

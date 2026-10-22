@@ -13,9 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLocale } from '@fuyeor/locale';
-
-const { t } = useLocale();
+import { t } from '@fuyeor/vue-locale';
 </script>
 
 <style scoped>

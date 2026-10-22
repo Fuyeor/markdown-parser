@@ -87,10 +87,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { getIconUrl } from '@fuyeor/commons';
 import {
-  useToast,
+  toast,
   Modal,
   Foldable,
   DropdownMenu,
@@ -100,15 +100,12 @@ import {
   useIndexedDb,
   type HistoryDocument,
 } from '@/document/composable/useIndexedDb';
-import { useFormatTime } from '@/document/composable/useFormatTime';
+import { formatTime } from '@/document/util/formatTime';
 
 const route = useRoute();
 const router = useRouter();
 
-const { t } = useLocale();
-const { showToast } = useToast();
 const { documents, deleteOne, deleteAll, purgeEmpty } = useIndexedDb();
-const { formatTime } = useFormatTime();
 
 const searchQuery = ref('');
 const isDeleteAllModalOpen = ref(false);
@@ -177,7 +174,7 @@ const handleDeleteOne = async (document: HistoryDocument) => {
 const handleDeleteEmpty = async () => {
   const idArray = await purgeEmpty(); // 🔧
   if (idArray.length > 0)
-    showToast(t('document.deleteEmpty.count', { count: idArray.length }), {
+    toast.show(t('document.deleteEmpty.count', { count: idArray.length }), {
       type: 'success',
     });
   if (!idArray.includes(currentDocumentId.value)) return;

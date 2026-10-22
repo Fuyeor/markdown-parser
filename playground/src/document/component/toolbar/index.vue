@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { getIconUrl, getTwemojiUrl } from '@fuyeor/commons';
 import type { MarkdownTool } from '@/document/composable/useMarkdownEditor';
 
@@ -73,8 +73,6 @@ const emit = defineEmits<{
   (event: 'copy-html'): void;
   (event: 'tool', tool: MarkdownTool): void;
 }>();
-
-const { t } = useLocale();
 
 interface ToolbarItem {
   tooltip: string;

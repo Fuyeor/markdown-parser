@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { computed, h, nextTick, ref, watch } from 'vue';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { Tabs, type TabItem } from '@fuyeor/interactify';
 import { getCdnLibraryUrl } from '@fuyeor/commons';
 import { createMarkdownParser, render, type AsyncRenderer } from '@ffm/parser';
@@ -41,7 +41,6 @@ const emit = defineEmits<{
   (event: 'scroll', percentage: number): void;
 }>();
 
-const { t } = useLocale();
 const { source } = usePlaygroundSource();
 const { markScrollSource, isScrollFromOther } = useScrollSync();
 

@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import {
   HeaderBar,
   HeaderSection,
@@ -71,11 +71,9 @@ import {
   useIndexedDb,
   type HistoryDocument,
 } from '@/document/composable/useIndexedDb';
-import { useFormatTime } from '@/document/composable/useFormatTime';
+import { formatTime } from '@/document/util/formatTime';
 
-const { t } = useLocale();
 const { trashed, purgeOne, purgeAll, restoreOne } = useIndexedDb();
-const { formatTime } = useFormatTime();
 
 const isPurgeAllModalOpen = ref(false);
 

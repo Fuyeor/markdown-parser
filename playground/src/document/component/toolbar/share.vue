@@ -14,12 +14,11 @@
 import CopyClipboard from './clipboard.vue';
 
 import { ref } from 'vue';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { Modal } from '@fuyeor/interactify';
 import { encodeSnippet } from '@/document/composable/useCompression';
 import { usePlaygroundSource } from '@/document/composable/usePlaygroundSource';
 
-const { t } = useLocale();
 const { source } = usePlaygroundSource();
 
 const isShareModalOpen = ref(false);
