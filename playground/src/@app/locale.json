@@ -1,5 +1,5 @@
 {
-  "documents": {
+  "document": {
     "ar": "المستندات",
     "de": "Dokumente",
     "en": "Documents",
@@ -11,31 +11,7 @@
     "ru": "Документы",
     "zh-hans": "文档"
   },
-  "documents.clear": {
-    "ar": "مسح المستندات",
-    "de": "Dokumente löschen",
-    "en": "Clear documents",
-    "es": "Borrar documentos",
-    "fr": "Effacer les documents",
-    "ja": "ドキュメントを消去",
-    "ko": "문서 지우기",
-    "pt": "Limpar documentos",
-    "ru": "Очистить документы",
-    "zh-hans": "清空文档"
-  },
-  "documents.clearConfirm": {
-    "ar": "سيؤدي هذا إلى إزالة جميع المستندات المحلية نهائيًا. هل تريد المتابعة؟",
-    "de": "Dadurch werden alle lokalen Dokumente dauerhaft entfernt. Fortfahren?",
-    "en": "This will permanently remove all local documents. Continue?",
-    "es": "Esto eliminará permanentemente todos los documentos locales. ¿Continuar?",
-    "fr": "Tous les documents locaux seront supprimés définitivement. Continuer ?",
-    "ja": "すべてのローカルドキュメントが完全に削除されます。続行しますか？",
-    "ko": "모든 로컬 문서가 영구적으로 삭제됩니다. 계속하시겠습니까?",
-    "pt": "Isso removerá permanentemente todos os documentos locais. Continuar?",
-    "ru": "Все локальные документы будут удалены навсегда. Продолжить?",
-    "zh-hans": "这将永久删除所有本地文档。是否继续？"
-  },
-  "documents.createdAt": {
+  "document.createdAt": {
     "ar": "تاريخ الإنشاء",
     "de": "Erstellt",
     "en": "Created",
@@ -47,7 +23,7 @@
     "ru": "Создано",
     "zh-hans": "创建于"
   },
-  "documents.daysAgo": {
+  "document.daysAgo": {
     "ar": "منذ {value} يوم",
     "de": "vor {value} Tagen",
     "en": "{value} days ago",
@@ -59,7 +35,151 @@
     "ru": "{value} дн. назад",
     "zh-hans": "{value} 天前"
   },
-  "documents.hoursAgo": {
+  "document.delete": {
+    "ar": "نقل إلى المهملات",
+    "de": "In den Papierkorb verschieben",
+    "en": "Move to trash",
+    "es": "Mover a la papelera",
+    "fr": "Mettre à la corbeille",
+    "ja": "ゴミ箱に移動",
+    "ko": "휴지통으로 이동",
+    "pt": "Mover para a lixeira",
+    "ru": "Переместить в корзину",
+    "zh-hans": "移动至回收站"
+  },
+  "document.deleteAll": {
+    "ar": "نقل الكل إلى المهملات",
+    "de": "Alle in den Papierkorb verschieben",
+    "en": "Move all to trash",
+    "es": "Mover todo a la papelera",
+    "fr": "Tout mettre à la corbeille",
+    "ja": "すべてゴミ箱に移動",
+    "ko": "모두 휴지통으로 이동",
+    "pt": "Mover todos para a lixeira",
+    "ru": "Переместить все в корзину",
+    "zh-hans": "全部移至回收站"
+  },
+  "document.deleteAll.confirm": {
+    "ar": "ستُنقل جميع المستندات إلى المهملات وستُحذف نهائيًا بعد {day} يومًا. حتى ذلك الحين، يمكنك استعادتها في أي وقت.",
+    "de": "Alle Dokumente werden in den Papierkorb verschoben und nach {day} Tagen endgültig gelöscht. Bis dahin können Sie sie jederzeit wiederherstellen.",
+    "en": "All documents will be moved to trash and permanently deleted after {day} days. Until then, you can restore them at any time.",
+    "es": "Todos los documentos se moverán a la papelera y se eliminarán definitivamente después de {day} días. Hasta entonces, podrás restaurarlos en cualquier momento.",
+    "fr": "Tous les documents seront mis à la corbeille et définitivement supprimés après {day} jours. D'ici là, vous pourrez les restaurer à tout moment.",
+    "ja": "すべてのドキュメントがゴミ箱に移動し、{day} 日後に完全に削除されます。それまでは、いつでも復元できます。",
+    "ko": "모든 문서가 휴지통으로 이동되며 {day}일 후 영구 삭제됩니다. 그때까지 언제든지 복원할 수 있습니다.",
+    "pt": "Todos os documentos serão movidos para a lixeira e excluídos permanentemente após {day} dias. Até lá, você poderá restaurá-los a qualquer momento.",
+    "ru": "Все документы будут перемещены в корзину и безвозвратно удалены через {day} дней. До этого момента вы сможете восстановить их в любое время.",
+    "zh-hans": "全部文档将移至回收站，并在 {day} 天后自动删除。在此期间，你也可以随时还原它们。"
+  },
+  "document.deleteEmpty": {
+    "ar": "مسح المستندات الفارغة",
+    "de": "Leere Dokumente löschen",
+    "en": "Delete empty documents",
+    "es": "Eliminar documentos vacíos",
+    "fr": "Supprimer les documents vides",
+    "ja": "空のドキュメントを削除",
+    "ko": "빈 문서 삭제",
+    "pt": "Excluir documentos vazios",
+    "ru": "Удалить пустые документы",
+    "zh-hans": "清除空文档"
+  },
+  "document.deleteEmpty.count": {
+    "ar": "تم مسح {count} من المستندات الفارغة",
+    "de": "{count} leere Dokumente gelöscht",
+    "en": "{count} empty documents deleted",
+    "es": "{count} documentos vacíos eliminados",
+    "fr": "{count} documents vides supprimés",
+    "ja": "{count} 件の空のドキュメントを削除しました",
+    "ko": "{count}개의 빈 문서가 삭제되었습니다",
+    "pt": "{count} documentos vazios excluídos",
+    "ru": "Удалено пустых документов: {count}",
+    "zh-hans": "已清除 {count} 篇空文档"
+  },
+  "document.deleted": {
+    "ar": "سلة المهملات",
+    "de": "Papierkorb",
+    "en": "Trash",
+    "es": "Papelera",
+    "fr": "Corbeille",
+    "ja": "ゴミ箱",
+    "ko": "휴지통",
+    "pt": "Lixeira",
+    "ru": "Корзина",
+    "zh-hans": "回收站"
+  },
+  "document.deleted.desc": {
+    "ar": "سيتم حذف المستندات الموجودة في سلة المهملات تلقائيًا بعد {day} يومًا.",
+    "de": "Dokumente im Papierkorb werden nach {day} Tagen automatisch gelöscht.",
+    "en": "Documents in the trash will be automatically deleted after {day} days.",
+    "es": "Los documentos de la papelera se eliminarán automáticamente después de {day} días.",
+    "fr": "Les documents dans la corbeille seront automatiquement supprimés après {day} jours.",
+    "ja": "ゴミ箱内のドキュメントは{day}日後に自動的に削除されます。",
+    "ko": "휴지통 안의 문서들은 {day}일 후 자동으로 삭제됩니다.",
+    "pt": "Os documentos na lixeira serão excluídos automaticamente após {day} dias.",
+    "ru": "Документы в корзине будут автоматически удалены через {day} день.",
+    "zh-hans": "回收站内的文档将在 {day} 天后自动删除。"
+  },
+  "document.deleted.empty": {
+    "ar": "سلة المهملات فارغة تمامًا.",
+    "de": "Der Papierkorb ist leer.",
+    "en": "The trash bin is empty.",
+    "es": "La papelera está vacía.",
+    "fr": "La corbeille est vide.",
+    "ja": "ゴミ箱の中身は空っぽです〜",
+    "ko": "휴지통이 텅 비어 있습니다.",
+    "pt": "A lixeira está vazia.",
+    "ru": "Корзина пуста.",
+    "zh-hans": "回收站内空空如也〜"
+  },
+  "document.deleted.purge": {
+    "ar": "حذف نهائي",
+    "de": "Endgültig löschen",
+    "en": "Permanently delete",
+    "es": "Eliminar permanentemente",
+    "fr": "Supprimer définitivement",
+    "ja": "完全に削除",
+    "ko": "영구 삭제",
+    "pt": "Excluir permanentemente",
+    "ru": "Удалить навсегда",
+    "zh-hans": "彻底删除"
+  },
+  "document.deleted.purgeAll": {
+    "ar": "إفراغ سلة المهملات",
+    "de": "Papierkorb leeren",
+    "en": "Empty trash bin",
+    "es": "Vaciar papelera",
+    "fr": "Vider la corbeille",
+    "ja": "ゴミ箱を空にする",
+    "ko": "휴지통 비우기",
+    "pt": "Esvaziar lixeira",
+    "ru": "Очистить корзину",
+    "zh-hans": "清空回收站"
+  },
+  "document.deleted.purgeAll.confirm": {
+    "ar": "هل أنت متأكد من إفراغ سلة المهملات؟ سيؤدي هذا إلى حذف جميع المستندات الموجودة بها نهائيًا.",
+    "de": "Möchten Sie den Papierkorb wirklich leeren? Dadurch werden alle darin enthaltenen Dokumente unwiderruflich gelöscht.",
+    "en": "Are you sure you want to empty the trash bin? This will permanently delete all documents inside.",
+    "es": "¿Está seguro de que desea vaciar la papelera? Esto eliminará permanentemente todos los documentos que contiene.",
+    "fr": "Voulez-vous vraiment vider la corbeille ? Cela supprimera définitivement tous les documents qu'elle contient.",
+    "ja": "ゴミ箱を空にしてもよろしいですか？この操作により、ゴミ箱内のすべてのドキュメントが完全に削除されます。",
+    "ko": "휴지통을 비우시겠습니까? 휴지통 안의 모든 문서가 영구적으로 삭제됩니다.",
+    "pt": "Tem certeza de que deseja esvaziar a lixeira? Isso excluirá permanentemente todos os documentos presentes nela.",
+    "ru": "Вы уверены, что хотите очистить корзину? Это навсегда удалит все находящиеся в ней документы.",
+    "zh-hans": "是否确认清空回收站？这将永久删除所有回收站内的文档。"
+  },
+  "document.deleted.restore": {
+    "ar": "استعادة",
+    "de": "Wiederherstellen",
+    "en": "Restore",
+    "es": "Restaurar",
+    "fr": "Restaurer",
+    "ja": "元に戻す",
+    "ko": "복원",
+    "pt": "Restaurar",
+    "ru": "Восстановить",
+    "zh-hans": "恢复"
+  },
+  "document.hoursAgo": {
     "ar": "منذ {value} ساعة",
     "de": "vor {value} Std.",
     "en": "{value} hr ago",
@@ -71,7 +191,7 @@
     "ru": "{value} ч назад",
     "zh-hans": "{value} 小时前"
   },
-  "documents.justNow": {
+  "document.justNow": {
     "ar": "الآن",
     "de": "Gerade eben",
     "en": "Just now",
@@ -83,7 +203,7 @@
     "ru": "Только что",
     "zh-hans": "刚刚"
   },
-  "documents.minutesAgo": {
+  "document.minutesAgo": {
     "ar": "منذ {value} دقيقة",
     "de": "vor {value} Min.",
     "en": "{value} min ago",
@@ -95,7 +215,7 @@
     "ru": "{value} мин назад",
     "zh-hans": "{value} 分钟前"
   },
-  "documents.new": {
+  "document.new": {
     "ar": "جديد",
     "de": "Neu",
     "en": "New",
@@ -107,7 +227,31 @@
     "ru": "Новый",
     "zh-hans": "新建"
   },
-  "documents.search": {
+  "document.pin": {
+    "ar": "تثبيت",
+    "de": "Anpinnen",
+    "en": "Pin",
+    "es": "Fijar",
+    "fr": "Épingler",
+    "ja": "ピン留め",
+    "ko": "고정",
+    "pt": "Fixar",
+    "ru": "Закрепить",
+    "zh-hans": "置顶"
+  },
+  "document.pin.cancel": {
+    "ar": "إلغاء التثبيت",
+    "de": "Anpinnung aufheben",
+    "en": "Unpin",
+    "es": "Desfijar",
+    "fr": "Déséplingler",
+    "ja": "ピン留めを解除",
+    "ko": "고정 해제",
+    "pt": "Desfixar",
+    "ru": "Открепить",
+    "zh-hans": "取消置顶"
+  },
+  "document.search": {
     "ar": "البحث في المستندات...",
     "de": "Dokumente durchsuchen...",
     "en": "Search documents...",
@@ -119,7 +263,7 @@
     "ru": "Поиск документов...",
     "zh-hans": "搜索文档..."
   },
-  "documents.stats.characters": {
+  "document.stat.character": {
     "ar": "{count} حرف",
     "de": "{count} Zeichen",
     "en": "{count} characters",
@@ -131,7 +275,7 @@
     "ru": "{count} символов",
     "zh-hans": "{count} 字符"
   },
-  "documents.stats.paragraphs": {
+  "document.stat.paragraph": {
     "ar": "{count} فقرة",
     "de": "{count} Absätze",
     "en": "{count} paragraphs",
@@ -143,7 +287,7 @@
     "ru": "{count} абзацев",
     "zh-hans": "{count} 段落"
   },
-  "documents.stats.sentences": {
+  "document.stat.sentence": {
     "ar": "{count} جملة",
     "de": "{count} Sätze",
     "en": "{count} sentences",
@@ -155,7 +299,7 @@
     "ru": "{count} предложений",
     "zh-hans": "{count} 句"
   },
-  "documents.stats.words": {
+  "document.stat.word": {
     "ar": "{count} كلمة",
     "de": "{count} Wörter",
     "en": "{count} words",
@@ -167,7 +311,7 @@
     "ru": "{count} слов",
     "zh-hans": "{count} 词"
   },
-  "documents.untitled": {
+  "document.untitled": {
     "ar": "مستند بلا عنوان",
     "de": "Unbenanntes Dokument",
     "en": "Untitled document",
@@ -179,7 +323,7 @@
     "ru": "Документ без названия",
     "zh-hans": "未命名文档"
   },
-  "documents.updatedAt": {
+  "document.updatedAt": {
     "ar": "تم التعديل",
     "de": "Überarbeitet",
     "en": "Revised",
@@ -191,7 +335,7 @@
     "ru": "Изменено",
     "zh-hans": "修订于"
   },
-  "documents.weeksAgo": {
+  "document.weeksAgo": {
     "ar": "منذ {value} أسبوع",
     "de": "vor {value} Wochen",
     "en": "{value} wk ago",
@@ -203,7 +347,7 @@
     "ru": "{value} нед. назад",
     "zh-hans": "{value} 周前"
   },
-  "documents.yesterday": {
+  "document.yesterday": {
     "ar": "أمس",
     "de": "Gestern",
     "en": "Yesterday",

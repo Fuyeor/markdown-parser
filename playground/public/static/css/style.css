@@ -3,6 +3,13 @@
   --width-main: 700px;
   --width-left-sidebar: 350px;
   --width-right-sidebar: 450px;
+  --height-header: 54px;
+  --height-sticky-header: 54px;
+}
+
+:root {
+  --surface: #fbfbf9;
+  --surface-top: #fff;
 }
 
 :root {
@@ -65,6 +72,10 @@ html {
 body {
   margin: 0;
   overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 
 .left-sidebar {
@@ -139,6 +150,8 @@ body {
     margin: 20px 0;
     border-radius: var(--radius-lg);
     overflow: clip;
+    /* 弥补滚动条 */
+    padding-right: 10px;
   }
 
   .header {

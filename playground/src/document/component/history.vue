@@ -3,7 +3,7 @@
   <!-- only shows when user created example doc -->
   <Foldable
     v-if="documents.length !== 0"
-    :title="t('documents')"
+    :title="t('document')"
     :model-value="true"
     :icon-url="getIconUrl('learn')"
     class="document-history"
@@ -13,38 +13,35 @@
         v-model="searchQuery"
         type="search"
         class="document-search-input"
-        :placeholder="t('documents.search')"
-        :aria-label="t('documents.search')"
+        :placeholder="t('document.search')"
+        :aria-label="t('document.search')"
       />
 
-      <button
-        type="button"
-        class="remove-btn"
-        v-tooltip="t('documents.clear')"
-        @click="isClearDocumentsModalOpen = true"
-      >
-        ✕
-      </button>
+      <DropdownMenu
+        class="menu-btn"
+        :aria-label="t('document.actions')"
+        :items="menu"
+      />
     </div>
 
-    <Modal v-model="isClearDocumentsModalOpen" size="small">
+    <Modal v-model="isDeleteAllModalOpen" size="small">
       <template #header>
-        <h3>{{ t('documents.clear') }}</h3>
+        <h3>{{ t('document.deleteAll') }}</h3>
       </template>
-      {{ t('documents.clearConfirm') }}
+      {{ t('document.deleteAll.confirm', { day: 21 }) }}
       <template #footer>
         <div class="confirm-dialog-actions">
           <button
             type="button"
             class="action-btn secondary"
-            @click="isClearDocumentsModalOpen = false"
+            @click="isDeleteAllModalOpen = false"
           >
             {{ t('cancel') }}
           </button>
           <button
             type="button"
             class="action-btn danger"
-            @click="handleClearDocuments"
+            @click="handleDeleteAll"
           >
             {{ t('confirm') }}
           </button>
@@ -63,9 +60,15 @@
         class="document-item"
         :class="{ active: currentDocumentId === document.id }"
       >
+        <img
+          v-if="document.pinned !== undefined"
+          alt=""
+          class="document-pin"
+          :src="pinIcon"
+        />
         <span class="document-info">
           <span class="document-title">{{
-            document.title || t('documents.untitled')
+            document.title || t('document.untitled')
           }}</span>
           <span class="document-time">
             {{ formatTime(document.updated) }}
@@ -73,11 +76,11 @@
               v-if="document.word !== undefined"
               class="document-word-count"
             >
-              {{ t('documents.stats.words', { count: document.word }) }}
+              {{ t('document.stat.word', { count: document.word }) }}
             </span>
             <DropdownMenu
               :aria-label="`${t('delete')}: ${document.title}`"
-              :items="documentMenuItems(document)"
+              :items="docMenu(document)"
               @click.stop.prevent
             />
           </span>
@@ -90,50 +93,98 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
-import { useLocale } from '@fuyeor/locale';
-import { getIconUrl } from '@fuyeor/commons';
+import { t } from '@fuyeor/vue-locale';
+import { getIconUrl, getTwemojiUrl } from '@fuyeor/commons';
 import {
-  DropdownMenu,
-  Foldable,
+  toast,
   Modal,
+  Foldable,
+  DropdownMenu,
   type DropdownItem,
 } from '@fuyeor/interactify';
 import {
   useIndexedDb,
   type HistoryDocument,
 } from '@/document/composable/useIndexedDb';
+import { formatTime } from '@/document/util/formatTime';
 
 const route = useRoute();
 const router = useRouter();
-const { t, locale } = useLocale();
-const { documents, deleteDocument, clearDocuments } = useIndexedDb();
-const searchQuery = ref('');
-const isClearDocumentsModalOpen = ref(false);
 
+const { documents, favorite, deleteOne, deleteAll, purgeEmpty } =
+  useIndexedDb();
+
+const pinIcon = getTwemojiUrl('⭐');
+
+const searchQuery = ref('');
+const isDeleteAllModalOpen = ref(false);
 const currentDocumentId = computed(() => String(route.params.id ?? ''));
 
-const documentMenuItems = (document: HistoryDocument): DropdownItem[] => [
-  {
-    label: t('delete'),
-    action: () => handleDeleteDocument(document),
+const emptyCount = computed(
+  () => documents.value.filter((document) => !document.word).length,
+);
+
+const menu = computed<DropdownItem[]>(() => {
+  const item: DropdownItem[] = [];
+
+  item.push({
+    label: t('document.deleted'),
+    action: () => router.push({ name: 'Document.Deleted' }),
+  });
+
+  if (emptyCount.value > 0) {
+    item.push({
+      label: t('document.deleteEmpty'),
+      action: () => void handleDeleteEmpty(),
+    });
+  }
+
+  item.push({
+    label: t('document.deleteAll'),
+    action: () => {
+      isDeleteAllModalOpen.value = true;
+    },
     class: 'text-danger',
+  });
+
+  return item;
+});
+
+const docMenu = (document: HistoryDocument): DropdownItem[] => [
+  {
+    label:
+      document.pinned === undefined
+        ? t('document.pin')
+        : t('document.pin.cancel'),
+    action: () => void favorite(document.id),
+  },
+  {
+    label: t('document.delete'),
+    action: () => handleDeleteOne(document),
   },
 ];
 
 const filteredDocuments = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase();
-  if (!query) return documents.value;
+  const list = query
+    ? documents.value.filter(
+        (document) =>
+          document.title.toLocaleLowerCase().includes(query) ||
+          document.content.toLocaleLowerCase().includes(query),
+      )
+    : documents.value;
 
-  return documents.value.filter(
-    (document) =>
-      document.title.toLocaleLowerCase().includes(query) ||
-      document.content.toLocaleLowerCase().includes(query),
-  );
+  // Pinned documents first, then by updated desc within each group.
+  return list.toSorted((a, b) => {
+    const aPinned = a.pinned === undefined ? 0 : 1;
+    const bPinned = b.pinned === undefined ? 0 : 1;
+    return bPinned - aPinned || b.updated - a.updated;
+  });
 });
 
 // Delete the local document and clear the current route when needed.
-const handleDeleteDocument = async (document: HistoryDocument) => {
-  await deleteDocument(document.id);
+const handleDeleteOne = async (document: HistoryDocument) => {
+  await deleteOne(document.id);
   if (currentDocumentId.value !== document.id) return;
 
   router.replace({
@@ -143,10 +194,13 @@ const handleDeleteDocument = async (document: HistoryDocument) => {
 };
 
 // Clear all local documents and leave the active document route when necessary.
-const handleClearDocuments = async () => {
-  await clearDocuments();
-  isClearDocumentsModalOpen.value = false;
-  if (route.name !== 'Document' || !currentDocumentId.value) return;
+const handleDeleteEmpty = async () => {
+  const idArray = await purgeEmpty();
+  if (idArray.length > 0)
+    toast.show(t('document.deleteEmpty.count', { count: idArray.length }), {
+      type: 'success',
+    });
+  if (!idArray.includes(currentDocumentId.value)) return;
 
   await router.replace({
     name: 'Document',
@@ -154,33 +208,15 @@ const handleClearDocuments = async () => {
   });
 };
 
-// Format relative timestamps in the active locale.
-const formatTime = (timestamp: number): string => {
-  const diff = Math.max(0, Date.now() - timestamp);
-  if (diff < 60000) return t('documents.justNow');
-  if (diff < 3600000)
-    return t('documents.minutesAgo', {
-      value: Math.floor(diff / 60000),
-    });
-  if (diff < 86400000)
-    return t('documents.hoursAgo', {
-      value: Math.floor(diff / 3600000),
-    });
-  if (diff < 172800000) return t('documents.yesterday');
-  if (diff < 604800000)
-    return t('documents.daysAgo', {
-      value: Math.floor(diff / 86400000),
-    });
-  if (diff < 2592000000)
-    return t('documents.weeksAgo', {
-      value: Math.floor(diff / 604800000),
-    });
+const handleDeleteAll = async () => {
+  await deleteAll();
+  isDeleteAllModalOpen.value = false;
+  if (route.name !== 'Document' || !currentDocumentId.value) return;
 
-  return new Intl.DateTimeFormat(locale.value, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(timestamp);
+  await router.replace({
+    name: 'Document',
+    params: { ...route.params, id: undefined },
+  });
 };
 </script>
 
@@ -214,20 +250,11 @@ const formatTime = (timestamp: number): string => {
   border: none;
   border-radius: var(--radius-lg);
   color: var(--text-secondary);
-  background: var(--surface-raised);
+  background-color: var(--surface-raised-hover);
   font-size: 0.85rem;
 
   &:focus {
     box-shadow: var(--input-border-shadow);
-  }
-}
-
-.remove-btn {
-  flex: 0 0 32px;
-
-  &:hover,
-  &:focus-visible {
-    color: var(--color-danger);
   }
 }
 
@@ -240,6 +267,7 @@ const formatTime = (timestamp: number): string => {
 }
 
 .document-item {
+  position: relative;
   display: flex;
   width: 100%;
   min-width: 0;
@@ -270,11 +298,13 @@ const formatTime = (timestamp: number): string => {
   min-width: 0;
 }
 
-.document-title,
-.document-time {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.document-pin {
+  position: absolute;
+  top: 8px;
+  left: 2px;
+  height: 1em;
+  pointer-events: none;
+  transform: rotate(280deg);
 }
 
 .document-title {
@@ -302,7 +332,11 @@ const formatTime = (timestamp: number): string => {
 
 @media (width <= 900px) {
   .document-item {
-    padding: 10px 0;
+    padding: 10px 0 10px 16px;
+  }
+  .document-pin {
+    top: 8px;
+    left: -6px;
   }
 }
 </style>

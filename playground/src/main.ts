@@ -13,7 +13,7 @@ const head = createHead();
 app.use(router);
 app.use(head);
 
-await initializeLocale({ app });
+await initializeLocale();
 
 app.directive('ripple', vRipple);
 app.directive('tooltip', vTooltip);

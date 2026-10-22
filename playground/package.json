@@ -16,11 +16,12 @@
     "@ffm/parser": "workspace:*",
     "@ffm/vue-editor": "workspace:*",
     "@ffm/vue-renderer": "workspace:*",
-    "@fuyeor/commons": "^0.1.4",
+    "@fuyeor/commons": "^0.1.5",
     "@fuyeor/config": "^0.1.3",
-    "@fuyeor/interactify": "^0.1.3",
-    "@fuyeor/locale": "^0.1.0",
+    "@fuyeor/interactify": "^0.1.5",
+    "@fuyeor/vue-locale": "^0.1.0",
     "@fuyeor/vue-router": "^0.1.2",
+    "@fuyeor/util": "^0.1.5",
     "vue": "^3.5.43"
   },
   "devDependencies": {

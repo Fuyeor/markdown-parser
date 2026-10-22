@@ -33,15 +33,15 @@ import Preview from './component/preview.vue';
 import ShareModal from './component/toolbar/share.vue';
 
 import { computed, ref, watch } from 'vue';
-import { useLocale } from '@fuyeor/locale';
-import { useToast, useCopy, LayoutAnchor } from '@fuyeor/interactify';
+import { t, locale } from '@fuyeor/vue-locale';
+import { toast, copyText, LayoutAnchor } from '@fuyeor/interactify';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { debounce } from '@fuyeor/commons';
+import { statText } from '@fuyeor/util';
 import { get } from './api';
 import { decodeSnippet } from './composable/useCompression';
 import { usePlaygroundSource } from './composable/usePlaygroundSource';
 import { useIndexedDb, type HistoryDocument } from './composable/useIndexedDb';
-import { countDocumentStats } from './composable/useDocumentStats';
 
 const { mode = 'code' } = defineProps<{
   mode: 'rich' | 'code';
@@ -50,9 +50,6 @@ const { mode = 'code' } = defineProps<{
 const route = useRoute();
 const router = useRouter();
 
-const { t, locale } = useLocale();
-const { copyText } = useCopy();
-const { showToast } = useToast();
 const { source } = usePlaygroundSource();
 
 const {
@@ -92,7 +89,7 @@ const handleCopyHtml = async () => {
     'text/plain': new window.Blob([source.value], { type: 'text/plain' }),
   });
   await window.navigator.clipboard.write([clipboardItem]);
-  showToast(t('copy.success'), { type: 'success' });
+  toast.show(t('copy.success'), { type: 'success' });
 };
 
 const handleEditorScroll = (percentage: number) => {
@@ -119,10 +116,10 @@ const saveDocumentContent = async (id: string, content: string) => {
 
   const document: HistoryDocument = {
     ...previous,
-    title: extractTitle(content, t('documents.untitled')),
+    title: extractTitle(content, t('document.untitled')),
     updated: Date.now(),
     content,
-    word: countDocumentStats(content).words,
+    word: statText(content).word,
   };
   await saveDocument(document);
 };
@@ -151,9 +148,9 @@ const createDocumentFromInput = async (content: string) => {
     const now = Date.now();
     const document: HistoryDocument = {
       id: window.crypto.getRandomValues(new Uint8Array(6)).toHex(),
-      title: extractTitle(content, t('documents.untitled')),
+      title: extractTitle(content, t('document.untitled')),
       content,
-      word: countDocumentStats(content).words,
+      word: statText(content).word,
       created: now,
       updated: now,
     };

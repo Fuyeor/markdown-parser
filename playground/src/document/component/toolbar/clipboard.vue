@@ -37,8 +37,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useLocale } from '@fuyeor/locale';
-import { useCopy } from '@fuyeor/interactify';
+import { t } from '@fuyeor/vue-locale';
+import { copyText } from '@fuyeor/interactify';
 
 const props = withDefaults(
   defineProps<{
@@ -55,9 +55,6 @@ const props = withDefaults(
     isSecret: false,
   },
 );
-
-const { t } = useLocale();
-const { copyText } = useCopy();
 
 const isRevealed = ref(false);
 

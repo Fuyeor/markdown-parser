@@ -110,7 +110,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import {
   HeaderBar,
   FormField,
@@ -122,7 +122,6 @@ import {
   useFormatOption,
 } from '@/document/composable/useFormatOption';
 
-const { t } = useLocale();
 const state = useFormatOption();
 
 const headingOption = computed(() => [

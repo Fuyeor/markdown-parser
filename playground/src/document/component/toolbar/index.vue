@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { getIconUrl, getTwemojiUrl } from '@fuyeor/commons';
 import type { MarkdownTool } from '@/document/composable/useMarkdownEditor';
 
@@ -73,8 +73,6 @@ const emit = defineEmits<{
   (event: 'copy-html'): void;
   (event: 'tool', tool: MarkdownTool): void;
 }>();
-
-const { t } = useLocale();
 
 interface ToolbarItem {
   tooltip: string;
@@ -214,10 +212,6 @@ const formatTool = computed<ToolbarItem[]>(() => [
     height: 20px;
   }
 
-  img.monochrome {
-    filter: brightness(1.6);
-  }
-
   &.is-active {
     background-color: var(--surface-top-hover);
   }
@@ -246,6 +240,14 @@ const formatTool = computed<ToolbarItem[]>(() => [
   .editor-toolbar button {
     min-width: 34px;
     height: 34px;
+  }
+}
+
+:root[data-theme='dark'],
+:root[data-theme='black'],
+:root[data-theme='contrast'] {
+  img.monochrome {
+    filter: brightness(1.6);
   }
 }
 </style>

@@ -28,15 +28,13 @@
 <script setup lang="ts">
 import OptionMenuItem from '@/option/component/item.vue';
 
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import type { OptionMenu } from '@/option/type';
 
 // 接收菜单配置对象
 defineProps<{
   menu: OptionMenu;
 }>();
-
-const { t } = useLocale();
 </script>
 
 <style module>

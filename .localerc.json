@@ -1,6 +1,6 @@
 {
   "basic": {
-    "source": "playground/node_modules/@fuyeor/locale/src/common.json",
+    "source": "playground/node_modules/@fuyeor/vue-locale/common.json",
     "outDir": "playground/public/static/locale"
   },
   "main": {

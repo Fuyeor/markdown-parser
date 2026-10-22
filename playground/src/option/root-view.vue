@@ -13,7 +13,7 @@
 import OptionMenuComponent from '@/option/component/menu.vue';
 
 import { computed } from 'vue';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { useRoute } from '@fuyeor/vue-router';
 import type { OptionMenu } from '@/option/type';
 
@@ -22,7 +22,6 @@ const props = defineProps<{
   menu: OptionMenu; // 菜单配置
 }>();
 
-const { t } = useLocale();
 const route = useRoute();
 
 // 判断当前是否是 /options/{routeName} 这个根路径

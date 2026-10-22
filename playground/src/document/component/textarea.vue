@@ -279,6 +279,8 @@ defineExpose({ textarea, replaceSource, stats, scrollToPercentage });
   grid-column: 1;
   padding: 0 12px;
   text-align: right;
+  font-family: 'Google code sans';
+  font-size: 0.9rem;
   color: #a0aec0;
   user-select: none;
   align-self: start;

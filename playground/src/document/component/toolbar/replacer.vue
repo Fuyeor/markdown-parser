@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import { useLocale } from '@fuyeor/locale';
+import { t } from '@fuyeor/vue-locale';
 import { useSearchReplace } from '@/document/composable/useReplacer';
 
 const props = defineProps<{ source: string }>();
@@ -66,7 +66,6 @@ const emit = defineEmits<{
   (event: 'close'): void;
 }>();
 
-const { t } = useLocale();
 const queryRef = ref<HTMLInputElement | null>(null);
 
 const {
