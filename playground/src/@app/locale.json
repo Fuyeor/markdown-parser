@@ -419,6 +419,18 @@
     "ru": "Блок кода",
     "zh-hans": "代码块"
   },
+  "editor.copy.link.internal": {
+    "ar": "نسخ الرابط الداخلي",
+    "de": "Internen Link kopieren",
+    "en": "Copy internal link",
+    "es": "Copiar enlace interno",
+    "fr": "Copier le lien interne",
+    "ja": "内部リンクをコピー",
+    "ko": "내부 링크 복사",
+    "pt": "Copiar link interno",
+    "ru": "Скопировать внутреннюю ссылку",
+    "zh-hans": "复制内链"
+  },
   "editor.copy.richText": {
     "ar": "نسخ النص المنسق",
     "de": "Rich Text kopieren",
@@ -442,6 +454,18 @@
     "pt": "Copiar Markdown",
     "ru": "Копировать Markdown",
     "zh-hans": "复制 Markdown"
+  },
+  "editor.format": {
+    "ar": "تنسيق",
+    "de": "Formatieren",
+    "en": "Format",
+    "es": "Formatear",
+    "fr": "Formater",
+    "ja": "整形",
+    "ko": "서식 지정",
+    "pt": "Formatar",
+    "ru": "Форматировать",
+    "zh-hans": "排版"
   },
   "editor.format.continuous": {
     "ar": "تكوين اللغات غير المفصولة",

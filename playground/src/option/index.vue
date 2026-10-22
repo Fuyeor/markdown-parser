@@ -32,13 +32,11 @@ import OptionMenu from '@/option/component/menu.vue';
 
 import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute, RouterView } from '@fuyeor/vue-router';
-import { Modal, useMobileDetection } from '@fuyeor/interactify';
+import { Modal, isMobile } from '@fuyeor/interactify';
 import { dashboardMenu } from '@/option/dashboard-menu';
 
 const router = useRouter();
 const route = useRoute();
-
-const { isMobile } = useMobileDetection();
 
 const sheetOpen = ref(true);
 

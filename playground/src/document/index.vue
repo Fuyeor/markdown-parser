@@ -14,11 +14,11 @@
         ref="textComponent"
         :created-at="currentDocument?.created"
         :updated-at="currentDocument?.updated"
+        :can-trash="!!currentDocument"
         @scroll="handleEditorScroll"
         @option="handleOption"
         @share="handleShare"
-        @copy-source="copyText(source)"
-        @copy-html="handleCopyHtml"
+        @trash="handleTrash"
       />
     </template>
 
@@ -34,14 +34,15 @@ import ShareModal from './component/toolbar/share.vue';
 
 import { computed, ref, watch } from 'vue';
 import { t, locale } from '@fuyeor/vue-locale';
-import { toast, copyText, LayoutAnchor } from '@fuyeor/interactify';
+import { LayoutAnchor } from '@fuyeor/interactify';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { debounce } from '@fuyeor/commons';
 import { statText } from '@fuyeor/util';
 import { get } from './api';
 import { decodeSnippet } from './composable/useCompression';
-import { usePlaygroundSource } from './composable/usePlaygroundSource';
 import { useIndexedDb, type HistoryDocument } from './composable/useIndexedDb';
+import { source } from './state/source';
+import { extractTitle } from './util/extractTitle';
 
 const { mode = 'code' } = defineProps<{
   mode: 'rich' | 'code';
@@ -50,11 +51,10 @@ const { mode = 'code' } = defineProps<{
 const route = useRoute();
 const router = useRouter();
 
-const { source } = usePlaygroundSource();
-
 const {
   documents,
   saveDocument,
+  deleteOne,
   isReady,
   error: storageError,
 } = useIndexedDb();
@@ -72,24 +72,27 @@ const currentDocument = computed(() => {
   return documents.value.find((document) => document.id === id);
 });
 
+const handleTrash = async () => {
+  const id = String(route.params.id ?? '');
+  if (!id) return;
+
+  await deleteOne(id);
+
+  await router.replace({
+    name: 'Document',
+    params: { ...route.params, id: undefined },
+  });
+};
+
 const handleShare = () => {
-  shareModalRef.value?.open();
+  shareModalRef.value?.open(
+    previewComponent.value?.html,
+    String(route.params.id ?? ''),
+  );
 };
 
 const handleOption = () => {
   router.push({ name: 'Option.Editor' });
-};
-
-const handleCopyHtml = async () => {
-  const html = previewComponent.value?.html;
-  if (!html) return;
-
-  const clipboardItem = new window.ClipboardItem({
-    'text/html': new window.Blob([html], { type: 'text/html' }),
-    'text/plain': new window.Blob([source.value], { type: 'text/plain' }),
-  });
-  await window.navigator.clipboard.write([clipboardItem]);
-  toast.show(t('copy.success'), { type: 'success' });
 };
 
 const handleEditorScroll = (percentage: number) => {
@@ -98,16 +101,6 @@ const handleEditorScroll = (percentage: number) => {
 
 const handlePreviewScroll = (percentage: number) => {
   textComponent.value?.scrollToPercentage(percentage);
-};
-
-const extractTitle = (content: string, untitled: string): string => {
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    const heading = /^#{1,6}\s+(.+)$/.exec(trimmed);
-    if (heading) return heading[1].trim().slice(0, 30) || untitled;
-    if (trimmed) return trimmed.slice(0, 30);
-  }
-  return untitled;
 };
 
 const saveDocumentContent = async (id: string, content: string) => {

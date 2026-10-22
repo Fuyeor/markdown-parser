@@ -33,15 +33,14 @@ import {
   createAbc,
 } from '@ffm/parser/plugin';
 import { renderToVue } from '@ffm/vue-renderer';
-import { usePlaygroundSource } from '@/document/composable/usePlaygroundSource';
 import { useScrollSync } from '@/document/composable/useScrollSync';
+import { source } from '@/document/state/source';
 import { formatHtml } from '@/document/util/formatter';
 
 const emit = defineEmits<{
   (event: 'scroll', percentage: number): void;
 }>();
 
-const { source } = usePlaygroundSource();
 const { markScrollSource, isScrollFromOther } = useScrollSync();
 
 const activeTab = ref('preview');

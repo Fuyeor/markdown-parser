@@ -29,7 +29,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
 
 # build linkify before parser consumers resolve its package exports
-RUN pnpm --filter @ffm/linkify build
+RUN pnpm --filter @ffm/linkify build:tld
 
 # generate production locale assets before the playground build copies public files
 RUN pnpm locale make playground --prod

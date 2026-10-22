@@ -4,6 +4,7 @@
     <toolbar
       :can-undo="canUndo"
       :can-redo="canRedo"
+      :can-trash="canTrash"
       @undo="undo"
       @redo="redo"
       @clean="handleClean"
@@ -12,8 +13,7 @@
       @option="emit('option')"
       @tool="applyTool"
       @share="emit('share')"
-      @copy-source="emit('copy-source')"
-      @copy-html="emit('copy-html')"
+      @trash="emit('trash')"
     />
 
     <div
@@ -75,15 +75,16 @@ import StatsBar from './stats-bar.vue';
 
 import { ref, watch } from 'vue';
 import { useMarkdownEditor } from '@/document/composable/useMarkdownEditor';
-import { usePlaygroundSource } from '@/document/composable/usePlaygroundSource';
 import { useScrollSync } from '@/document/composable/useScrollSync';
 import { useMarkdownHighlighter } from '@/document/composable/useMarkdownHighlighter';
 import { useDocumentStats } from '@/document/composable/useDocumentStats';
+import { source } from '@/document/state/source';
 
 const props = withDefaults(
   defineProps<{
     createdAt?: number;
     updatedAt?: number;
+    canTrash?: boolean;
   }>(),
   {
     createdAt: 0,
@@ -97,11 +98,9 @@ const emit = defineEmits<{
   (e: 'clean'): void;
   (e: 'option'): void;
   (e: 'share'): void;
-  (e: 'copy-source'): void;
-  (e: 'copy-html'): void;
+  (e: 'trash'): void;
 }>();
 
-const { source } = usePlaygroundSource();
 const { markScrollSource, isScrollFromOther } = useScrollSync();
 
 const replacerOpen = ref(false);

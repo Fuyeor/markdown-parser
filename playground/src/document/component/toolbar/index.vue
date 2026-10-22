@@ -58,6 +58,7 @@ import type { MarkdownTool } from '@/document/composable/useMarkdownEditor';
 const props = defineProps<{
   canUndo: boolean;
   canRedo: boolean;
+  canTrash?: boolean;
   hasContent?: boolean;
 }>();
 
@@ -65,12 +66,11 @@ const emit = defineEmits<{
   (event: 'undo'): void;
   (event: 'redo'): void;
   (event: 'clean'): void;
+  (event: 'trash'): void;
   (event: 'format'): void;
   (event: 'search'): void;
   (event: 'option'): void;
   (event: 'share'): void;
-  (event: 'copy-source'): void;
-  (event: 'copy-html'): void;
   (event: 'tool', tool: MarkdownTool): void;
 }>();
 
@@ -105,8 +105,7 @@ const documentTool = computed<ToolbarItem[][]>(() => [
   ],
   [
     {
-      icon: getTwemojiUrl('2728'),
-      isColorful: true,
+      icon: getIconUrl('autorenew'),
       tooltip: t('editor.format'),
       action: () => emit('format'),
     },
@@ -128,16 +127,10 @@ const documentTool = computed<ToolbarItem[][]>(() => [
       action: () => emit('share'),
     },
     {
-      icon: getTwemojiUrl('1f4c4'),
-      isColorful: true,
-      tooltip: t('editor.copy.source'),
-      action: () => emit('copy-source'),
-    },
-    {
-      icon: getTwemojiUrl('1f4d1'),
-      isColorful: true,
-      tooltip: t('editor.copy.richText'),
-      action: () => emit('copy-html'),
+      icon: getIconUrl('recycling'),
+      tooltip: t('document.delete'),
+      isDisabled: () => !props.canTrash,
+      action: () => emit('trash'),
     },
   ],
 ]);

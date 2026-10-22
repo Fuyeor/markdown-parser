@@ -15,7 +15,7 @@
       </div>
       <div class="statement-side">
         <p>{{ t('home.statement.description') }}</p>
-        <router-link :to="playgroundLink">
+        <router-link :to="{ name: 'Document' }">
           {{ t('home.statement.cta') }} <span aria-hidden="true">↗</span>
         </router-link>
       </div>
@@ -24,11 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@fuyeor/vue-locale';
 import HomeSectionLabel from './section-label.vue';
-import { usePlaygroundLink } from '@/document/composable/usePlaygroundLink';
 
-const playgroundLink = usePlaygroundLink();
+import { t } from '@fuyeor/vue-locale';
 </script>
 
 <style scoped>

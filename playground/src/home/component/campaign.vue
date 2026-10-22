@@ -7,7 +7,7 @@
       </HomeSectionLabel>
       <blockquote>{{ t('home.campaign.quote') }}</blockquote>
       <p>{{ t('home.campaign.description') }}</p>
-      <router-link :to="playgroundLink" class="button-primary">
+      <router-link :to="{ name: 'Document' }" class="button-primary">
         {{ t('home.campaign.cta') }} <span aria-hidden="true">↗</span>
       </router-link>
     </div>
@@ -22,12 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@fuyeor/vue-locale';
 import HomeImagePlaceholder from './image-placehoder.vue';
 import HomeSectionLabel from './section-label.vue';
-import { usePlaygroundLink } from '@/document/composable/usePlaygroundLink';
 
-const playgroundLink = usePlaygroundLink();
+import { t } from '@fuyeor/vue-locale';
 </script>
 
 <style scoped>
