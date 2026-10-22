@@ -28,7 +28,7 @@
       <template #header>
         <h3>{{ t('document.deleteAll') }}</h3>
       </template>
-      {{ t('document.deleteAll.confirm') }}
+      {{ t('document.deleteAll.confirm', { day: 21 }) }}
       <template #footer>
         <div class="confirm-dialog-actions">
           <button
@@ -100,13 +100,15 @@ import {
   useIndexedDb,
   type HistoryDocument,
 } from '@/document/composable/useIndexedDb';
+import { useFormatTime } from '@/document/composable/useFormatTime';
 
 const route = useRoute();
 const router = useRouter();
 
-const { t, locale } = useLocale();
+const { t } = useLocale();
 const { showToast } = useToast();
-const { documents, deleteOne, deleteEmpty, deleteAll } = useIndexedDb();
+const { documents, deleteOne, deleteAll, purgeEmpty } = useIndexedDb();
+const { formatTime } = useFormatTime();
 
 const searchQuery = ref('');
 const isDeleteAllModalOpen = ref(false);
@@ -118,6 +120,11 @@ const emptyCount = computed(
 
 const menu = computed<DropdownItem[]>(() => {
   const item: DropdownItem[] = [];
+
+  item.push({
+    label: t('document.deleted'),
+    action: () => router.push({ name: 'Document.Deleted' }),
+  });
 
   if (emptyCount.value > 0) {
     item.push({
@@ -139,9 +146,8 @@ const menu = computed<DropdownItem[]>(() => {
 
 const docMenu = (document: HistoryDocument): DropdownItem[] => [
   {
-    label: t('delete'),
+    label: t('document.delete'),
     action: () => handleDeleteOne(document),
-    class: 'text-danger',
   },
 ];
 
@@ -169,7 +175,7 @@ const handleDeleteOne = async (document: HistoryDocument) => {
 
 // Clear all local documents and leave the active document route when necessary.
 const handleDeleteEmpty = async () => {
-  const idArray = await deleteEmpty();
+  const idArray = await purgeEmpty(); // 🔧
   if (idArray.length > 0)
     showToast(t('document.deleteEmpty.count', { count: idArray.length }), {
       type: 'success',
@@ -191,35 +197,6 @@ const handleDeleteAll = async () => {
     name: 'Document',
     params: { ...route.params, id: undefined },
   });
-};
-
-// Format relative timestamps in the active locale.
-const formatTime = (timestamp: number): string => {
-  const diff = Math.max(0, Date.now() - timestamp);
-  if (diff < 60000) return t('document.justNow');
-  if (diff < 3600000)
-    return t('document.minutesAgo', {
-      value: Math.floor(diff / 60000),
-    });
-  if (diff < 86400000)
-    return t('document.hoursAgo', {
-      value: Math.floor(diff / 3600000),
-    });
-  if (diff < 172800000) return t('document.yesterday');
-  if (diff < 604800000)
-    return t('document.daysAgo', {
-      value: Math.floor(diff / 86400000),
-    });
-  if (diff < 2592000000)
-    return t('document.weeksAgo', {
-      value: Math.floor(diff / 604800000),
-    });
-
-  return new Intl.DateTimeFormat(locale.value, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(timestamp);
 };
 </script>
 

@@ -16,6 +16,15 @@ const appRoutes: Array<RouteRecord> = [
     },
   },
   {
+    // flavored.fuyeor.com/document/deleted
+    path: 'document/deleted',
+    name: 'Document.Deleted',
+    component: () => import('@/document/deleted.vue'),
+    meta: {
+      titleKey: 'document.deleted',
+    },
+  },
+  {
     // flavored.fuyeor.com/document
     // flavored.fuyeor.com/document/:id
     // The optional segment uses URLPattern syntax required by @fuyeor/vue-router.

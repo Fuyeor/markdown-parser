@@ -9,23 +9,34 @@ export interface HistoryDocument {
   word?: number;
   created: number;
   updated: number;
+  deleted?: number;
 }
 
 type SyncMessage =
   | { type: 'SAVE'; document: HistoryDocument }
-  | { type: 'DELETE'; idArray: string[] }
+  /** soft deletion */
+  | { type: 'DELETE'; idArray: string[]; deletedAt: number }
+  /** hard deletion */
+  | { type: 'PURGE'; idArray: string[] }
+  | { type: 'RESTORE'; idArray: string[]; updated: number }
+  /** clear deleted document */
   | { type: 'CLEAR' };
 
 const db = {
   name: 'ffm-playground',
-  version: 1,
+  version: 2,
   table: {
     name: 'document',
     updatedAtIndex: 'updated',
+    deletedAtIndex: 'deleted',
   },
 };
 
+/** 21 days */
+const trashTtl = 21 * 24 * 60 * 60 * 1000;
+
 const documents = ref<HistoryDocument[]>([]);
+const trashed = ref<HistoryDocument[]>([]);
 const isReady = ref(false);
 const error = ref<Error | null>(null);
 let database: IDBDatabase | null = null;
@@ -39,8 +50,29 @@ const upsertDocumentState = (document: HistoryDocument) => {
   documents.value.sort((a, b) => b.updated - a.updated);
 };
 
-const removeDocumentState = (id: string) => {
+// Move an active document into the trash state.
+const trashDocumentState = (id: string, deleted: number) => {
+  const index = documents.value.findIndex((item) => item.id === id);
+  if (index < 0) return;
+  const [document] = documents.value.splice(index, 1);
+  trashed.value = [{ ...document, deleted }, ...trashed.value].sort(
+    (a, b) => b.deleted! - a.deleted!,
+  );
+};
+
+// Restore a trashed document into the active state with a fresh timestamp.
+const restoreDocumentState = (id: string, updated: number) => {
+  const index = trashed.value.findIndex((item) => item.id === id);
+  if (index < 0) return;
+  const [document] = trashed.value.splice(index, 1);
+  const { deleted, ...rest } = document;
+  upsertDocumentState({ ...rest, updated });
+};
+
+// Remove a document from both active and trash state.
+const purgeDocumentState = (id: string) => {
   documents.value = documents.value.filter((item) => item.id !== id);
+  trashed.value = trashed.value.filter((item) => item.id !== id);
 };
 
 const initBroadcastChannel = () => {
@@ -51,14 +83,20 @@ const initBroadcastChannel = () => {
     const message = event.data;
     if (message.type === 'SAVE') upsertDocumentState(message.document);
     else if (message.type === 'DELETE')
-      for (const id of message.idArray) removeDocumentState(id);
-    else if (message.type === 'CLEAR') documents.value = [];
+      for (const id of message.idArray)
+        trashDocumentState(id, message.deletedAt);
+    else if (message.type === 'PURGE')
+      for (const id of message.idArray) purgeDocumentState(id);
+    else if (message.type === 'RESTORE')
+      for (const id of message.idArray)
+        restoreDocumentState(id, message.updated);
+    else if (message.type === 'CLEAR') trashed.value = [];
   };
 };
 
 const executeStore = (
   mode: IDBTransactionMode,
-  action: (store: IDBObjectStore) => IDBRequest | void, // 🔧 批量场景无单一请求
+  action: (store: IDBObjectStore) => IDBRequest | void,
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!database) return reject(new Error('IndexedDB is not initialized'));
@@ -84,13 +122,16 @@ const loadAllDocuments = (): Promise<void> => {
       .objectStore(db.table.name)
       .index(db.table.updatedAtIndex)
       .openCursor(null, 'prev');
-    const result: HistoryDocument[] = [];
+    const active: HistoryDocument[] = [];
+    const trash: HistoryDocument[] = [];
 
     request.onsuccess = () => {
       const cursor = request.result;
       if (!cursor) {
         transaction.oncomplete = () => {
-          documents.value = result;
+          documents.value = active;
+          // sorted by new deleted time
+          trashed.value = trash.toSorted((a, b) => b.deleted! - a.deleted!);
           resolve();
         };
         return;
@@ -99,13 +140,13 @@ const loadAllDocuments = (): Promise<void> => {
       const document = cursor.value as HistoryDocument;
       const normalizedDocument =
         document.word === undefined
-          ? {
-              ...document,
-              word: statText(document.content).word,
-            }
+          ? { ...document, word: statText(document.content).word }
           : document;
-      result.push(normalizedDocument);
       if (normalizedDocument !== document) cursor.update(normalizedDocument);
+
+      if (normalizedDocument.deleted === undefined)
+        active.push(normalizedDocument);
+      else trash.push(normalizedDocument);
       cursor.continue();
     };
 
@@ -116,6 +157,21 @@ const loadAllDocuments = (): Promise<void> => {
     transaction.onabort = () =>
       reject(transaction.error ?? new Error('Failed to read documents'));
   });
+};
+
+// Purge documents that have been in trash longer than trashTtl.
+const purgeExpired = async (): Promise<void> => {
+  const threshold = Date.now() - trashTtl;
+  const idArray = trashed.value
+    .filter((document) => document.deleted! < threshold)
+    .map((document) => document.id);
+  if (idArray.length === 0) return;
+
+  await executeStore('readwrite', (store) => {
+    for (const id of idArray) store.delete(id);
+  });
+  for (const id of idArray) purgeDocumentState(id);
+  broadcastChannel?.postMessage({ type: 'PURGE', idArray });
 };
 
 const initialize = (): Promise<void> => {
@@ -138,11 +194,18 @@ const initialize = (): Promise<void> => {
           unique: false,
         });
       }
+
+      if (store && !store.indexNames.contains(db.table.deletedAtIndex)) {
+        store.createIndex(db.table.deletedAtIndex, 'deleted', {
+          unique: false,
+        });
+      }
     };
     request.onsuccess = () => {
       database = request.result;
       database.onversionchange = () => database?.close();
-      loadAllDocuments().then(resolve).catch(reject);
+      // purge expired document when loaded
+      loadAllDocuments().then(purgeExpired).then(resolve).catch(reject);
     };
   }).then(
     () => {
@@ -167,14 +230,81 @@ const requireDatabase = async (): Promise<IDBDatabase> => {
 
 export function useIndexedDb() {
   const saveDocument = async (document: HistoryDocument): Promise<void> => {
+    if (document.deleted !== undefined)
+      throw new Error('Cannot save a trashed document; use restoreOne instead');
+
     await requireDatabase();
     await executeStore('readwrite', (store) => store.put({ ...document }));
     upsertDocumentState(document);
     broadcastChannel?.postMessage({ type: 'SAVE', document });
   };
 
-  // Delete every document without words (word === 0 or undefined) in one transaction.
-  const deleteEmpty = async (): Promise<string[]> => {
+  /** soft delete one document */
+  const deleteOne = async (id: string): Promise<void> => {
+    const document = documents.value.find((item) => item.id === id);
+    if (!document) throw new Error(`Document not found: ${id}`);
+
+    const deleted = Date.now();
+    await requireDatabase();
+    await executeStore('readwrite', (store) =>
+      store.put({ ...document, deleted }),
+    );
+    trashDocumentState(id, deleted);
+    broadcastChannel?.postMessage({
+      type: 'DELETE',
+      idArray: [id],
+      deletedAt: deleted,
+    });
+  };
+
+  /** soft delete all document */
+  const deleteAll = async (): Promise<void> => {
+    const idArray = documents.value.map((document) => document.id);
+    if (idArray.length === 0) return;
+
+    const deleted = Date.now();
+    const trashedDocuments = documents.value.map((document) => ({
+      ...document,
+      deleted,
+    }));
+    await requireDatabase();
+    await executeStore('readwrite', (store) => {
+      for (const document of trashedDocuments) store.put(document);
+    });
+    trashed.value = [...trashedDocuments, ...trashed.value].sort(
+      (a, b) => b.deleted! - a.deleted!,
+    );
+    documents.value = [];
+    broadcastChannel?.postMessage({
+      type: 'DELETE',
+      idArray,
+      deletedAt: deleted,
+    });
+  };
+
+  /** hard delete one document */
+  const purgeOne = async (id: string): Promise<void> => {
+    await requireDatabase();
+    await executeStore('readwrite', (store) => store.delete(id));
+    purgeDocumentState(id);
+    broadcastChannel?.postMessage({ type: 'PURGE', idArray: [id] });
+  };
+
+  /** hard delete all deleted document */
+  const purgeAll = async (): Promise<void> => {
+    const idArray = trashed.value.map((document) => document.id);
+    if (idArray.length === 0) return;
+
+    await requireDatabase();
+    await executeStore('readwrite', (store) => {
+      for (const id of idArray) store.delete(id);
+    });
+    trashed.value = [];
+    broadcastChannel?.postMessage({ type: 'CLEAR' });
+  };
+
+  /** hard delete all empty document */
+  const purgeEmpty = async (): Promise<string[]> => {
     const idArray = documents.value
       .filter((document) => !document.word)
       .map((document) => document.id);
@@ -184,23 +314,22 @@ export function useIndexedDb() {
     await executeStore('readwrite', (store) => {
       for (const id of idArray) store.delete(id);
     });
-    for (const id of idArray) removeDocumentState(id);
-    broadcastChannel?.postMessage({ type: 'DELETE', idArray });
+    for (const id of idArray) purgeDocumentState(id);
+    broadcastChannel?.postMessage({ type: 'PURGE', idArray });
     return idArray;
   };
 
-  const deleteOne = async (id: string): Promise<void> => {
-    await requireDatabase();
-    await executeStore('readwrite', (store) => store.delete(id));
-    removeDocumentState(id);
-    broadcastChannel?.postMessage({ type: 'DELETE', idArray: [id] });
-  };
+  /** restore one deleted document */
+  const restoreOne = async (id: string): Promise<void> => {
+    const document = trashed.value.find((item) => item.id === id);
+    if (!document) throw new Error(`Trashed document not found: ${id}`);
 
-  const deleteAll = async (): Promise<void> => {
+    const { deleted, ...rest } = document;
+    const updated = Date.now();
     await requireDatabase();
-    await executeStore('readwrite', (store) => store.clear());
-    documents.value = [];
-    broadcastChannel?.postMessage({ type: 'CLEAR' });
+    await executeStore('readwrite', (store) => store.put({ ...rest, updated }));
+    restoreDocumentState(id, updated);
+    broadcastChannel?.postMessage({ type: 'RESTORE', idArray: [id], updated });
   };
 
   onMounted(() => {
@@ -210,12 +339,16 @@ export function useIndexedDb() {
 
   return {
     documents,
+    trashed,
     isReady,
     error,
     saveDocument,
     deleteOne,
-    deleteEmpty,
     deleteAll,
+    purgeOne,
+    purgeAll,
+    purgeEmpty,
+    restoreOne,
     loadAllDocuments,
   };
 }
