@@ -60,6 +60,12 @@
         class="document-item"
         :class="{ active: currentDocumentId === document.id }"
       >
+        <img
+          v-if="document.pinned !== undefined"
+          alt=""
+          class="document-pin"
+          :src="pinIcon"
+        />
         <span class="document-info">
           <span class="document-title">{{
             document.title || t('document.untitled')
@@ -88,7 +94,7 @@
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { t } from '@fuyeor/vue-locale';
-import { getIconUrl } from '@fuyeor/commons';
+import { getIconUrl, getTwemojiUrl } from '@fuyeor/commons';
 import {
   toast,
   Modal,
@@ -105,7 +111,10 @@ import { formatTime } from '@/document/util/formatTime';
 const route = useRoute();
 const router = useRouter();
 
-const { documents, deleteOne, deleteAll, purgeEmpty } = useIndexedDb();
+const { documents, favorite, deleteOne, deleteAll, purgeEmpty } =
+  useIndexedDb();
+
+const pinIcon = getTwemojiUrl('⭐');
 
 const searchQuery = ref('');
 const isDeleteAllModalOpen = ref(false);
@@ -143,6 +152,13 @@ const menu = computed<DropdownItem[]>(() => {
 
 const docMenu = (document: HistoryDocument): DropdownItem[] => [
   {
+    label:
+      document.pinned === undefined
+        ? t('document.pin')
+        : t('document.pin.cancel'),
+    action: () => void favorite(document.id),
+  },
+  {
     label: t('document.delete'),
     action: () => handleDeleteOne(document),
   },
@@ -150,13 +166,20 @@ const docMenu = (document: HistoryDocument): DropdownItem[] => [
 
 const filteredDocuments = computed(() => {
   const query = searchQuery.value.trim().toLocaleLowerCase();
-  if (!query) return documents.value;
+  const list = query
+    ? documents.value.filter(
+        (document) =>
+          document.title.toLocaleLowerCase().includes(query) ||
+          document.content.toLocaleLowerCase().includes(query),
+      )
+    : documents.value;
 
-  return documents.value.filter(
-    (document) =>
-      document.title.toLocaleLowerCase().includes(query) ||
-      document.content.toLocaleLowerCase().includes(query),
-  );
+  // Pinned documents first, then by updated desc within each group.
+  return list.toSorted((a, b) => {
+    const aPinned = a.pinned === undefined ? 0 : 1;
+    const bPinned = b.pinned === undefined ? 0 : 1;
+    return bPinned - aPinned || b.updated - a.updated;
+  });
 });
 
 // Delete the local document and clear the current route when needed.
@@ -172,7 +195,7 @@ const handleDeleteOne = async (document: HistoryDocument) => {
 
 // Clear all local documents and leave the active document route when necessary.
 const handleDeleteEmpty = async () => {
-  const idArray = await purgeEmpty(); // 🔧
+  const idArray = await purgeEmpty();
   if (idArray.length > 0)
     toast.show(t('document.deleteEmpty.count', { count: idArray.length }), {
       type: 'success',
@@ -227,7 +250,7 @@ const handleDeleteAll = async () => {
   border: none;
   border-radius: var(--radius-lg);
   color: var(--text-secondary);
-  background: var(--surface-raised);
+  background-color: var(--surface-raised-hover);
   font-size: 0.85rem;
 
   &:focus {
@@ -244,6 +267,7 @@ const handleDeleteAll = async () => {
 }
 
 .document-item {
+  position: relative;
   display: flex;
   width: 100%;
   min-width: 0;
@@ -274,11 +298,13 @@ const handleDeleteAll = async () => {
   min-width: 0;
 }
 
-.document-title,
-.document-time {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.document-pin {
+  position: absolute;
+  top: 8px;
+  left: 2px;
+  height: 1em;
+  pointer-events: none;
+  transform: rotate(280deg);
 }
 
 .document-title {
@@ -306,7 +332,11 @@ const handleDeleteAll = async () => {
 
 @media (width <= 900px) {
   .document-item {
-    padding: 10px 0;
+    padding: 10px 0 10px 16px;
+  }
+  .document-pin {
+    top: 8px;
+    left: -6px;
   }
 }
 </style>

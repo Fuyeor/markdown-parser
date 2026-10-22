@@ -9,6 +9,7 @@ export interface HistoryDocument {
   word?: number;
   created: number;
   updated: number;
+  pinned?: number;
   deleted?: number;
 }
 
@@ -34,14 +35,14 @@ const db = {
 
 /** 21 days */
 const trashTtl = 21 * 24 * 60 * 60 * 1000;
-
+const broadcastChannel = new window.BroadcastChannel(db.name);
 const documents = ref<HistoryDocument[]>([]);
 const trashed = ref<HistoryDocument[]>([]);
 const isReady = ref(false);
 const error = ref<Error | null>(null);
+
 let database: IDBDatabase | null = null;
 let initialization: Promise<void> | null = null;
-let broadcastChannel: BroadcastChannel | null = null;
 
 const upsertDocumentState = (document: HistoryDocument) => {
   const index = documents.value.findIndex((item) => item.id === document.id);
@@ -75,23 +76,33 @@ const purgeDocumentState = (id: string) => {
   trashed.value = trashed.value.filter((item) => item.id !== id);
 };
 
-const initBroadcastChannel = () => {
-  if (broadcastChannel) return;
-  broadcastChannel = new window.BroadcastChannel(db.name);
-
-  broadcastChannel.onmessage = (event: MessageEvent<SyncMessage>) => {
-    const message = event.data;
-    if (message.type === 'SAVE') upsertDocumentState(message.document);
-    else if (message.type === 'DELETE')
+broadcastChannel.onmessage = (event: MessageEvent<SyncMessage>) => {
+  const message = event.data;
+  switch (message.type) {
+    case 'SAVE': {
+      upsertDocumentState(message.document);
+      break;
+    }
+    case 'DELETE': {
       for (const id of message.idArray)
         trashDocumentState(id, message.deletedAt);
-    else if (message.type === 'PURGE')
+      break;
+    }
+    case 'PURGE': {
       for (const id of message.idArray) purgeDocumentState(id);
-    else if (message.type === 'RESTORE')
+      break;
+    }
+    case 'RESTORE': {
       for (const id of message.idArray)
         restoreDocumentState(id, message.updated);
-    else if (message.type === 'CLEAR') trashed.value = [];
-  };
+      break;
+    }
+    case 'CLEAR': {
+      trashed.value = [];
+      break;
+    }
+    default:
+  }
 };
 
 const executeStore = (
@@ -113,7 +124,7 @@ const executeStore = (
   });
 };
 
-const loadAllDocuments = (): Promise<void> => {
+const getAll = (): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!database) return reject(new Error('IndexedDB is not initialized'));
 
@@ -171,7 +182,7 @@ const purgeExpired = async (): Promise<void> => {
     for (const id of idArray) store.delete(id);
   });
   for (const id of idArray) purgeDocumentState(id);
-  broadcastChannel?.postMessage({ type: 'PURGE', idArray });
+  broadcastChannel.postMessage({ type: 'PURGE', idArray });
 };
 
 const initialize = (): Promise<void> => {
@@ -205,7 +216,7 @@ const initialize = (): Promise<void> => {
       database = request.result;
       database.onversionchange = () => database?.close();
       // purge expired document when loaded
-      loadAllDocuments().then(purgeExpired).then(resolve).catch(reject);
+      getAll().then(purgeExpired).then(resolve).catch(reject);
     };
   }).then(
     () => {
@@ -236,7 +247,22 @@ export function useIndexedDb() {
     await requireDatabase();
     await executeStore('readwrite', (store) => store.put({ ...document }));
     upsertDocumentState(document);
-    broadcastChannel?.postMessage({ type: 'SAVE', document });
+    broadcastChannel.postMessage({ type: 'SAVE', document });
+  };
+
+  // Toggle the pinned state without refreshing `updated`.
+  const favorite = async (id: string): Promise<void> => {
+    const document = documents.value.find((item) => item.id === id);
+    if (!document) throw new Error(`Document not found: ${id}`);
+
+    const { pinned, ...rest } = document;
+    const next: HistoryDocument =
+      pinned === undefined ? { ...rest, pinned: Date.now() } : rest;
+
+    await requireDatabase();
+    await executeStore('readwrite', (store) => store.put({ ...next }));
+    upsertDocumentState(next);
+    broadcastChannel.postMessage({ type: 'SAVE', document: next });
   };
 
   /** soft delete one document */
@@ -250,7 +276,7 @@ export function useIndexedDb() {
       store.put({ ...document, deleted }),
     );
     trashDocumentState(id, deleted);
-    broadcastChannel?.postMessage({
+    broadcastChannel.postMessage({
       type: 'DELETE',
       idArray: [id],
       deletedAt: deleted,
@@ -275,7 +301,7 @@ export function useIndexedDb() {
       (a, b) => b.deleted! - a.deleted!,
     );
     documents.value = [];
-    broadcastChannel?.postMessage({
+    broadcastChannel.postMessage({
       type: 'DELETE',
       idArray,
       deletedAt: deleted,
@@ -287,7 +313,7 @@ export function useIndexedDb() {
     await requireDatabase();
     await executeStore('readwrite', (store) => store.delete(id));
     purgeDocumentState(id);
-    broadcastChannel?.postMessage({ type: 'PURGE', idArray: [id] });
+    broadcastChannel.postMessage({ type: 'PURGE', idArray: [id] });
   };
 
   /** hard delete all deleted document */
@@ -300,7 +326,7 @@ export function useIndexedDb() {
       for (const id of idArray) store.delete(id);
     });
     trashed.value = [];
-    broadcastChannel?.postMessage({ type: 'CLEAR' });
+    broadcastChannel.postMessage({ type: 'CLEAR' });
   };
 
   /** hard delete all empty document */
@@ -315,7 +341,7 @@ export function useIndexedDb() {
       for (const id of idArray) store.delete(id);
     });
     for (const id of idArray) purgeDocumentState(id);
-    broadcastChannel?.postMessage({ type: 'PURGE', idArray });
+    broadcastChannel.postMessage({ type: 'PURGE', idArray });
     return idArray;
   };
 
@@ -329,11 +355,10 @@ export function useIndexedDb() {
     await requireDatabase();
     await executeStore('readwrite', (store) => store.put({ ...rest, updated }));
     restoreDocumentState(id, updated);
-    broadcastChannel?.postMessage({ type: 'RESTORE', idArray: [id], updated });
+    broadcastChannel.postMessage({ type: 'RESTORE', idArray: [id], updated });
   };
 
   onMounted(() => {
-    initBroadcastChannel();
     initialize().catch(() => undefined);
   });
 
@@ -343,12 +368,12 @@ export function useIndexedDb() {
     isReady,
     error,
     saveDocument,
+    favorite,
     deleteOne,
     deleteAll,
     purgeOne,
     purgeAll,
     purgeEmpty,
     restoreOne,
-    loadAllDocuments,
   };
 }

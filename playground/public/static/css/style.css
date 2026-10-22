@@ -3,6 +3,8 @@
   --width-main: 700px;
   --width-left-sidebar: 350px;
   --width-right-sidebar: 450px;
+  --height-header: 54px;
+  --height-sticky-header: 54px;
 }
 
 :root {

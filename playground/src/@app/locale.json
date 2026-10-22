@@ -227,6 +227,30 @@
     "ru": "Новый",
     "zh-hans": "新建"
   },
+  "document.pin": {
+    "ar": "تثبيت",
+    "de": "Anpinnen",
+    "en": "Pin",
+    "es": "Fijar",
+    "fr": "Épingler",
+    "ja": "ピン留め",
+    "ko": "고정",
+    "pt": "Fixar",
+    "ru": "Закрепить",
+    "zh-hans": "置顶"
+  },
+  "document.pin.cancel": {
+    "ar": "إلغاء التثبيت",
+    "de": "Anpinnung aufheben",
+    "en": "Unpin",
+    "es": "Desfijar",
+    "fr": "Déséplingler",
+    "ja": "ピン留めを解除",
+    "ko": "고정 해제",
+    "pt": "Desfixar",
+    "ru": "Открепить",
+    "zh-hans": "取消置顶"
+  },
   "document.search": {
     "ar": "البحث في المستندات...",
     "de": "Dokumente durchsuchen...",
