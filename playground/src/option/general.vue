@@ -1,12 +1,8 @@
-<!-- @/option/view/general.vue -->
+<!-- @/option/general.vue -->
 <template>
   <header-bar :title="t('option.general')" />
 
   <div class="option-layout">
-    <p>
-      {{ t('option.prefer.example') }} ({{ t('option.prefer.example.desc') }})
-    </p>
-
     <!-- Theme Mode Selection -->
     <AppearanceSelector
       :active="appearanceState.theme"
@@ -20,7 +16,7 @@
     />
 
     <!-- 节日气氛 -->
-    <form-field class="checkbox-group" :tip="t('option.holidayMode.desc')">
+    <form-field class="checkbox-group" :tip="t('mode.holiday.desc')">
       <label>
         <input
           type="checkbox"
@@ -30,7 +26,7 @@
               appearanceState.setFlower((e.target as HTMLInputElement).checked)
           "
         />
-        {{ t('option.holidayMode') }}
+        {{ t('mode.holiday') }}
       </label>
     </form-field>
   </div>

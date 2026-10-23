@@ -39,9 +39,9 @@ import { useRoute, useRouter } from '@fuyeor/vue-router';
 import { debounce } from '@fuyeor/commons';
 import { statText } from '@fuyeor/util';
 import { get } from './api';
-import { decodeSnippet } from './composable/useCompression';
 import { useIndexedDb, type HistoryDocument } from './composable/useIndexedDb';
 import { source } from './state/source';
+import { decodeSnippet } from './util/compression';
 import { extractTitle } from './util/extractTitle';
 
 const { mode = 'code' } = defineProps<{

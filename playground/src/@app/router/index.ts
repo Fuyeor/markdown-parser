@@ -53,19 +53,22 @@ const appRoutes: Array<RouteRecord> = [
         // flavored.fuyeor.com/option/general
         path: 'general',
         name: 'Option.General',
-        component: () => import('@/option/view/general.vue'),
-        meta: {
-          titleKey: 'option.preferences',
-        },
+        component: () => import('@/option/general.vue'),
+        meta: { titleKey: 'option.general' },
       },
       {
         // flavored.fuyeor.com/option/editor
         path: 'editor',
         name: 'Option.Editor',
-        component: () => import('@/option/view/editor.vue'),
-        meta: {
-          titleKey: 'option.preferences',
-        },
+        component: () => import('@/option/editor.vue'),
+        meta: { titleKey: 'option.editor' },
+      },
+      {
+        // flavored.fuyeor.com/option/document
+        path: 'document',
+        name: 'Option.Document',
+        component: () => import('@/option/document.vue'),
+        meta: { titleKey: 'option.document' },
       },
     ],
   },

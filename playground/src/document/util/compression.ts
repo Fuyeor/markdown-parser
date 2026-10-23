@@ -1,4 +1,4 @@
-// @/document/composable/useCompression.ts
+// @/document/util/compression.ts
 
 /**
  * Encode a string to a base64url-encoded compressed format.

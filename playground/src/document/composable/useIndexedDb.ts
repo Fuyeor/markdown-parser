@@ -358,6 +358,37 @@ export function useIndexedDb() {
     broadcastChannel.postMessage({ type: 'RESTORE', idArray: [id], updated });
   };
 
+  // Move a document into the active or trashed state based on its `deleted` field.
+  const applyDocumentState = (document: HistoryDocument) => {
+    if (document.deleted === undefined) {
+      trashed.value = trashed.value.filter((item) => item.id !== document.id);
+      upsertDocumentState(document);
+      return;
+    }
+
+    documents.value = documents.value.filter((item) => item.id !== document.id);
+    const index = trashed.value.findIndex((item) => item.id === document.id);
+    if (index >= 0) trashed.value[index] = { ...document };
+    else
+      trashed.value = [{ ...document }, ...trashed.value].sort(
+        (a, b) => b.deleted! - a.deleted!,
+      );
+  };
+
+  // Insert or replace imported documents in a single atomic transaction.
+  const importDocuments = async (list: HistoryDocument[]): Promise<void> => {
+    if (list.length === 0) return;
+    await requireDatabase();
+    await executeStore('readwrite', (store) => {
+      for (const document of list) store.put({ ...document });
+    });
+    for (const document of list) {
+      applyDocumentState(document);
+      if (document.deleted === undefined)
+        broadcastChannel.postMessage({ type: 'SAVE', document });
+    }
+  };
+
   onMounted(() => {
     initialize().catch(() => undefined);
   });
@@ -375,5 +406,6 @@ export function useIndexedDb() {
     purgeAll,
     purgeEmpty,
     restoreOne,
+    importDocuments,
   };
 }

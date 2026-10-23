@@ -64,12 +64,11 @@
   color: var(--code-fence);
 }
 
-html {
-  /* remove scroll bar */
-  scrollbar-gutter: unset;
+body {
+  margin: 0;
 }
 
-body {
+body:has(.playground) {
   margin: 0;
   overflow: hidden;
 }
@@ -150,8 +149,6 @@ body {
     margin: 20px 0;
     border-radius: var(--radius-lg);
     overflow: clip;
-    /* 弥补滚动条 */
-    padding-right: 10px;
   }
 
   .header {

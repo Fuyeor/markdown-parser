@@ -1,4 +1,4 @@
-<!-- @/option/view/editor.vue -->
+<!-- @/option/editor.vue -->
 <template>
   <header-bar :title="t('option.editor')" />
 

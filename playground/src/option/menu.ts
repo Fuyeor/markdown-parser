@@ -1,4 +1,4 @@
-// @/option/dashboard-menu.ts
+// @/option/menu.ts
 import { getIconUrl } from '@fuyeor/commons';
 
 export const dashboardMenu = {
@@ -16,6 +16,11 @@ export const dashboardMenu = {
           icon: getIconUrl('extension'),
           title: 'option.editor',
           to: { name: 'Option.Editor' },
+        },
+        {
+          icon: getIconUrl('learn'),
+          title: 'option.document',
+          to: { name: 'Option.Document' },
         },
       ],
     },

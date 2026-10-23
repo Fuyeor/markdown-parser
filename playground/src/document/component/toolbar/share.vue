@@ -52,8 +52,8 @@ import { ref } from 'vue';
 import { t } from '@fuyeor/vue-locale';
 import { Modal, toast, copyText } from '@fuyeor/interactify';
 import { getTwemojiUrl } from '@fuyeor/commons';
-import { encodeSnippet } from '@/document/composable/useCompression';
 import { source } from '@/document/state/source';
+import { encodeSnippet } from '@/document/util/compression';
 import { extractTitle } from '@/document/util/extractTitle';
 
 const isShareModalOpen = ref(false);
