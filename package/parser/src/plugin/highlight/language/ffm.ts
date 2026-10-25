@@ -9,35 +9,42 @@ export default function ffm(): Language {
     name: 'FFM',
     aliases: ['ffm', 'markdown', 'md'],
     contains: [
+      // 表格分隔行：必须放在删除线之前，整行吃掉
+      {
+        className: 'table',
+        begin: /^(?=.*\|)(?=[\s:|-]*-{3,})[\s:|-]+$/,
+        contains: [],
+      },
       // 仅支持 ATX 风格标题 (# ## ###)
       {
         className: 'section',
         begin: /^#{1,6}\s+.*$/,
       },
-      // FFM 特殊块语法：slide, chain, accordion, quote 等
+      // FFM 特殊块：一次性匹配整个块
+      // \1 = 反引号串，正则内部反向引用，精确匹配同数量的结束反引号
       {
         className: 'meta',
-        begin: /^(`{3,4})(slide|chain|accordion|quote|mermaid|smiles|abc)\b/,
-        end: '\\1',
+        begin:
+          /(`{3,4})(slide|chain|accordion|quote|mermaid|smiles|abc)\b[^\n]*\n[\s\S]*?\n\1(?!`)/,
       },
       // 通用栅栏代码块 (```)
       // 用字符串 '\\1' 匹配组 1 (N 个反引号)
       {
         className: 'code',
-        begin: /^(`{3,})/,
-        end: '\\1',
+        begin: /(`{3,})[^\n]*\n[\s\S]*?\n\1(?!`)/,
       },
       // 行内代码 (`code`)
+      // 一次性匹配，不跨行，不会吞后续内容
       {
         className: 'code',
-        begin: /`/,
-        end: /`/,
+        begin: /`[^`\n]+`/,
       },
       // 删除线 (--strikethrough--)
+      // 排除 --- 水平线/表格分隔行
       {
         className: 'deletion',
-        begin: /--/,
-        end: /--/,
+        begin: /(?<!-)--(?!-)/,
+        end: /(?<!-)--(?!-)/,
       },
       // 下划线 (__underline__)
       {
@@ -62,11 +69,17 @@ export default function ffm(): Language {
         className: 'quote',
         begin: /^\s*>\s*.*$/,
       },
-      // LaTeX 行内与块级公式 ($...$ 或 $$...$$)
+      // LaTeX 块级公式
       {
         className: 'formula',
-        begin: /\${1,2}/,
-        end: /\${1,2}/,
+        begin: /\$\$/,
+        end: /\$\$/,
+      },
+      // LaTeX 行内公式
+      {
+        className: 'formula',
+        begin: /(?<!\$)\$(?!\$)/,
+        end: /(?<!\$)\$(?!\$)/,
       },
     ],
   };

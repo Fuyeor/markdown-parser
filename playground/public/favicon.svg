@@ -1,27 +1,7 @@
 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <!-- fuyeor lavender background -->
-  <rect x="0" y="0" width="100" height="100" rx="12" fill="#AEA4E4" />
-
-  <!-- group for scaling the icon only -->
-  <g transform="translate(50, 50) scale(1.25) translate(-50, -55)">
-    <!-- fuyeor flavored markdown "M↓" -->
-    <path fill="#FFF"
-      d="M25 25
-         L25 75
-         L38 75 
-         L38 50 
-         L50 65 
-         L62 50 
-         L62 75
-         L57 75
-         L69.5 90
-         L80 75
-         L75 75
-         L75 25
-         L62 25 
-         L50 45 
-         L38 25 
-         L25 25Z"
-    />
-  </g>
+  <rect width="100" height="100" rx="12" fill="#AEA4E4" />
+  <!-- fuyeor flavored markdown "M↓" -->
+  <path fill="#FFF"
+    d="M11.248 75.835C9.72 2.294 37.873 3.826 48.829 26.703 60.121 3.65 87.68 3.42 85.595 76.483h7.628s-15.506 21.144-15.54 21.144l-15.69-21.144h7.317c0-.16 3.189-47.374-6.445-47.414-7.947-.032-5.938 46.787-5.938 46.787h-17.13s2.738-46.79-6.809-46.806c-8.144-.014-5.73 46.806-5.73 46.806-3.278 0-16.01-.021-16.01-.021z" />
 </svg>
