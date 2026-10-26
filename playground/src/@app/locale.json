@@ -875,30 +875,6 @@
     "ru": "Заголовок",
     "zh-hans": "标题"
   },
-  "home.brand.alt": {
-    "ar": "شعار FFM",
-    "de": "FFM-Logo",
-    "en": "FFM mark",
-    "es": "Logotipo de FFM",
-    "fr": "Logo FFM",
-    "ja": "FFM ロゴ",
-    "ko": "FFM 로고",
-    "pt": "Logotipo FFM",
-    "ru": "Логотип FFM",
-    "zh-hans": "FFM 图形标志"
-  },
-  "home.brand.ariaLabel": {
-    "ar": "الصفحة الرئيسية لـ FFM",
-    "de": "FFM-Startseite",
-    "en": "FFM home",
-    "es": "Página de inicio de FFM",
-    "fr": "Accueil FFM",
-    "ja": "FFM ホーム",
-    "ko": "FFM 홈",
-    "pt": "Página inicial do FFM",
-    "ru": "Главная страница FFM",
-    "zh-hans": "FFM 首页"
-  },
   "home.campaign.cta": {
     "ar": "ابدأ صفحتك الأولى",
     "de": "Mit der ersten Seite beginnen",
@@ -922,18 +898,6 @@
     "pt": "O FFM foi criado para que cada quebra de linha e cada destaque façam parte do ritmo da escrita, não sejam uma distração.",
     "ru": "FFM создан, чтобы каждый перенос строки и каждое выделение были частью ритма письма, а не отвлечением.",
     "zh-hans": "FFM 的设计初衷，是让每一次换行、每一个加粗，都成为写作节奏的一部分，而不是干扰。"
-  },
-  "home.campaign.imagePlaceholder": {
-    "ar": "عنصر نائب لصورة الحملة",
-    "de": "Platzhalter für das Kampagnenbild",
-    "en": "Campaign image placeholder",
-    "es": "Marcador de imagen de campaña",
-    "fr": "Espace réservé à l'image de campagne",
-    "ja": "キャンペーン画像のプレースホルダー",
-    "ko": "캠페인 이미지 자리표시자",
-    "pt": "Espaço reservado para imagem da campanha",
-    "ru": "Заполнитель изображения кампании",
-    "zh-hans": "宣传图片占位符"
   },
   "home.campaign.label": {
     "ar": "كلمة من السفير",
@@ -959,43 +923,7 @@
     "ru": "Когда вам больше не нужно думать о том, как пользоваться инструментом, вы наконец слышите голос в своей голове.",
     "zh-hans": "当你不再需要思考工具该怎么用时，你才能听见自己脑海里的声音。"
   },
-  "home.features.imageCaption": {
-    "ar": "مصمم للهامش",
-    "de": "Für den Rand entworfen",
-    "en": "Designed for the margin",
-    "es": "Diseñado para el margen",
-    "fr": "Conçu pour la marge",
-    "ja": "余白のために設計",
-    "ko": "여백을 위해 설계됨",
-    "pt": "Projetado para a margem",
-    "ru": "Создано для полей",
-    "zh-hans": "为边缘留白而设计"
-  },
-  "home.features.imagePlaceholder": {
-    "ar": "عنصر نائب لصورة الميزة",
-    "de": "Platzhalter für das Feature-Bild",
-    "en": "Feature image placeholder",
-    "es": "Marcador de imagen de función",
-    "fr": "Espace réservé à l'image de fonctionnalité",
-    "ja": "機能イメージのプレースホルダー",
-    "ko": "기능 이미지 자리표시자",
-    "pt": "Espaço reservado para imagem do recurso",
-    "ru": "Заполнитель изображения возможности",
-    "zh-hans": "功能图片占位符"
-  },
-  "home.features.imageTitle": {
-    "ar": "اكتب دون مغادرة الصفحة.",
-    "de": "Schreiben, ohne die Seite zu verlassen.",
-    "en": "Write without leaving the page.",
-    "es": "Escribe sin salir de la página.",
-    "fr": "Écrire sans quitter la page.",
-    "ja": "ページを離れずに書く。",
-    "ko": "페이지를 떠나지 않고 쓰세요.",
-    "pt": "Escreva sem sair da página.",
-    "ru": "Пишите, не покидая страницу.",
-    "zh-hans": "写作，无需离开页面。"
-  },
-  "home.features.items.format.description": {
+  "home.feature.item.format.description": {
     "ar": "أنجز كل الأنماط ضمن السطر دون مغادرة لوحة المفاتيح أو البحث عن قائمة.",
     "de": "Erledige alle Formatierungen direkt im Text, ohne Tastatur oder Seite zu verlassen.",
     "en": "Handle every style inline without leaving the keyboard or hunting through menus.",
@@ -1007,7 +935,7 @@
     "ru": "Оформляйте всё прямо в строке, не отрываясь от клавиатуры и меню.",
     "zh-hans": "在行内完成所有样式，无需频繁离开键盘或寻找菜单。"
   },
-  "home.features.items.format.title": {
+  "home.feature.item.format.title": {
     "ar": "تنسيق طبيعي كالتنفس",
     "de": "Formatierung so natürlich wie Atmen",
     "en": "Formatting as natural as breathing",
@@ -1019,7 +947,7 @@
     "ru": "Форматирование естественно, как дыхание",
     "zh-hans": "格式化如呼吸般自然"
   },
-  "home.features.items.output.description": {
+  "home.feature.item.output.description": {
     "ar": "هيكل نظيف وقياسي، جاهز للدخول في أي مسار نشر.",
     "de": "Eine saubere, standardisierte Struktur, bereit für jeden Veröffentlichungsprozess.",
     "en": "A clean, standard structure ready to enter any publishing flow.",
@@ -1031,7 +959,7 @@
     "ru": "Чистая стандартная структура, готовая для любого процесса публикации.",
     "zh-hans": "生成的结构干净标准，随时准备好进入任何发布流。"
   },
-  "home.features.items.output.title": {
+  "home.feature.item.output.title": {
     "ar": "مخرجات جاهزة للنشر",
     "de": "Ausgaben bereit für die Veröffentlichung",
     "en": "Output ready for publishing",
@@ -1043,7 +971,7 @@
     "ru": "Результат готов к публикации",
     "zh-hans": "为发布准备的输出"
   },
-  "home.features.items.preview.description": {
+  "home.feature.item.preview.description": {
     "ar": "يظهر النص والمعاينة معًا، ولكل فقرة مساحتها المناسبة.",
     "de": "Text und Vorschau erscheinen gemeinsam, mit dem richtigen Raum für jeden Absatz.",
     "en": "Text and preview appear together, giving every paragraph the space it deserves.",
@@ -1055,7 +983,7 @@
     "ru": "Текст и предпросмотр отображаются вместе, оставляя каждому абзацу нужное место.",
     "zh-hans": "文字与预览同时呈现，每一段都有它该有的留白。"
   },
-  "home.features.items.preview.title": {
+  "home.feature.item.preview.title": {
     "ar": "إيقاع ما تراه هو ما تحصل عليه",
     "de": "Der Rhythmus dessen, was du siehst",
     "en": "The rhythm of what you see",
@@ -1067,7 +995,7 @@
     "ru": "Ритм того, что вы видите",
     "zh-hans": "所见即所得的节奏"
   },
-  "home.features.label": {
+  "home.feature.label": {
     "ar": "ميزات مصممة للتركيز",
     "de": "Funktionen für konzentriertes Arbeiten",
     "en": "Features built for focus",
@@ -1079,7 +1007,7 @@
     "ru": "Возможности для сосредоточенной работы",
     "zh-hans": "为专注时刻打造的功能"
   },
-  "home.features.titleEmphasis": {
+  "home.feature.titleEmphasis": {
     "ar": "لحظات التركيز.",
     "de": "fokussierte Momente.",
     "en": "focused moments.",
@@ -1091,7 +1019,7 @@
     "ru": "моменты концентрации.",
     "zh-hans": "每一项功能。"
   },
-  "home.features.titleLead": {
+  "home.feature.titleLead": {
     "ar": "كل ميزة",
     "de": "Jede Funktion für",
     "en": "Every feature for",
@@ -1103,185 +1031,17 @@
     "ru": "Каждая возможность для",
     "zh-hans": "写给专注时刻的"
   },
-  "home.footer.ariaLabel": {
-    "ar": "تذييل الموقع",
-    "de": "Website-Fußzeile",
-    "en": "Site footer",
-    "es": "Pie de página del sitio",
-    "fr": "Pied de page du site",
-    "ja": "サイトフッター",
-    "ko": "사이트 푸터",
-    "pt": "Rodapé do site",
-    "ru": "Подвал сайта",
-    "zh-hans": "网站页脚"
-  },
-  "home.footer.copyright": {
-    "ar": "© 2026 Fuyeor. جميع الحقوق محفوظة.",
-    "de": "© 2026 Fuyeor. Alle Rechte vorbehalten.",
-    "en": "© 2026 Fuyeor. All rights reserved.",
-    "es": "© 2026 Fuyeor. Todos los derechos reservados.",
-    "fr": "© 2026 Fuyeor. Tous droits réservés.",
-    "ja": "© 2026 Fuyeor. All rights reserved.",
-    "ko": "© 2026 Fuyeor. All rights reserved.",
-    "pt": "© 2026 Fuyeor. Todos os direitos reservados.",
-    "ru": "© 2026 Fuyeor. Все права защищены.",
-    "zh-hans": "© 2026 Fuyeor。保留所有权利。"
-  },
-  "home.footer.privacy": {
-    "ar": "الخصوصية",
-    "de": "Datenschutz",
-    "en": "Privacy",
-    "es": "Privacidad",
-    "fr": "Confidentialité",
-    "ja": "プライバシー",
-    "ko": "개인정보 보호",
-    "pt": "Privacidade",
-    "ru": "Конфиденциальность",
-    "zh-hans": "隐私"
-  },
-  "home.footer.terms": {
-    "ar": "الشروط",
-    "de": "Bedingungen",
-    "en": "Terms",
-    "es": "Términos",
-    "fr": "Conditions",
-    "ja": "利用規約",
-    "ko": "약관",
-    "pt": "Termos",
-    "ru": "Условия",
-    "zh-hans": "条款"
-  },
-  "home.header.features": {
-    "ar": "الميزات",
-    "de": "Funktionen",
-    "en": "Features",
-    "es": "Funciones",
-    "fr": "Fonctionnalités",
-    "ja": "機能",
-    "ko": "기능",
-    "pt": "Recursos",
-    "ru": "Возможности",
-    "zh-hans": "功能"
-  },
-  "home.header.navigation": {
-    "ar": "التنقل الرئيسي",
-    "de": "Hauptnavigation",
-    "en": "Main navigation",
-    "es": "Navegación principal",
-    "fr": "Navigation principale",
-    "ja": "メインナビゲーション",
-    "ko": "주요 탐색",
-    "pt": "Navegação principal",
-    "ru": "Основная навигация",
-    "zh-hans": "主导航"
-  },
-  "home.header.notes": {
-    "ar": "ملاحظات",
-    "de": "Notizen",
-    "en": "Notes",
-    "es": "Notas",
-    "fr": "Notes",
-    "ja": "ノート",
-    "ko": "노트",
-    "pt": "Notas",
-    "ru": "Заметки",
-    "zh-hans": "笔记"
-  },
-  "home.header.theme.light": {
-    "ar": "فاتح",
-    "de": "Hell",
-    "en": "Light",
-    "es": "Claro",
-    "fr": "Clair",
-    "ja": "ライト",
-    "ko": "라이트",
-    "pt": "Claro",
-    "ru": "Светлая",
-    "zh-hans": "浅色"
-  },
-  "home.header.theme.night": {
-    "ar": "ليلي",
-    "de": "Nacht",
-    "en": "Night",
-    "es": "Noche",
-    "fr": "Nuit",
-    "ja": "ナイト",
-    "ko": "나이트",
-    "pt": "Noite",
-    "ru": "Ночная",
-    "zh-hans": "夜间"
-  },
-  "home.header.theme.toggle": {
-    "ar": "تبديل سمة الألوان",
-    "de": "Farbmodus umschalten",
-    "en": "Toggle color theme",
-    "es": "Cambiar tema de color",
-    "fr": "Changer de thème de couleur",
-    "ja": "カラーテーマを切り替え",
-    "ko": "색상 테마 전환",
-    "pt": "Alternar tema de cores",
-    "ru": "Переключить цветовую тему",
-    "zh-hans": "切换颜色主题"
-  },
-  "home.header.why": {
-    "ar": "لماذا FFM",
-    "de": "Warum FFM",
-    "en": "Why FFM",
-    "es": "Por qué FFM",
-    "fr": "Pourquoi FFM",
-    "ja": "FFM とは",
-    "ko": "왜 FFM인가",
-    "pt": "Por que FFM",
-    "ru": "Почему FFM",
-    "zh-hans": "为什么选择 FFM"
-  },
-  "home.header.writeLine": {
-    "ar": "اكتب سطرًا",
-    "de": "Eine Zeile schreiben",
-    "en": "Write a line",
-    "es": "Escribe una línea",
-    "fr": "Écrire une ligne",
-    "ja": "一行を書く",
-    "ko": "한 줄 쓰기",
-    "pt": "Escreva uma linha",
-    "ru": "Написать строку",
-    "zh-hans": "写下一行"
-  },
-  "home.hero.attribution": {
-    "ar": "اكتب دون أن تقاطعك الأدوات",
-    "de": "Schreiben, ohne die Seite zu verlassen",
-    "en": "Write without leaving the page",
-    "es": "Escribe sin salir de la página",
-    "fr": "Écrire sans quitter la page",
-    "ja": "ページを離れずに書く",
-    "ko": "페이지를 떠나지 않고 쓰기",
-    "pt": "Escreva sem sair da página",
-    "ru": "Пишите, не покидая страницу",
-    "zh-hans": "写作不必被工具打断"
-  },
-  "home.hero.captionMargin": {
-    "ar": "مصممة للهامش",
-    "de": "Für den Rand gemacht",
-    "en": "Made for the margin",
-    "es": "Hecho para el margen",
-    "fr": "Pensé pour la marge",
-    "ja": "余白のために",
-    "ko": "여백을 위해 만들어졌습니다",
-    "pt": "Feito para a margem",
-    "ru": "Создано для полей",
-    "zh-hans": "为边缘留白而生"
-  },
-  "home.hero.captionSentence": {
-    "ar": "أبقِ الجملة قريبة",
-    "de": "Den Satz nah halten",
-    "en": "Keep the sentence close",
-    "es": "Mantén cerca la frase",
-    "fr": "Garder la phrase près de soi",
-    "ja": "文をそばに置く",
-    "ko": "문장을 가까이 두기",
-    "pt": "Mantenha a frase por perto",
-    "ru": "Держите предложение рядом",
-    "zh-hans": "让句子保持靠近"
+  "home.hero.cta": {
+    "ar": "افتح المختبر",
+    "de": "Labor öffnen",
+    "en": "Open Laboratory",
+    "es": "Abrir laboratorio",
+    "fr": "Ouvrir le laboratoire",
+    "ja": "ラボを開く",
+    "ko": "실험실 열기",
+    "pt": "Abrir laboratório",
+    "ru": "Открыть лабораторию",
+    "zh-hans": "打开实验室"
   },
   "home.hero.description": {
     "ar": "مساحة Markdown مصممة لمن يكتبون بجدية. واضحة، ذات إحساس، وتضع الكلمات أولاً.",
@@ -1295,79 +1055,7 @@
     "ru": "Пространство Markdown для тех, кто пишет осознанно. Ясное, выразительное и всегда ставящее слова на первое место.",
     "zh-hans": "一个为认真写作的人设计的 Markdown 空间。它清楚、有感觉，并且始终把文字放在前面。"
   },
-  "home.hero.eyebrow": {
-    "ar": "نحو، مع مساحة للتنفس",
-    "de": "Syntax mit Raum zum Atmen",
-    "en": "Syntax, with room to breathe",
-    "es": "Sintaxis, con espacio para respirar",
-    "fr": "La syntaxe, avec de l'espace pour respirer",
-    "ja": "呼吸できる余白のある構文",
-    "ko": "숨 쉴 여백이 있는 구문",
-    "pt": "Sintaxe, com espaço para respirar",
-    "ru": "Синтаксис с пространством для дыхания",
-    "zh-hans": "语法，也需要呼吸的空间"
-  },
-  "home.hero.kicker": {
-    "ar": "FFM / 01",
-    "de": "FFM / 01",
-    "en": "FFM / 01",
-    "es": "FFM / 01",
-    "fr": "FFM / 01",
-    "ja": "FFM / 01",
-    "ko": "FFM / 01",
-    "pt": "FFM / 01",
-    "ru": "FFM / 01",
-    "zh-hans": "FFM / 01"
-  },
-  "home.hero.learnMore": {
-    "ar": "تعرّف على FFM",
-    "de": "FFM kennenlernen",
-    "en": "Meet FFM",
-    "es": "Conoce FFM",
-    "fr": "Découvrir FFM",
-    "ja": "FFM を知る",
-    "ko": "FFM 알아보기",
-    "pt": "Conheça o FFM",
-    "ru": "Узнать о FFM",
-    "zh-hans": "认识 FFM"
-  },
-  "home.hero.openPage": {
-    "ar": "افتح هذه الصفحة",
-    "de": "Diese Seite öffnen",
-    "en": "Open this page",
-    "es": "Abrir esta página",
-    "fr": "Ouvrir cette page",
-    "ja": "このページを開く",
-    "ko": "이 페이지 열기",
-    "pt": "Abrir esta página",
-    "ru": "Открыть эту страницу",
-    "zh-hans": "打开这一页"
-  },
-  "home.hero.portraitPlaceholder": {
-    "ar": "عنصر نائب لصورة البطل",
-    "de": "Platzhalter für das Hero-Bild",
-    "en": "Hero portrait placeholder",
-    "es": "Marcador de retrato principal",
-    "fr": "Espace réservé au portrait principal",
-    "ja": "ヒーロー肖像プレースホルダー",
-    "ko": "히어로 초상화 자리표시자",
-    "pt": "Espaço reservado para o retrato principal",
-    "ru": "Заполнитель портрета героя",
-    "zh-hans": "首屏肖像图占位符"
-  },
-  "home.hero.sampleTitle": {
-    "ar": "العنوان يعرف أين يستريح",
-    "de": "Ein Titel weiß, wo er ruhen darf",
-    "en": "a title knows where to rest",
-    "es": "un título sabe dónde descansar",
-    "fr": "un titre sait où se poser",
-    "ja": "タイトルには落ち着く場所がある",
-    "ko": "제목은 쉴 곳을 안다",
-    "pt": "um título sabe onde repousar",
-    "ru": "заголовок знает, где остановиться",
-    "zh-hans": "标题知道该在哪里停留"
-  },
-  "home.hero.titleEmphasis": {
+  "home.hero.title.emphasis": {
     "ar": "ودع التعبير يظهر.",
     "de": "damit Ausdruck sichtbar wird.",
     "en": "let expression appear.",
@@ -1379,7 +1067,7 @@
     "ru": "пусть появится выражение.",
     "zh-hans": "让表达出现。"
   },
-  "home.hero.titleLead": {
+  "home.hero.title.lead": {
     "ar": "دع التنسيق يتراجع،",
     "de": "Lass die Formatierung zurücktreten,",
     "en": "Let format step back,",
@@ -1391,77 +1079,29 @@
     "ru": "Пусть формат отступит,",
     "zh-hans": "让格式退后，"
   },
-  "home.intro.ariaLabel": {
-    "ar": "فلسفة FFM",
-    "de": "Die Idee von FFM",
-    "en": "The FFM idea",
-    "es": "La idea de FFM",
-    "fr": "L'idée de FFM",
-    "ja": "FFM の理念",
-    "ko": "FFM의 철학",
-    "pt": "A ideia do FFM",
-    "ru": "Идея FFM",
-    "zh-hans": "FFM 理念"
+  "home.statement.efficiency.desc": {
+    "ar": "يحتفظ FFM بصيغ Markdown الشائعة مع الاستغناء عن قواعد CommonMark التقليدية غير الضرورية. ويُعرض HTML دائمًا كنص عادي دون تحليله أو تنفيذه. وهذا يجعل التنفيذ الأساسي أكثر خفة ويقلل الاعتماديات غير الضرورية وحركة البيانات عبر الشبكة وعبء المعالجة أثناء التشغيل.",
+    "de": "FFM behält gängige Markdown-Syntax bei und verzichtet auf unnötige ältere CommonMark-Regeln. HTML wird stets als reiner Text angezeigt, ohne geparst oder ausgeführt zu werden. Dadurch bleibt der Kern schlank und unnötige Abhängigkeiten, Netzwerkverkehr und Laufzeitaufwand werden reduziert.",
+    "en": "FFM retains familiar Markdown syntax while dropping unnecessary legacy CommonMark rules. HTML is always displayed as plain text and is never parsed or executed. This keeps the core implementation lean, reducing unnecessary dependencies, network traffic, and runtime overhead.",
+    "es": "FFM conserva la sintaxis habitual de Markdown y prescinde de reglas heredadas innecesarias de CommonMark. El HTML siempre se muestra como texto sin formato, sin analizarse ni ejecutarse. Esto mantiene el núcleo ligero y reduce las dependencias innecesarias, el tráfico de red y la sobrecarga en tiempo de ejecución.",
+    "fr": "FFM conserve la syntaxe Markdown courante tout en abandonnant les anciennes règles inutiles de CommonMark. Le HTML est toujours affiché comme du texte brut, sans être analysé ni exécuté. Le cœur reste ainsi léger, avec moins de dépendances superflues, de trafic réseau et de surcharge à l’exécution.",
+    "ja": "FFMは一般的なMarkdown構文を維持しながら、不要な従来のCommonMarkルールを排除します。HTMLは常にプレーンテキストとして表示され、解析・実行されません。これによりコア実装を軽量に保ち、不要な依存関係、ネットワーク通信量、実行時の負荷を削減します。",
+    "ko": "FFM은 익숙한 Markdown 문법을 유지하면서 불필요한 기존 CommonMark 규칙을 제거합니다. HTML은 항상 일반 텍스트로 표시되며 파싱되거나 실행되지 않습니다. 이를 통해 핵심 구현을 가볍게 유지하고 불필요한 의존성, 네트워크 트래픽, 런타임 오버헤드를 줄입니다.",
+    "pt": "O FFM mantém a sintaxe Markdown habitual e elimina regras legadas desnecessárias do CommonMark. O HTML é sempre exibido como texto simples, sem ser analisado nem executado. Isso mantém o núcleo enxuto e reduz dependências desnecessárias, tráfego de rede e sobrecarga em tempo de execução.",
+    "ru": "FFM сохраняет привычный синтаксис Markdown, отказываясь от ненужных устаревших правил CommonMark. HTML всегда отображается как обычный текст без разбора и выполнения. Это позволяет сохранить компактность ядра и сократить число лишних зависимостей, сетевой трафик и нагрузку во время выполнения.",
+    "zh-hans": "FFM 在保留常用 Markdown 语法的同时，摒弃不必要的传统 CommonMark 规则。HTML 始终作为纯文本显示，不会被解析执行。这让核心实现更加精简，减少不必要的依赖、网络流量与运行时开销。"
   },
-  "home.intro.caption": {
-    "ar": "علامة واحدة في كل مرة",
-    "de": "Ein Zeichen nach dem anderen",
-    "en": "One mark at a time",
-    "es": "Una marca a la vez",
-    "fr": "Un signe à la fois",
-    "ja": "一つずつ記号を",
-    "ko": "한 기호씩",
-    "pt": "Uma marca de cada vez",
-    "ru": "По одному знаку",
-    "zh-hans": "一次一个标记"
-  },
-  "home.intro.emphasis": {
-    "ar": "حالة كتابة أكثر سهولة.",
-    "de": "leichteres Schreibgefühl.",
-    "en": "more effortless writing state.",
-    "es": "estado de escritura más ligero.",
-    "fr": "état d'écriture plus léger.",
-    "ja": "もっと軽やかな書く状態。",
-    "ko": "더 편안한 글쓰기 상태입니다.",
-    "pt": "estado de escrita mais leve.",
-    "ru": "более лёгкое состояние письма.",
-    "zh-hans": "更轻松的写作状态。"
-  },
-  "home.intro.lead": {
-    "ar": "ليس محررًا أكثر تعقيدًا، بل ",
-    "de": "Kein komplexerer Editor, sondern ein ",
-    "en": "Not a more complex editor, but a ",
-    "es": "No un editor más complejo, sino un ",
-    "fr": "Pas un éditeur plus complexe, mais un ",
-    "ja": "複雑なエディターではなく、",
-    "ko": "더 복잡한 편집기가 아니라, ",
-    "pt": "Não um editor mais complexo, mas um ",
-    "ru": "Не более сложный редактор, а ",
-    "zh-hans": "不是更复杂的编辑器，而是"
-  },
-  "home.statement.cta": {
-    "ar": "اكتشف إيقاع الكتابة",
-    "de": "Den Schreibrhythmus entdecken",
-    "en": "Explore the writing rhythm",
-    "es": "Explora el ritmo de escritura",
-    "fr": "Explorer le rythme de l'écriture",
-    "ja": "書くリズムを探る",
-    "ko": "글쓰기 리듬 탐색하기",
-    "pt": "Explore o ritmo da escrita",
-    "ru": "Исследовать ритм письма",
-    "zh-hans": "探索写作节奏"
-  },
-  "home.statement.description": {
-    "ar": "يضع FFM صيغة Markdown المألوفة في تجربة تهتم بالتدرج والإيقاع والتغذية الراجعة للمعاينة. لا تحتاج إلى تعلم لغة جديدة، ما عليك سوى الاستمرار في الكتابة.",
-    "de": "FFM setzt vertraute Markdown-Syntax in eine Erfahrung mit Sinn für Hierarchie, Rhythmus und Vorschau-Feedback. Du musst keine neue Sprache lernen, sondern nur weiterschreiben.",
-    "en": "FFM places familiar Markdown syntax in an experience shaped around hierarchy, rhythm, and preview feedback. You do not need to learn a new language; you only need to keep writing.",
-    "es": "FFM sitúa la sintaxis Markdown conocida en una experiencia atenta a la jerarquía, el ritmo y la respuesta de la vista previa. No necesitas aprender un idioma nuevo; solo seguir escribiendo.",
-    "fr": "FFM place la syntaxe Markdown familière dans une expérience attentive à la hiérarchie, au rythme et au retour de prévisualisation. Inutile d'apprendre un nouveau langage : continuez simplement à écrire.",
-    "ja": "FFM はおなじみの Markdown 構文を、階層・リズム・プレビューのフィードバックを大切にする体験へ置きます。新しい言語を学ぶ必要はありません。ただ書き続ければよいのです。",
-    "ko": "FFM은 익숙한 Markdown 구문을 계층, 리듬, 미리보기 피드백에 집중한 경험으로 확장합니다. 새로운 언어를 배울 필요 없이 계속 써 내려가면 됩니다.",
-    "pt": "O FFM coloca a sintaxe Markdown familiar em uma experiência guiada por hierarquia, ritmo e retorno da pré-visualização. Você não precisa aprender uma nova linguagem; basta continuar escrevendo.",
-    "ru": "FFM помещает знакомый синтаксис Markdown в опыт, построенный вокруг иерархии, ритма и обратной связи предпросмотра. Вам не нужно учить новый язык — просто продолжайте писать.",
-    "zh-hans": "FFM 将熟悉的 Markdown 语法，放进一套更注重层级、节奏与预览反馈的体验里。你不需要学习新语言，只需要继续写下去。"
+  "home.statement.efficiency.title": {
+    "ar": "اختر FFM، اختر حماية البيئة",
+    "de": "Wählen Sie FFM, wählen Sie Umweltschutz",
+    "en": "Choose FFM, choose eco-friendly",
+    "es": "Elige FFM, elige ecológico",
+    "fr": "Choisissez FFM, choisissez l'éco-responsabilité",
+    "ja": "FFMを選び、エコを選ぶ",
+    "ko": "FFM을 선택하고, 친환경을 선택하세요",
+    "pt": "Escolha FFM, escolha eco-friendly",
+    "ru": "Выбирайте FFM, выбирайте экологичность",
+    "zh-hans": "选择 FFM，选择环保"
   },
   "home.statement.label": {
     "ar": "نظام صغير للأفكار الحقيقية",
@@ -1475,53 +1115,53 @@
     "ru": "Небольшая система для настоящих мыслей",
     "zh-hans": "为真实想法设计的小系统"
   },
-  "home.statement.overline": {
-    "ar": "مقروء افتراضيًا",
-    "de": "Standardmäßig lesbar",
-    "en": "Readable by default",
-    "es": "Legible por defecto",
-    "fr": "Lisible par défaut",
-    "ja": "読みやすさを標準に",
-    "ko": "기본적으로 읽기 쉽게",
-    "pt": "Legível por padrão",
-    "ru": "Читаемо по умолчанию",
-    "zh-hans": "默认即可读"
+  "home.statement.progressive.desc": {
+    "ar": "ابدأ بنص عادي، ثم أضف إلى كتابتك مكونات تفاعلية وصيغًا رياضية ومخططات وتراكيب كيميائية كلما احتجت إليها.",
+    "de": "Beginne mit einfachem Text und erweitere deine Inhalte bei Bedarf um interaktive Elemente, mathematische Notation, Diagramme und chemische Strukturformeln.",
+    "en": "Start with plain text and enrich your writing with interactive components, mathematical notation, charts, and chemical structures whenever you need them.",
+    "es": "Empieza con texto sin formato y enriquece tus escritos con componentes interactivos, notación matemática, gráficos y estructuras químicas cuando los necesites.",
+    "fr": "Commencez par du texte brut, puis enrichissez vos écrits avec des composants interactifs, des notations mathématiques, des graphiques et des structures chimiques selon vos besoins.",
+    "ja": "プレーンテキストから始め、必要に応じてインタラクティブなコンポーネント、数式、グラフ、化学構造式を追加できます。",
+    "ko": "일반 텍스트로 시작하고 필요에 따라 대화형 컴포넌트, 수학 표기법, 차트, 화학 구조식을 추가해 글을 더욱 풍부하게 만들 수 있습니다.",
+    "pt": "Comece com texto simples e enriqueça sua escrita com componentes interativos, notação matemática, gráficos e estruturas químicas sempre que precisar.",
+    "ru": "Начните с обычного текста и дополняйте его интерактивными компонентами, математическими формулами, диаграммами и химическими структурами по мере необходимости.",
+    "zh-hans": "从纯文本开始，根据需要逐步添加交互式组件、数学公式、图表和化学结构式，让表达更加丰富。"
   },
-  "home.statement.titleEmphasis": {
-    "ar": "موضع يتنفس فيه.",
-    "de": "Atemraum.",
-    "en": "breathing room.",
-    "es": "espacio para respirar.",
-    "fr": "espace pour respirer.",
-    "ja": "呼吸する場所がある。",
-    "ko": "숨 쉴 자리가 있습니다.",
-    "pt": "espaço para respirar.",
-    "ru": "пространство для дыхания.",
-    "zh-hans": "呼吸位置。"
+  "home.statement.progressive.title": {
+    "ar": "الكتابة التقدمية",
+    "de": "Progressives Schreiben",
+    "en": "Progressive Writing",
+    "es": "Escritura progresiva",
+    "fr": "Écriture progressive",
+    "ja": "プログレッシブ・ライティング",
+    "ko": "점진적 글쓰기",
+    "pt": "Escrita progressiva",
+    "ru": "Прогрессивное письмо",
+    "zh-hans": "渐进式写作"
   },
-  "home.statement.titleLead": {
-    "ar": "كل رمز،",
-    "de": "Jedes Zeichen",
-    "en": "Every mark",
-    "es": "Cada signo",
-    "fr": "Chaque signe",
-    "ja": "すべての記号に、",
-    "ko": "모든 기호에는",
-    "pt": "Cada marca",
-    "ru": "Каждый знак",
-    "zh-hans": "每一个符号，"
+  "home.statement.web.desc": {
+    "ar": "من موجزات التواصل الاجتماعي إلى المستندات الطويلة، يجمع FFM بين سرعة العرض ومرونة التوسّع لتلبية احتياجات تجارب الويب الحديثة.",
+    "de": "Von Social-Media-Feeds bis hin zu umfangreichen Dokumenten verbindet FFM schnelles Rendering mit flexibler Erweiterbarkeit für moderne Webanwendungen.",
+    "en": "From social media feeds to long-form documents, FFM combines fast rendering with flexible extensibility for modern web experiences.",
+    "es": "Desde los feeds de redes sociales hasta los documentos extensos, FFM combina una renderización rápida con una gran flexibilidad de extensión para las experiencias web modernas.",
+    "fr": "Des fils d'actualité des réseaux sociaux aux documents longs, FFM associe un rendu rapide à une extensibilité flexible pour les expériences Web modernes.",
+    "ja": "SNSのフィードから長文ドキュメントまで、FFMは高速なレンダリングと柔軟な拡張性を両立し、現代のWeb体験を支えます。",
+    "ko": "소셜 미디어 피드부터 긴 문서까지, FFM은 빠른 렌더링과 유연한 확장성을 결합해 현대적인 웹 경험을 지원합니다.",
+    "pt": "Dos feeds das redes sociais aos documentos extensos, o FFM combina renderização rápida com extensibilidade flexível para experiências web modernas.",
+    "ru": "От лент социальных сетей до объёмных документов — FFM сочетает быструю отрисовку с гибкими возможностями расширения для современного веба.",
+    "zh-hans": "从社交媒体信息流到长篇文档，FFM 兼顾快速渲染与灵活扩展，为现代 Web 应用提供支持。"
   },
-  "home.statement.titleMiddle": {
-    "ar": "له ",
-    "de": "findet seinen ",
-    "en": "has its ",
-    "es": "tiene su ",
-    "fr": "a sa ",
-    "ja": "には、",
-    "ko": "에는",
-    "pt": "tem seu ",
-    "ru": "имеет своё ",
-    "zh-hans": "都有它的"
+  "home.statement.web.title": {
+    "ar": "محسن للويب",
+    "de": "Für Web optimiert",
+    "en": "Optimized for Web",
+    "es": "Optimizado para Web",
+    "fr": "Optimisé pour le Web",
+    "ja": "Webのために最適化",
+    "ko": "Web에 최적화됨",
+    "pt": "Otimizado para Web",
+    "ru": "Оптимизировано для Web",
+    "zh-hans": "为 Web 优化"
   },
   "mode.holiday": {
     "ar": "جو العطلة",

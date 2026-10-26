@@ -12,16 +12,7 @@ const appRoutes: Array<RouteRecord> = [
     name: 'Home',
     component: () => import('@/home/index.vue'),
     meta: {
-      overrideTitle: ['site.name', '/', 'site.title'],
-    },
-  },
-  {
-    // flavored.fuyeor.com/document/deleted
-    path: 'document/deleted',
-    name: 'Document.Deleted',
-    component: () => import('@/document/deleted.vue'),
-    meta: {
-      titleKey: 'document.deleted',
+      overrideTitle: ['site.name', '/', 'home'],
     },
   },
   {
@@ -36,6 +27,15 @@ const appRoutes: Array<RouteRecord> = [
     }),
     meta: {
       titleKey: 'playground',
+    },
+  },
+  {
+    // flavored.fuyeor.com/document/deleted
+    path: 'document/deleted',
+    name: 'Document.Deleted',
+    component: () => import('@/document/deleted.vue'),
+    meta: {
+      titleKey: 'document.deleted',
     },
   },
   {

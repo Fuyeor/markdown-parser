@@ -341,9 +341,18 @@ defineExpose({ textarea, replaceSource, stats, scrollToPercentage });
   color: transparent;
 }
 
+:root[data-theme='dark'],
+:root[data-theme='black'] {
+  @media (width <= 900px) {
+    .textarea {
+      --surface-top: #20253a;
+    }
+  }
+}
+
 @media (width <= 900px) {
   .textarea {
-    --surface-top: #20253a;
+    --surface-top: var(--surface);
 
     z-index: 10;
     background: var(--surface-top);

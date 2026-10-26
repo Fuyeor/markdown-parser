@@ -1,9 +1,9 @@
-<!-- @/components/Home/HomeSectionLabel.vue -->
+<!-- @/home/component/section-label.vue -->
 <template>
   <div class="section-label">
     <span>{{ number }}</span>
-    <slot />
     <i v-if="syntax">{{ syntax }}</i>
+    <slot />
   </div>
 </template>
 

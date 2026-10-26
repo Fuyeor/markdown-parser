@@ -8,50 +8,93 @@
       <span class="spine-flower">✦</span>
     </div>
 
-    <HomeHero />
-    <HomeIntro />
-    <HomeStatement />
-    <HomeFeatures />
-    <HomeCampaign />
+    <hero />
+    <statement />
+    <feature />
+    <campaign />
   </div>
 </template>
 
 <script setup lang="ts">
-import HomeCampaign from './component/campaign.vue';
-import HomeFeatures from './component/feature.vue';
-import HomeHero from './component/hero.vue';
-import HomeIntro from './component/intro.vue';
-import HomeStatement from './component/statement.vue';
+import Hero from './component/hero.vue';
+import Statement from './component/statement.vue';
+import Feature from './component/feature.vue';
+import Campaign from './component/campaign.vue';
 
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 // Scope page-level scrolling to Home while preserving the Playground layout.
 onMounted(() => {
-  document.body.classList.add('home-page');
+  document.body.classList.add('home');
 });
 
 onBeforeUnmount(() => {
-  document.body.classList.remove('home-page');
+  document.body.classList.remove('home');
 });
 </script>
+
+<style>
+:root {
+  --ink: #24354b;
+  --ink-soft: #64707d;
+  --paper: #fbfaf7;
+  --paper-deep: #f1efe8;
+  --lilac: #aea4e4;
+  --lilac-deep: #8275ce;
+  --lilac-pale: #eeebfb;
+  --sage: #8ba493;
+  --line: rgba(36, 53, 75, 0.12);
+  --card: rgba(255, 255, 255, 0.86);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--lilac-deep);
+  --primary-foreground: #fff;
+  --secondary: var(--lilac-pale);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--lilac-pale);
+  --accent-foreground: var(--ink);
+  --destructive: #c84c4a;
+  --destructive-foreground: #fff;
+  --serif-font: 'DM Serif Display', Georgia, serif;
+
+  --section-width: calc(100% - 150px);
+}
+
+:root[data-theme='dark'],
+:root[data-theme='black'] {
+  --ink: #f0eff5;
+  --ink-soft: #b7b6c4;
+  --paper: #11101c;
+  --paper-deep: #292743;
+  --lilac-pale: #292743;
+  --line: rgba(239, 238, 247, 0.12);
+  --card: rgba(30, 29, 44, 0.9);
+
+  .paper-grain {
+    mix-blend-mode: screen;
+    opacity: 0.13;
+  }
+}
+
+.home {
+  color: var(--ink);
+
+  .paper-grain {
+    opacity: 1;
+    mix-blend-mode: multiply;
+  }
+}
+</style>
 
 <style scoped>
 .site-shell {
   position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-  color: var(--ink);
-  background: var(--paper);
-}
-
-.site-shell.night {
-  --ink: #f0eff5;
-  --ink-soft: #b7b6c4;
-  --paper: #11101c;
-  --paper-deep: #191827;
-  --lilac-pale: #292743;
-  --line: rgba(239, 238, 247, 0.12);
-  --card: rgba(30, 29, 44, 0.9);
 }
 
 .paper-grain {
@@ -61,14 +104,14 @@ onBeforeUnmount(() => {
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.1'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
-  opacity: 0.35;
+  opacity: 0.6;
 }
 
 .page-spine {
   position: absolute;
   z-index: 3;
-  top: 108px;
-  bottom: 73px;
+  top: 80px;
+  bottom: 70px;
   left: max(20px, calc((100vw - 1480px) / 2));
   display: flex;
   align-items: center;
@@ -102,7 +145,6 @@ onBeforeUnmount(() => {
   position: absolute;
   bottom: -8px;
   padding: 3px 0;
-  background: var(--paper);
   font-size: 23px;
 }
 

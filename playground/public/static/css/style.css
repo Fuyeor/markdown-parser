@@ -188,61 +188,45 @@ h3::after {
   }
 }
 
-/* FFM Ambassador Theme Tokens */
-:root {
-  --ink: #24354b;
-  --ink-soft: #64707d;
-  --paper: #fbfaf7;
-  --paper-deep: #f1efe8;
-  --lilac: #aea4e4;
-  --lilac-deep: #8275ce;
-  --lilac-pale: #eeebfb;
-  --sage: #8ba493;
-  --line: rgba(36, 53, 75, 0.12);
-  --card: rgba(255, 255, 255, 0.86);
-  --radius: 16px;
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card-foreground: var(--ink);
-  --popover: var(--paper);
-  --popover-foreground: var(--ink);
-  --primary: var(--lilac-deep);
-  --primary-foreground: #fff;
-  --secondary: var(--lilac-pale);
-  --secondary-foreground: var(--ink);
-  --muted: var(--paper-deep);
-  --muted-foreground: var(--ink-soft);
-  --accent: var(--lilac-pale);
-  --accent-foreground: var(--ink);
-  --destructive: #c84c4a;
-  --destructive-foreground: #fff;
-  --border: var(--line);
-  --input: var(--line);
-  --ring: var(--lilac);
+.button-primary,
+.button-quiet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 180ms var(--ease-out),
+    color 180ms var(--ease-out),
+    border-color 180ms var(--ease-out);
 }
 
-.night {
-  --ink: #f0eff5;
-  --ink-soft: #b7b6c4;
-  --paper: #11101c;
-  --paper-deep: #191827;
-  --lilac-pale: #292743;
-  --line: rgba(239, 238, 247, 0.12);
-  --card: rgba(30, 29, 44, 0.9);
+.button-primary {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 14px 26px 14px 18px;
+  color: #fff;
+  border-radius: 22px;
+  background: var(--lilac);
+  box-shadow: 3px 3px 0 rgba(36, 53, 75, 0.18);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-shadow:
+    0 1px 2px #0003,
+    0 0 8px #553cb44d;
 }
 
-body.home-page {
-  overflow: auto;
-  background: var(--paper);
-  color: var(--ink);
+.button-primary::before {
+  content: '#';
+  font:
+    500 1.2em 'IBM Plex Mono',
+    ui-monospace,
+    monospace;
 }
 
-.home-page .paper-grain {
-  mix-blend-mode: multiply;
-}
-
-.night .paper-grain {
-  mix-blend-mode: screen;
-  opacity: 0.13;
+.button-primary:hover {
+  background: #c0b8ed;
+  box-shadow: 5px 5px 0 rgba(36, 53, 75, 0.14);
+  transform: translate(-1px, -2px);
 }

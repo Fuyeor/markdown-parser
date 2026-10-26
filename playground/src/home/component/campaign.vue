@@ -1,20 +1,18 @@
-<!-- @/components/Home/HomeCampaign.vue -->
+<!-- @/home/component/campaign.vue -->
 <template>
   <section id="notes" class="campaign-section">
     <div class="campaign-copy">
-      <HomeSectionLabel number="05">
-        {{ t('home.campaign.label') }}
-      </HomeSectionLabel>
+      <section-label number="04">{{ t('home.campaign.label') }}</section-label>
       <blockquote>{{ t('home.campaign.quote') }}</blockquote>
       <p>{{ t('home.campaign.description') }}</p>
       <router-link :to="{ name: 'Document' }" class="button-primary">
-        {{ t('home.campaign.cta') }} <span aria-hidden="true">↗</span>
+        {{ t('home.campaign.cta') }}
       </router-link>
     </div>
+
     <div class="campaign-image">
-      <HomeImagePlaceholder
-        class-name="campaign-main-img"
-        :label="t('home.campaign.imagePlaceholder')"
+      <img
+        src="https://deliver.fuyeor.net/@fu/images/ffm-ambassador.webp?v=261025a"
       />
       <div class="campaign-stamp">FFM<br /><span>2026</span></div>
     </div>
@@ -22,8 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import HomeImagePlaceholder from './image-placehoder.vue';
-import HomeSectionLabel from './section-label.vue';
+import SectionLabel from './section-label.vue';
 
 import { t } from '@fuyeor/vue-locale';
 </script>
@@ -31,20 +28,18 @@ import { t } from '@fuyeor/vue-locale';
 <style scoped>
 .campaign-section {
   display: grid;
-  width: min(1128px, calc(100% - 150px));
-  grid-template-columns: 0.95fr 1.05fr;
-  align-items: center;
-  gap: 108px;
+  width: var(--section-width);
+  gap: 60px;
   margin: 0 auto;
   padding: 150px 0;
 }
 
 .campaign-copy blockquote {
   margin: 31px 0 23px;
-  font:
-    400 clamp(36px, 3.8vw, 55px)/1.05 'DM Serif Display',
-    Georgia,
-    serif;
+  font-family: var(--serif-font);
+  font-weight: 400;
+  font-size: clamp(36px, 3.8vw, 55px);
+  line-height: 1.05;
   letter-spacing: -0.045em;
 }
 
@@ -57,52 +52,17 @@ import { t } from '@fuyeor/vue-locale';
 }
 
 .button-primary {
-  position: relative;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 18px;
-  color: var(--ink);
-  border-radius: 2px;
-  background: var(--lilac);
-  box-shadow: 3px 3px 0 rgba(36, 53, 75, 0.18);
-  font-size: 12px;
-  font-weight: 800;
-  transition:
-    transform 160ms var(--ease-out),
-    background-color 180ms var(--ease-out),
-    box-shadow 180ms var(--ease-out);
-}
-
-.button-primary::before {
-  color: rgba(36, 53, 75, 0.52);
-  content: '#';
-  font:
-    500 10px/1 'IBM Plex Mono',
-    ui-monospace,
-    monospace;
-}
-
-.button-primary:hover {
-  background: #c0b8ed;
-  box-shadow: 5px 5px 0 rgba(36, 53, 75, 0.14);
-  transform: translate(-1px, -2px);
-}
-
-.button-primary:active {
-  transform: scale(0.97);
 }
 
 .campaign-image {
   position: relative;
-  height: 523px;
-  overflow: hidden;
-}
+  overflow: clip;
+  border-radius: var(--radius-lg);
 
-.campaign-main-img {
-  width: 100%;
-  height: 100%;
+  img {
+    width: 100%;
+  }
 }
 
 .campaign-stamp {
@@ -135,10 +95,6 @@ import { t } from '@fuyeor/vue-locale';
     gap: 45px;
     padding: 100px 0;
   }
-
-  .campaign-image {
-    height: 495px;
-  }
 }
 
 @media (width <= 490px) {
@@ -148,10 +104,6 @@ import { t } from '@fuyeor/vue-locale';
 
   .campaign-copy blockquote {
     font-size: 39px;
-  }
-
-  .campaign-image {
-    height: 440px;
   }
 }
 </style>

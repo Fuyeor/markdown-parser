@@ -304,6 +304,7 @@ const handleDeleteAll = async () => {
   left: 2px;
   height: 1em;
   pointer-events: none;
+  opacity: 1 !important;
   transform: rotate(280deg);
 }
 

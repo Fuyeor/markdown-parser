@@ -32,11 +32,11 @@ import TextArea from './component/textarea.vue';
 import Preview from './component/preview.vue';
 import ShareModal from './component/toolbar/share.vue';
 
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onUnmounted } from 'vue';
 import { t, locale } from '@fuyeor/vue-locale';
 import { LayoutAnchor } from '@fuyeor/interactify';
 import { useRoute, useRouter } from '@fuyeor/vue-router';
-import { debounce } from '@fuyeor/commons';
+import { debounce, useTitleStore } from '@fuyeor/commons';
 import { statText } from '@fuyeor/util';
 import { get } from './api';
 import { useIndexedDb, type HistoryDocument } from './composable/useIndexedDb';
@@ -50,6 +50,7 @@ const { mode = 'code' } = defineProps<{
 
 const route = useRoute();
 const router = useRouter();
+const titleStore = useTitleStore();
 
 const {
   documents,
@@ -213,6 +214,24 @@ const loadRouteDocument = async () => {
   replaceSourceIfChanged('');
   isRouteLoading.value = false;
 };
+
+// update title
+watch(
+  currentDocument,
+  (document) => {
+    if (document) {
+      titleStore.setDynamicSegment(document.title);
+    } else {
+      titleStore.clearDynamicSegment();
+    }
+  },
+  { immediate: true },
+);
+
+// clear title
+onUnmounted(() => {
+  titleStore.clearDynamicSegment();
+});
 
 watch(source, (content) => {
   if (!isReady.value || storageError.value || isRouteLoading.value) return;

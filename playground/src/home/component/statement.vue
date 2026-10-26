@@ -1,116 +1,156 @@
-<!-- @/components/Home/HomeStatement.vue -->
+<!-- @/home/component/statement.vue -->
 <template>
   <section class="statement-section">
-    <HomeSectionLabel number="02" syntax="# > **">
+    <section-label number="02" syntax="#">
       {{ t('home.statement.label') }}
-    </HomeSectionLabel>
-    <div class="statement-grid">
-      <div class="statement-main">
-        <p class="statement-overline">{{ t('home.statement.overline') }}</p>
-        <h2>
-          {{ t('home.statement.titleLead') }}<br />
-          {{ t('home.statement.titleMiddle')
-          }}<strong>{{ t('home.statement.titleEmphasis') }}</strong>
-        </h2>
-      </div>
+    </section-label>
+
+    <div v-for="item in statement" :key="item.title" class="statement-grid">
+      <h2>{{ t(item.title) }}</h2>
       <div class="statement-side">
-        <p>{{ t('home.statement.description') }}</p>
-        <router-link :to="{ name: 'Document' }">
-          {{ t('home.statement.cta') }} <span aria-hidden="true">↗</span>
-        </router-link>
+        <p>{{ t(item.desc) }}</p>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import HomeSectionLabel from './section-label.vue';
+import SectionLabel from './section-label.vue';
 
 import { t } from '@fuyeor/vue-locale';
+
+const statement = [
+  {
+    title: 'home.statement.progressive.title',
+    desc: 'home.statement.progressive.desc',
+  },
+  {
+    title: 'home.statement.efficiency.title',
+    desc: 'home.statement.efficiency.desc',
+  },
+  {
+    title: 'home.statement.web.title',
+    desc: 'home.statement.web.desc',
+  },
+];
 </script>
 
 <style scoped>
+h2 {
+  border: none;
+}
+
 .statement-section {
-  width: min(1128px, calc(100% - 150px));
+  width: var(--section-width);
   margin: 0 auto;
-  padding: 155px 0 132px;
+  padding: 40px 0 100px;
 }
 
 .statement-grid {
   display: grid;
-  grid-template-columns: 1.36fr 0.64fr;
   align-items: end;
-  column-gap: 110px;
-  margin-top: 39px;
-}
+  margin-top: 40px;
 
-.statement-overline {
-  margin: 0 0 20px;
-  color: var(--lilac-deep);
-  font:
-    500 11px/1 'IBM Plex Mono',
-    ui-monospace,
-    monospace;
-}
+  h2 {
+    margin: 0;
+    font-family: var(--serif-font);
+    font-weight: 400;
+    font-size: 2rem;
+    letter-spacing: -0.057em;
+  }
 
-.statement-main h2 {
-  margin: 0;
-  font:
-    400 clamp(45px, 4.5vw, 69px)/0.95 'DM Serif Display',
-    Georgia,
-    serif;
-  letter-spacing: -0.057em;
-}
+  h2 {
+    position: relative;
+    width: fit-content;
+    isolation: isolate;
+  }
 
-.statement-main strong {
-  color: var(--lilac-deep);
-  font-weight: 400;
+  h2::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: -8px;
+    right: -8px;
+    bottom: 4px;
+    height: 3.4rem;
+    background: var(--paper-deep);
+    opacity: 0.65;
+    transform: rotate(-1deg);
+    border-radius: 6px;
+  }
 }
 
 .statement-side {
-  padding-bottom: 6px;
-}
+  p {
+    margin: 0 0 26px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.9;
+  }
 
-.statement-side p {
-  margin: 0 0 26px;
-  color: var(--ink-soft);
-  font-size: 14px;
-  line-height: 1.9;
-}
+  /*
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--lilac);
+    font-size: 13px;
+    font-weight: 800;
+  }
 
-.statement-side a {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid var(--lilac);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.statement-side a:hover {
-  color: var(--lilac-deep);
+  a:hover {
+    color: var(--lilac-deep);
+  }
+  */
 }
 
 @media (width <= 900px) {
   .statement-section {
     width: min(100% - 54px, 650px);
-    padding: 100px 0;
+    padding: 30px 0;
   }
 
   .statement-grid {
     grid-template-columns: 1fr;
     gap: 37px;
   }
-
-  .statement-main h2 {
-    font-size: 54px;
-  }
 }
 
 @media (width <= 490px) {
   .statement-section {
     width: calc(100% - 40px);
+  }
+}
+
+.feature-section {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  width: var(--section-width);
+  margin: 0 auto;
+  padding: 74px 0 52px;
+}
+
+.feature-section::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 -3rem;
+  background: var(--paper-deep);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
+
+@media (width <= 900px) {
+  .feature-section {
+    width: 100%;
+    padding: 57px 20px 40px;
+  }
+
+  .feature-section::before {
+    inset: 0;
+    border-radius: 0;
   }
 }
 </style>
