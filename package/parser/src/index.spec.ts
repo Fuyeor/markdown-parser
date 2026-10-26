@@ -29,7 +29,7 @@ type MarkdownCase = {
 };
 
 type MarkdownFixtureFile = {
-  schema_version: number;
+  version: number;
   description: string;
   cases: MarkdownCase[];
 };
@@ -96,7 +96,7 @@ function executeMarkdownSuite(
   ffm: boolean,
 ): void {
   describe(name, () => {
-    expect(fixtureFile.schema_version).toBe(2);
+    expect(fixtureFile.version).toBe(2);
     for (const [index, fixture] of fixtureFile.cases.entries()) {
       it(String(index), () => executeMarkdownCase(fixture, ffm));
     }
@@ -143,11 +143,11 @@ describe('AST field names', () => {
 });
 
 describe('safety fixture', () => {
-  expect(safety.schema_version).toBe(1);
-  for (const fixture of safety.links)
+  expect(safety.version).toBe(1);
+  for (const fixture of safety.link)
     it(`link: ${fixture.input}`, () =>
       expect(isSafeLinkUrl(fixture.input)).toBe(fixture.valid));
-  for (const fixture of safety.colors)
+  for (const fixture of safety.color)
     it(`color: ${fixture.input}`, () =>
       expect(isSafeColorValue(fixture.input)).toBe(fixture.valid));
 });

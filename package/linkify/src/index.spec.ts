@@ -5,7 +5,7 @@ import fixture from '../../../fixture/linkify.json' with { type: 'json' };
 
 // Execute every language-neutral linkify fixture against the TypeScript implementation.
 describe('language-neutral linkify fixture', () => {
-  expect(fixture.schema_version).toBe(1);
+  expect(fixture.version).toBe(1);
 
   for (const [index, item] of fixture.case.entries()) {
     it(String(index), () => {

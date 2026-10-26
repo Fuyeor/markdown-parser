@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
+  "version": 1,
   "description": "Language-neutral URL and color safety fixtures.",
-  "links": [
+  "link": [
     {
       "input": "https://fuyeor.com",
       "valid": true
@@ -23,14 +23,26 @@
       "valid": false
     }
   ],
-  "colors": [
+  "color": [
     {
-      "input": "#fff",
+      "input": "#aea4e4",
+      "valid": true
+    },
+    {
+      "input": "#aea4e400",
       "valid": true
     },
     {
       "input": "rgba(0, 0, 0, 50%)",
       "valid": true
+    },
+    {
+      "input": "#fff",
+      "valid": false
+    },
+    {
+      "input": "#aea4e40",
+      "valid": false
     },
     {
       "input": "red",
